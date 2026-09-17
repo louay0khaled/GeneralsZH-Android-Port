@@ -66,6 +66,13 @@ fi
 
 # --- configure + build -------------------------------------------------------
 cd "${PROJECT_ROOT}"
+
+# GeneralsX @feature Android Arabic RTL 17/09/2026
+# The legacy sentence renderer is intentionally per-glyph. Apply the small,
+# idempotent source hook that preprocesses Arabic into contextual presentation
+# forms and visual RTL order before the normal FreeType/texture path runs.
+python3 "${PROJECT_ROOT}/scripts/build/android/apply-android-arabic-rtl.py"
+
 echo "==> Configuring (preset: android-vulkan)"
 cmake --preset android-vulkan
 
