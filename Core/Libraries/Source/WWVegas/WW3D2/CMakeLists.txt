@@ -160,6 +160,8 @@ set(WW3D2_SRC
     #render2d.h
     render2dsentence.cpp
     render2dsentence.h
+    arabicrtl.cpp
+    arabicrtl.h
     renderobjectrecycler.cpp
     renderobjectrecycler.h
     rendobj.cpp
