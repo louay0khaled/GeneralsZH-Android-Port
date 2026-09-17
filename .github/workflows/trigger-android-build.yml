@@ -25,16 +25,11 @@ jobs:
   dispatch:
     runs-on: ubuntu-latest
     steps:
-      - name: Dispatch Build Android workflow
+      - name: Dispatch optimized Android build
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh workflow run build-android.yml \
+          gh workflow run build-android-fast.yml \
             --repo "${{ github.repository }}" \
-            --ref "${{ github.ref_name }}" \
-            -f preset=android-vulkan \
-            -f version_name= \
-            -f version_code= \
-            -f create_release=false \
-            -f release_notes=
+            --ref "${{ github.ref_name }}"
