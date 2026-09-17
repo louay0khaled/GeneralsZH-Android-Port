@@ -1,0 +1,40 @@
+name: Trigger Android Build
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Core/**'
+      - 'GeneralsMD/**'
+      - 'Dependencies/**'
+      - 'cmake/**'
+      - 'android/**'
+      - 'scripts/build/android/**'
+      - 'Patches/**'
+      - 'CMakeLists.txt'
+      - 'CMakePresets.json'
+      - 'vcpkg.json'
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch Build Android workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run build-android.yml \
+            --repo "${{ github.repository }}" \
+            --ref "${{ github.ref_name }}" \
+            -f preset=android-vulkan \
+            -f version_name= \
+            -f version_code= \
+            -f create_release=false \
+            -f release_notes=
