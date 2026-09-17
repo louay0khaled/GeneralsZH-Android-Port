@@ -1,0 +1,176 @@
+name: Build Android (Optimized)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        type: string
+        description: "Optional versionName override"
+        default: ""
+      version_code:
+        type: string
+        description: "Optional versionCode override"
+        default: ""
+      create_release:
+        type: boolean
+        description: "Create a GitHub Release"
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: android-optimized-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-android:
+    name: apk@android-vulkan-optimized
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      NDK_VERSION: "27.2.12479018"
+      CMDLINE_TOOLS_VERSION: "13114758"
+      CMDLINE_TOOLS_SHA1: "5fdcc763663eefb86a5b8879697aa6088b041e70"
+      VCPKG_COMMIT: "42e4e33e1505c9f47b58c21e0f557c1571b751ee"
+      GX_ANDROID_VERSION_NAME: ${{ inputs.version_name || '' }}
+      GX_ANDROID_VERSION_CODE: ${{ inputs.version_code || '' }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: false
+
+      - name: Checkout DXVK fork submodule
+        run: |
+          set -euo pipefail
+          git submodule update --init --depth 1 references/fbraz3-dxvk
+          git -C references/fbraz3-dxvk submodule update --init --depth 1
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Install Android build tools
+        run: |
+          set -euo pipefail
+          sudo rm -f /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update -qq || sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ninja-build meson pkg-config glslang-tools ccache
+
+      - name: Restore Android SDK cache
+        id: cache-android-sdk
+        uses: actions/cache/restore@v5
+        with:
+          path: /opt/android-sdk
+          key: android-sdk-${{ env.CMDLINE_TOOLS_VERSION }}-ndk${{ env.NDK_VERSION }}-p35-bt35
+
+      - name: Restore vcpkg cache
+        id: cache-vcpkg
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            /opt/vcpkg
+            ~/.cache/vcpkg
+          key: vcpkg-android-${{ runner.os }}-${{ env.VCPKG_COMMIT }}-${{ hashFiles('vcpkg.json', 'vcpkg-lock.json', 'cmake/triplets/arm64-android.cmake') }}
+          restore-keys: |
+            vcpkg-android-${{ runner.os }}-${{ env.VCPKG_COMMIT }}-
+
+      - name: Restore FetchContent source cache
+        id: cache-fetchcontent
+        uses: actions/cache/restore@v5
+        with:
+          path: /opt/fetchcontent-src
+          key: fetchcontent-android-SDL3-3.4.2-SDL3image-3.4.0-openal-1.24.2
+
+      - name: Restore ccache
+        id: cache-ccache
+        uses: actions/cache/restore@v5
+        with:
+          path: ~/.cache/ccache
+          key: ccache-android-optimized-${{ github.run_id }}
+          restore-keys: |
+            ccache-android-optimized-
+
+      - name: Build Android APK (prefetch dependencies before CMake)
+        run: |
+          set -euo pipefail
+          chmod +x scripts/build/android/build-local-sandboxed.sh
+          scripts/build/android/build-local-sandboxed.sh
+
+      - name: Save Android SDK cache
+        if: always() && steps.cache-android-sdk.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: /opt/android-sdk
+          key: android-sdk-${{ env.CMDLINE_TOOLS_VERSION }}-ndk${{ env.NDK_VERSION }}-p35-bt35
+
+      - name: Save vcpkg cache
+        if: always() && steps.cache-vcpkg.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            /opt/vcpkg
+            ~/.cache/vcpkg
+          key: vcpkg-android-${{ runner.os }}-${{ env.VCPKG_COMMIT }}-${{ hashFiles('vcpkg.json', 'vcpkg-lock.json', 'cmake/triplets/arm64-android.cmake') }}
+
+      - name: Save FetchContent source cache
+        if: always() && steps.cache-fetchcontent.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: /opt/fetchcontent-src
+          key: fetchcontent-android-SDL3-3.4.2-SDL3image-3.4.0-openal-1.24.2
+
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.cache/ccache
+          key: ccache-android-optimized-${{ github.run_id }}
+
+      - name: Locate APK
+        id: apk
+        run: |
+          set -euo pipefail
+          src="GeneralsXZH-android-local.apk"
+          test -f "$src"
+          out="GeneralsXZH-android-run${{ github.run_number }}.apk"
+          cp "$src" "$out"
+          echo "path=$out" >> "$GITHUB_OUTPUT"
+          ls -lh "$out"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: GeneralsXZH-android-run${{ github.run_number }}
+          path: ${{ steps.apk.outputs.path }}
+          retention-days: 7
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: android-optimized-logs-${{ github.run_number }}
+          path: logs/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Create GitHub Release
+        if: ${{ inputs.create_release && inputs.version_name != '' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version_name }}
+          name: v${{ inputs.version_name }}
+          files: ${{ steps.apk.outputs.path }}
+          generate_release_notes: true
+          make_latest: true
