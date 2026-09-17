@@ -1,3 +1,22 @@
+# GeneralsX @feature Android Arabic RTL 17/09/2026
+# Apply the idempotent source hook during Android configure as well as from the
+# dedicated Android build script. This keeps the fix active for CI workflows
+# that call CMake directly instead of the helper script.
+if(ANDROID)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    execute_process(
+        COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/build/android/apply-android-arabic-rtl.py"
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        RESULT_VARIABLE GX_ANDROID_RTL_RESULT
+        OUTPUT_VARIABLE GX_ANDROID_RTL_OUTPUT
+        ERROR_VARIABLE GX_ANDROID_RTL_ERROR
+    )
+    if(NOT GX_ANDROID_RTL_RESULT EQUAL 0)
+        message(FATAL_ERROR "Android Arabic RTL source hook failed (${GX_ANDROID_RTL_RESULT}):\\n${GX_ANDROID_RTL_OUTPUT}\\n${GX_ANDROID_RTL_ERROR}")
+    endif()
+    message(STATUS "${GX_ANDROID_RTL_OUTPUT}")
+endif()
+
 set(WW3D2_SRC
     aabtree.cpp
     aabtree.h
@@ -160,6 +179,8 @@ set(WW3D2_SRC
     #render2d.h
     render2dsentence.cpp
     render2dsentence.h
+    arabicrtl.cpp
+    arabicrtl.h
     renderobjectrecycler.cpp
     renderobjectrecycler.h
     rendobj.cpp
