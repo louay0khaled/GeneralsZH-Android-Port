@@ -16,6 +16,11 @@ permissions:
   actions: write
 
 on:
+  # Temporary branch trigger for the GeneralsX server fix build.
+  push:
+    branches:
+      - fix/generalsx-server-20260919
+
   # GeneralsX @bugfix Android CI 01/08/2026 dropped the push: trigger that
   # used to fire a full CI build on every push to main/claude/** touching
   # these paths. This session's actual dev loop builds and checksum-verifies
