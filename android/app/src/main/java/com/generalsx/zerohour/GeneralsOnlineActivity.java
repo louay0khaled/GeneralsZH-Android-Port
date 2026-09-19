@@ -66,7 +66,7 @@ public class GeneralsOnlineActivity extends Activity {
     // the code with a pending login (the site says "return to the game" but
     // CheckLogin never resolves it, so the launcher sits on "Not signed in"
     // with a network-error toast until POLL_MAX_ATTEMPTS gives up).
-    private static final String LOGIN_URL_FMT = "https://www.playgenerals.online/login/?gamecode=%s&client=%s";
+    private static final String LOGIN_URL_FMT = "https://login.generalsx.org/login/?gamecode=%s&client=%s";
     private static final String CLIENT_ID = "custom_third_party_client";
 
     private static final String PREFS_NAME = GeneralsOnlineSession.PREFS_NAME;

@@ -52,7 +52,7 @@ final class GeneralsOnlineSession {
 
     private static final String TAG = "GeneralsOnlineSession";
 
-    static final String API_BASE = "https://api.playgenerals.online/env/prod/contract/1/";
+    static final String API_BASE = "https://online.generalsx.org/env/prod/contract/1/";
 
     // GeneralsX @bugfix Android port 08/30/2026 Mirrors Network_
     // UseAlternativeEndpoint() in the native client (GeneralsOnline_Settings.h/
@@ -64,7 +64,7 @@ final class GeneralsOnlineSession {
     // manual settings toggle; this launcher has no settings screen for it
     // yet, so postJson() below falls back to it automatically whenever the
     // primary host doesn't answer.
-    static final String API_BASE_ALT = "https://api-ru.playgenerals.online/env/prod/contract/1/";
+    static final String API_BASE_ALT = "https://online.generalsx.org/env/prod/contract/1/";
 
     static final String PREFS_NAME = "generalsonline_session";
     static final String PREF_SESSION_TOKEN = "session_token";
