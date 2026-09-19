@@ -271,11 +271,11 @@ std::string NGMP_OnlineServicesManager::GetAPIEndpoint(const char* szEndpoint)
 	{
 		if (NGMP_OnlineServicesManager::Settings.Network_UseAlternativeEndpoint())
 		{
-			return std::format("https://api-ru.playgenerals.online/env/prod/contract/1/{}", szEndpoint);
+			return std::format("https://online.generalsx.org/env/prod/contract/1/{}", szEndpoint);
 		}
 		else
 		{
-			return std::format("https://api.playgenerals.online/env/prod/contract/1/{}", szEndpoint);
+			return std::format("https://online.generalsx.org/env/prod/contract/1/{}", szEndpoint);
 		}
 	}
 }
@@ -831,7 +831,7 @@ void NGMP_OnlineServicesManager::OnLogin(ELoginResult loginResult, const char* s
 		m_pWebSocket = std::make_shared<WebSocket>();
 
 		// TODO_NGMP: This should come from the service, if the service was russia-aware
-		std::string strWebsocketAddr = NGMP_OnlineServicesManager::Settings.Network_UseAlternativeEndpoint() ? "wss://api-ru.playgenerals.online/ws" : std::string(szWSAddr);
+		std::string strWebsocketAddr = NGMP_OnlineServicesManager::Settings.Network_UseAlternativeEndpoint() ? "wss://online.generalsx.org/ws" : std::string(szWSAddr);
 
         m_pWebSocket->Connect(strWebsocketAddr.c_str(), false, [=]()
             {
