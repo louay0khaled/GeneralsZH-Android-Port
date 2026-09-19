@@ -81,7 +81,7 @@ public class GeneralsOnlineActivity extends Activity {
     // changes the observed 403 behavior, the original 1s cadence was too fast.
     // The same interval is used for subsequent polls while the test runs.
     private static final int POLL_INTERVAL_MS = 15000;
-    private static final int POLL_MAX_ATTEMPTS = 180; // ~3 minutes
+    private static final int POLL_MAX_ATTEMPTS = 12; // ~3 minutes at 15s per poll
 
     private static final String CODE_CHARSET =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
