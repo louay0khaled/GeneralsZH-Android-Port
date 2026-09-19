@@ -76,9 +76,11 @@ public class GeneralsOnlineActivity extends Activity {
     private static final String PREF_DISPLAY_NAME = GeneralsOnlineSession.PREF_DISPLAY_NAME;
     private static final String PREF_WS_URI = GeneralsOnlineSession.PREF_WS_URI;
 
-    // Matches the reference client's own 1s poll cadence
-    // (OnlineServices_Auth.cpp::Tick, timeBetweenChecks = 1000).
-    private static final int POLL_INTERVAL_MS = 1000;
+    // Diagnostic experiment: wait 15s before the first CheckLogin poll so
+    // the browser has time to create/load the login session first. If this
+    // changes the observed 403 behavior, the original 1s cadence was too fast.
+    // The same interval is used for subsequent polls while the test runs.
+    private static final int POLL_INTERVAL_MS = 15000;
     private static final int POLL_MAX_ATTEMPTS = 180; // ~3 minutes
 
     private static final String CODE_CHARSET =
