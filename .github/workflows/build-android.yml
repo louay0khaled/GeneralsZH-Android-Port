@@ -16,6 +16,9 @@ permissions:
   actions: write
 
 on:
+  push:
+    branches:
+      - test/online-15s-build
   # GeneralsX @bugfix Android CI 01/08/2026 dropped the push: trigger that
   # used to fire a full CI build on every push to main/claude/** touching
   # these paths. This session's actual dev loop builds and checksum-verifies
