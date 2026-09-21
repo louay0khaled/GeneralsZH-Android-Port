@@ -80,6 +80,13 @@ android {
         }
     }
 
+    // AGP 8.x disables BuildConfig generation by default. GeneralsOnlineSession uses
+    // BuildConfig.VERSION_NAME for the client fingerprint sent to GeneralsX, so
+    // generate the module BuildConfig explicitly instead of removing that metadata.
+    buildFeatures {
+        buildConfig true
+    }
+
     sourceSets {
         main {
             // Both directories are STAGED by scripts/build/android/package-android-zh.sh
