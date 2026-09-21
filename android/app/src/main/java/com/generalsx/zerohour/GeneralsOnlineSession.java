@@ -86,6 +86,11 @@ final class GeneralsOnlineSession {
         String wsUri = "";
     }
 
+    static class LoginCodeResult {
+        boolean success = false;
+        String loginCode = "";
+    }
+
     // GeneralsX @bugfix Android port 08/30/2026 A user reported the network-
     // error screen with no way to see WHY -- no adb, no logcat access, just
     // a generic "check your connection" string. This captures the actual
@@ -96,6 +101,77 @@ final class GeneralsOnlineSession {
     static volatile String lastNetworkErrorDetail = "";
 
     private GeneralsOnlineSession() {
+    }
+
+    // The official GeneralsOnline client first asks the service for a
+    // server-registered pending login code. The web portal completes that
+    // exact pending entry after Discord/Steam authentication; inventing a
+    // random client-side code leaves CheckLogin with no pending entry and
+    // therefore produces HTTP 403 even when browser authentication succeeds.
+    static LoginCodeResult requestLoginCode() {
+        LoginCodeResult result = new LoginCodeResult();
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(API_BASE + "LoginCode");
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
+
+            int status = conn.getResponseCode();
+            if (status < 200 || status >= 300) {
+                lastNetworkErrorDetail = hostOf(API_BASE) + ": HTTP " + status;
+                String snippet = readSnippet(conn.getErrorStream());
+                if (!snippet.isEmpty()) {
+                    lastNetworkErrorDetail += " " + snippet;
+                }
+                return result;
+            }
+
+            JSONObject json = new JSONObject(readAll(conn.getInputStream()));
+            result.success = json.optBoolean("success", false);
+            result.loginCode = json.optString("login_code", "");
+            if (!result.success || result.loginCode.isEmpty()) {
+                lastNetworkErrorDetail = hostOf(API_BASE) + ": LoginCode returned no usable code";
+            } else {
+                lastNetworkErrorDetail = "";
+            }
+            return result;
+        } catch (Exception e) {
+            lastNetworkErrorDetail = hostOf(API_BASE) + ": " + e.getClass().getSimpleName()
+                + (e.getMessage() != null ? ": " + e.getMessage() : "");
+            return result;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+    }
+
+    // Build the same device/application metadata the desktop client sends
+    // with CheckLogin/LoginWithToken. GeneralsX uses these fields for device
+    // registration and client bookkeeping; they are not used as the browser
+    // authentication secret.
+    static void addAndroidClientMetadata(Context ctx, JSONObject body) {
+        try {
+            String androidId = android.provider.Settings.Secure.getString(
+                ctx.getContentResolver(),
+                android.provider.Settings.Secure.ANDROID_ID
+            );
+            if (androidId == null || androidId.isEmpty()) {
+                androidId = "android-unknown";
+            }
+
+            body.put("machine_guid", androidId);
+            body.put("mac_addr", "android:" + androidId);
+            body.put("vol_serial", "android:" + Integer.toHexString(
+                ctx.getFilesDir().getAbsolutePath().hashCode()));
+            body.put("exe_crc", "android-" + com.generalsx.zerohour.BuildConfig.VERSION_NAME);
+            body.put("ini_crc", 0);
+        } catch (Exception ignored) {
+            // Authentication remains valid even if a device identifier is unavailable.
+        }
     }
 
     // Runs on a background thread.
@@ -230,12 +306,13 @@ final class GeneralsOnlineSession {
 
     // Runs on a background thread. Mirrors the reference client's
     // GetCredentials()/LoginWithToken silent-reauth branch.
-    static AuthResult loginWithToken(String refreshToken) {
+    static AuthResult loginWithToken(Context ctx, String refreshToken) {
         JSONObject body = new JSONObject();
         try {
             body.put("reserved_0", "");
             body.put("reserved_1", "");
             body.put("reserved_2", "");
+            addAndroidClientMetadata(ctx, body);
         } catch (Exception e) {
             return null;
         }
