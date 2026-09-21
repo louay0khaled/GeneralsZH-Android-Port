@@ -51,7 +51,6 @@ import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONObject;
 
-import java.security.SecureRandom;
 
 public class GeneralsOnlineActivity extends Activity {
 
@@ -76,20 +75,12 @@ public class GeneralsOnlineActivity extends Activity {
     private static final String PREF_DISPLAY_NAME = GeneralsOnlineSession.PREF_DISPLAY_NAME;
     private static final String PREF_WS_URI = GeneralsOnlineSession.PREF_WS_URI;
 
-    // Diagnostic experiment: wait 15s before the first CheckLogin poll so
-    // the browser has time to create/load the login session first. If this
-    // changes the observed 403 behavior, the original 1s cadence was too fast.
-    // The same interval is used for subsequent polls while the test runs.
-    private static final int POLL_INTERVAL_MS = 15000;
-    private static final int POLL_MAX_ATTEMPTS = 12; // ~3 minutes at 15s per poll
-
-    private static final String CODE_CHARSET =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private static final int CODE_LENGTH = 32;
+    // Match the reference client's 1-second CheckLogin cadence.
+    // The pending server-side login code is valid for five minutes.
+    private static final int POLL_INTERVAL_MS = 1000;
+    private static final int POLL_MAX_ATTEMPTS = 240; // ~4 minutes
 
     private final Handler handler = new Handler(Looper.getMainLooper());
-    private final SecureRandom random = new SecureRandom();
-
     private TextView statusText;
     private MaterialButton signInButton;
     private MaterialButton signOutButton;
@@ -143,14 +134,6 @@ public class GeneralsOnlineActivity extends Activity {
         UiKit.supporting(stepsCard, getString(R.string.online_signin_help));
         signInButton = UiKit.button(stepsCard, UiKit.BTN_PRIMARY, R.drawable.ic_gzh_account,
             getString(R.string.online_button_sign_in), this::onSignIn);
-    }
-
-    private String generateGameCode() {
-        StringBuilder sb = new StringBuilder(CODE_LENGTH);
-        for (int i = 0; i < CODE_LENGTH; ++i) {
-            sb.append(CODE_CHARSET.charAt(random.nextInt(CODE_CHARSET.length())));
-        }
-        return sb.toString();
     }
 
     // If we already have a refresh_token from a previous sign-in, try to
@@ -233,23 +216,52 @@ public class GeneralsOnlineActivity extends Activity {
         if (!ensureNotBatteryOptimized()) {
             return;
         }
+
         busy = true;
         pollAttempt = 0;
         signInButton.setEnabled(false);
+        statusText.setText(R.string.online_status_signing_in);
 
-        String code = generateGameCode();
-        String url = String.format(LOGIN_URL_FMT, code, CLIENT_ID);
-        try {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-        } catch (Exception e) {
-            busy = false;
-            signInButton.setEnabled(true);
-            Toast.makeText(this, getString(R.string.online_toast_no_browser, e.getMessage()), Toast.LENGTH_LONG).show();
-            return;
-        }
+        // IMPORTANT: obtain the pending login code from GeneralsX first.
+        // The web portal marks this exact server-side code as authenticated.
+        // A locally generated code is unknown to the server and causes
+        // CheckLogin to return HTTP 403 after successful Discord auth.
+        new Thread(() -> {
+            GeneralsOnlineSession.LoginCodeResult codeResult =
+                GeneralsOnlineSession.requestLoginCode();
 
-        statusText.setText(R.string.online_status_continue_browser);
-        handler.postDelayed(() -> pollOnce(code), POLL_INTERVAL_MS);
+            handler.post(() -> {
+                if (!codeResult.success || codeResult.loginCode.isEmpty()) {
+                    busy = false;
+                    signInButton.setEnabled(true);
+                    statusText.setText(withNetworkErrorDetail(
+                        getString(R.string.online_status_network_error)));
+                    return;
+                }
+
+                String url = String.format(
+                    LOGIN_URL_FMT,
+                    codeResult.loginCode,
+                    CLIENT_ID
+                );
+
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                } catch (Exception e) {
+                    busy = false;
+                    signInButton.setEnabled(true);
+                    Toast.makeText(
+                        this,
+                        getString(R.string.online_toast_no_browser, e.getMessage()),
+                        Toast.LENGTH_LONG
+                    ).show();
+                    return;
+                }
+
+                statusText.setText(R.string.online_status_continue_browser);
+                handler.postDelayed(() -> pollOnce(codeResult.loginCode), POLL_INTERVAL_MS);
+            });
+        }, "GeneralsOnlineLoginCode").start();
     }
 
     private void pollOnce(String code) {
@@ -323,6 +335,7 @@ public class GeneralsOnlineActivity extends Activity {
             body.put("reserved_0", "");
             body.put("reserved_1", "");
             body.put("reserved_2", "");
+            GeneralsOnlineSession.addAndroidClientMetadata(this, body);
         } catch (Exception e) {
             return null;
         }
@@ -331,7 +344,7 @@ public class GeneralsOnlineActivity extends Activity {
 
     // Runs on a background thread.
     private GeneralsOnlineSession.AuthResult callLoginWithToken(String refreshToken) {
-        return GeneralsOnlineSession.loginWithToken(refreshToken);
+        return GeneralsOnlineSession.loginWithToken(this, refreshToken);
     }
 
     private void saveSession(GeneralsOnlineSession.AuthResult result) {
