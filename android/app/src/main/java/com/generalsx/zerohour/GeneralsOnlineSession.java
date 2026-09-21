@@ -364,7 +364,7 @@ final class GeneralsOnlineSession {
                 Log.i(TAG, "no cached refresh_token; skipping launch-time session refresh");
                 return;
             }
-            AuthResult result = loginWithToken(refreshToken);
+            AuthResult result = loginWithToken(ctx, refreshToken);
             if (result != null && result.state == 1) {
                 saveSession(ctx, result);
                 Log.i(TAG, "session refreshed at launch for user " + result.userId);
