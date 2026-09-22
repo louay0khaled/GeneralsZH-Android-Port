@@ -2,13 +2,13 @@ package com.generalsx.zerohour;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import java.io.File;
 
 /**
  * Central definition of the two supported GeneralsOnline backends.
  *
  * The Android launcher, session cache and native engine all use the same
- * selected server id. Credentials are kept separately per server so switching
- * between servers never mixes refresh/session tokens.
+ * selected server id. Credentials are kept independently per server.
  */
 final class GeneralsOnlineServer {
 
@@ -36,14 +36,21 @@ final class GeneralsOnlineServer {
         if (!isKnown(serverId)) {
             serverId = DEFAULT;
         }
+
+        String oldServer = getSelected(ctx);
+        if (!serverId.equals(oldServer)) {
+            // Never let the native engine pair server B with a session token
+            // that belongs to server A. The per-server refresh tokens stay
+            // cached, but the active native marker is reset and will be
+            // regenerated immediately after a successful login/refresh.
+            new File(ctx.getFilesDir(), GeneralsOnlineSession.SESSION_MARKER_NAME).delete();
+        }
+
         ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .putString(PREF_SELECTED_SERVER, serverId)
             .apply();
 
-        // The native game reads this tiny marker before it creates the
-        // GeneralsOnline manager. Keeping the selection separate from the
-        // session marker also lets a user choose a server before signing in.
         GeneralsOnlineSession.writeSelectedServerMarker(ctx, serverId);
     }
 
@@ -53,7 +60,7 @@ final class GeneralsOnlineServer {
 
     static String subtitle(String serverId) {
         return PLAYGENERALS.equals(serverId)
-            ? "Official GeneralsOnline / playgenerals.online"
+            ? "Original GeneralsOnline / playgenerals.online"
             : "GeneralsX / FBraz3 server";
     }
 
@@ -70,6 +77,7 @@ final class GeneralsOnlineServer {
                 code, clientId
             );
         }
+
         return String.format(
             "https://login.generalsx.org/login/?gamecode=%s&client=%s",
             code, clientId
