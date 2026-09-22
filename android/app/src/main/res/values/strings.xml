@@ -220,4 +220,12 @@
     <string name="setup_render_backend_gles_short">GLES</string>
     <string name="setup_render_backend_gles_angle_short">ANGLE</string>
     <string name="setup_render_backend_vulkan_short">Vulkan</string>
+    <string name="online_card_server">Online Server</string>
+    <string name="online_server_help">Choose which GeneralsOnline backend this installation uses. Your sign-in is saved separately for each server, so you can switch back without mixing sessions.</string>
+    <string name="online_server_playgenerals">Generals Online — playgenerals.online</string>
+    <string name="online_server_generalsx">GeneralsX — FBraz3 server</string>
+    <string name="online_status_signing_in_server">Signing in to %1$s...</string>
+    <string name="online_status_continue_browser_server">Continue in your browser to sign in to %1$s, then return here.</string>
+    <string name="online_status_signed_in_server">%1$s — signed in as %2$s.</string>
+    <string name="online_status_not_signed_in_server">%1$s — not signed in.</string>
 </resources>
