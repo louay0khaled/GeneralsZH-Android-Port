@@ -1,36 +1,7 @@
 /*
 **	Command & Conquer Generals Zero Hour(tm)
 **	Copyright 2025 Electronic Arts Inc.
-**
-**	This program is free software: you can redistribute it and/or modify
-**	it under the terms of the GNU General Public License as published by
-**	the Free Software Foundation, either version 3 of the License, or
-**	(at your option) any later version.
-**
-**	This program is distributed in the hope that it will be useful,
-**	but WITHOUT ANY WARRANTY; without even the implied warranty of
-**	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-**	GNU General Public License for more details.
-**
-**	You should have received a copy of the GNU General Public License
-**	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-// GeneralsX @bugfix Android port 12/07/2026
-//
-// Shared GeneralsOnline session store + HTTP auth calls, extracted from
-// GeneralsOnlineActivity so the GAME activity can refresh the session too.
-//
-// Why: the native game reads a static session_token from the marker file
-// written at sign-in time. GeneralsOnline session tokens expire server-side
-// after a few hours, so a player who signed in earlier in the day got
-// "Could not connect to GeneralsOnline (HTTP response code said error)"
-// (WebSocket + MOTD both rejected 401, confirmed by device log) even though
-// their sign-in "looked" fine. The launcher already caches a refresh_token
-// and knows how to trade it for a fresh session (LoginWithToken) -- the fix
-// is simply to do that on every game launch, before native code reads the
-// marker file, which GeneralsZHActivity.onCreate() now does via
-// refreshSessionAsync().
 
 package com.generalsx.zerohour;
 
@@ -48,34 +19,26 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Shared GeneralsOnline session store + HTTP auth calls.
+ *
+ * Sessions are stored independently for each supported server. The selected
+ * server is also mirrored into a tiny native-readable marker so the C++ game
+ * engine uses the same backend as the browser login that just completed.
+ */
 final class GeneralsOnlineSession {
 
     private static final String TAG = "GeneralsOnlineSession";
 
-    static final String API_BASE = "https://online.generalsx.org/env/prod/contract/1/";
-
-    // GeneralsX @bugfix Android port 08/30/2026 Mirrors Network_
-    // UseAlternativeEndpoint() in the native client (GeneralsOnline_Settings.h/
-    // OnlineServices_Init.cpp), which exists specifically because some
-    // players can't reach api.playgenerals.online directly (ISP/DNS-level
-    // filtering is the documented reason for that setting existing at all)
-    // even though the login WEBSITE (www.playgenerals.online, a different
-    // host) works fine for them. The native client only exposes this as a
-    // manual settings toggle; this launcher has no settings screen for it
-    // yet, so postJson() below falls back to it automatically whenever the
-    // primary host doesn't answer.
-    static final String API_BASE_ALT = "https://online.generalsx.org/env/prod/contract/1/";
-
-    static final String PREFS_NAME = "generalsonline_session";
+    static final String PREFS_NAME = GeneralsOnlineServer.PREFS_NAME;
     static final String PREF_SESSION_TOKEN = "session_token";
     static final String PREF_REFRESH_TOKEN = "refresh_token";
     static final String PREF_USER_ID = "user_id";
     static final String PREF_DISPLAY_NAME = "display_name";
     static final String PREF_WS_URI = "ws_uri";
 
-    // Native code reads this -- same plain-marker-file convention as
-    // gamedata_path.txt (see GeneralsOnline_AndroidGlue.cpp).
     static final String SESSION_MARKER_NAME = "generalsonline_session.txt";
+    static final String SERVER_MARKER_NAME = "generalsonline_server.txt";
 
     static class AuthResult {
         int state = -1;
@@ -86,59 +49,104 @@ final class GeneralsOnlineSession {
         String wsUri = "";
     }
 
-    // GeneralsX @bugfix Android port 08/30/2026 A user reported the network-
-    // error screen with no way to see WHY -- no adb, no logcat access, just
-    // a generic "check your connection" string. This captures the actual
-    // failure (host tried, HTTP status + a body snippet, or the exception)
-    // from the most recent postJson() call so the caller can put it right
-    // on screen. Single mutable field is fine: this launcher only ever runs
-    // one login/refresh attempt at a time.
     static volatile String lastNetworkErrorDetail = "";
 
     private GeneralsOnlineSession() {
     }
 
+    private static String prefKey(String serverId, String baseKey) {
+        return serverId + "_" + baseKey;
+    }
+
+    private static SharedPreferences prefs(Context ctx) {
+        return ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+    }
+
+    /**
+     * Read a server-scoped value. Older Build #11 installs stored GeneralsX
+     * credentials under the old unscoped key names; migrate those lazily so
+     * an update does not force a fresh Discord/browser login.
+     */
+    private static String getString(Context ctx, String serverId, String baseKey) {
+        SharedPreferences p = prefs(ctx);
+        String scoped = p.getString(prefKey(serverId, baseKey), null);
+        if (scoped != null) {
+            return scoped;
+        }
+
+        if (GeneralsOnlineServer.GENERALSX.equals(serverId)) {
+            String legacy = p.getString(baseKey, null);
+            if (legacy != null) {
+                p.edit().putString(prefKey(serverId, baseKey), legacy).apply();
+                return legacy;
+            }
+        }
+        return null;
+    }
+
+    private static long getLong(Context ctx, String serverId, String baseKey, long defaultValue) {
+        SharedPreferences p = prefs(ctx);
+        if (p.contains(prefKey(serverId, baseKey))) {
+            return p.getLong(prefKey(serverId, baseKey), defaultValue);
+        }
+
+        if (GeneralsOnlineServer.GENERALSX.equals(serverId) && p.contains(baseKey)) {
+            long legacy = p.getLong(baseKey, defaultValue);
+            p.edit().putLong(prefKey(serverId, baseKey), legacy).apply();
+            return legacy;
+        }
+        return defaultValue;
+    }
+
     // Runs on a background thread.
-    //
-    // GeneralsX @bugfix Android port 08/30/2026 Falls back to API_BASE_ALT
-    // when the primary host is unreachable or rejects the request at the
-    // transport level. Confirmed live (curl) that api.playgenerals.online
-    // can answer a CheckLogin call with HTTP 403 while still returning a
-    // body shaped exactly like a normal AuthResponse
-    // ({"result":2,"session_token":"",...}) -- postJsonOnce() below now
-    // treats any non-2xx status as a transport failure (null) rather than
-    // trusting that body's "result" field, so a rejected/blocked request
-    // can no longer be misread as "the user's login attempt failed" (it
-    // previously was: state=2 is FAILED, same as a real failed login,
-    // and the UI has no way to tell the two apart). That alone fixed the
-    // mislabeling; this fallback additionally gives blocked requests a
-    // second real chance via the alternate host before giving up.
-    static AuthResult postJson(String endpoint, JSONObject body, String bearerToken) {
+    static AuthResult postJson(String serverId, String endpoint, JSONObject body, String bearerToken) {
+        String primary = GeneralsOnlineServer.apiBase(serverId);
+        String alternate = alternateApiBase(serverId);
+
         StringBuilder errors = new StringBuilder();
-        AuthResult result = postJsonOnce(API_BASE, endpoint, body, bearerToken, errors);
+        AuthResult result = postJsonOnce(primary, endpoint, body, bearerToken, errors);
         if (result != null) {
             lastNetworkErrorDetail = "";
             return result;
         }
-        Log.w(TAG, "primary API endpoint (" + API_BASE + ") unreachable or rejected the request; retrying via alternate endpoint");
-        result = postJsonOnce(API_BASE_ALT, endpoint, body, bearerToken, errors);
+
+        // The original service historically exposed an alternate Russian API
+        // hostname. GeneralsX currently has one API hostname, so do not issue
+        // a duplicate request there.
+        if (alternate != null && !alternate.equals(primary)) {
+            Log.w(TAG, "primary API endpoint (" + primary + ") failed; retrying via alternate endpoint");
+            result = postJsonOnce(alternate, endpoint, body, bearerToken, errors);
+        }
+
         lastNetworkErrorDetail = errors.toString().trim();
         if (result != null) {
             lastNetworkErrorDetail = "";
         } else {
-            Log.w(TAG, "both API endpoints failed for " + endpoint + ": " + lastNetworkErrorDetail);
+            Log.w(TAG, "API request failed for server=" + serverId + ", endpoint=" + endpoint + ": " + lastNetworkErrorDetail);
         }
         return result;
     }
 
-    private static AuthResult postJsonOnce(String base, String endpoint, JSONObject body, String bearerToken, StringBuilder errorOut) {
+    private static String alternateApiBase(String serverId) {
+        if (GeneralsOnlineServer.PLAYGENERALS.equals(serverId)) {
+            return "https://api-ru.playgenerals.online/env/prod/contract/1/";
+        }
+        return null;
+    }
+
+    private static AuthResult postJsonOnce(
+            String base,
+            String endpoint,
+            JSONObject body,
+            String bearerToken,
+            StringBuilder errorOut) {
         HttpURLConnection conn = null;
         try {
             URL url = new URL(base + endpoint);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
-            if (bearerToken != null) {
+            if (bearerToken != null && !bearerToken.isEmpty()) {
                 conn.setRequestProperty("Authorization", "Bearer " + bearerToken);
             }
             conn.setConnectTimeout(10000);
@@ -151,10 +159,6 @@ final class GeneralsOnlineSession {
 
             int status = conn.getResponseCode();
             if (status < 200 || status >= 300) {
-                // See the class-level comment on postJson(): a non-2xx
-                // response is a transport/policy rejection, not an answer
-                // about the login attempt itself, even when its body
-                // happens to parse as a valid-looking AuthResponse.
                 errorOut.append(hostOf(base)).append(": HTTP ").append(status);
                 String snippet = readSnippet(conn.getErrorStream());
                 if (!snippet.isEmpty()) {
@@ -163,13 +167,14 @@ final class GeneralsOnlineSession {
                 errorOut.append("; ");
                 return null;
             }
+
             java.io.InputStream in = conn.getInputStream();
             if (in == null) {
                 errorOut.append(hostOf(base)).append(": empty response body; ");
                 return null;
             }
-            JSONObject json = new JSONObject(readAll(in));
 
+            JSONObject json = new JSONObject(readAll(in));
             AuthResult result = new AuthResult();
             result.state = json.optInt("result", -1);
             result.sessionToken = json.optString("session_token", "");
@@ -200,15 +205,12 @@ final class GeneralsOnlineSession {
         }
     }
 
-    // Best-effort, truncated: this is for on-screen diagnostics, not a full
-    // dump -- a WAF/proxy error page can be arbitrarily large.
     private static String readSnippet(java.io.InputStream in) {
         if (in == null) {
             return "";
         }
         try {
-            String body = readAll(in);
-            body = body.replaceAll("\\s+", " ").trim();
+            String body = readAll(in).replaceAll("\\s+", " ").trim();
             if (body.length() > 200) {
                 body = body.substring(0, 200) + "...";
             }
@@ -228,9 +230,7 @@ final class GeneralsOnlineSession {
         return buf.toString("UTF-8");
     }
 
-    // Runs on a background thread. Mirrors the reference client's
-    // GetCredentials()/LoginWithToken silent-reauth branch.
-    static AuthResult loginWithToken(String refreshToken) {
+    static AuthResult loginWithToken(String serverId, String refreshToken) {
         JSONObject body = new JSONObject();
         try {
             body.put("reserved_0", "");
@@ -239,61 +239,96 @@ final class GeneralsOnlineSession {
         } catch (Exception e) {
             return null;
         }
-        return postJson("LoginWithToken", body, refreshToken);
+        return postJson(serverId, "LoginWithToken", body, refreshToken);
     }
 
-    static void saveSession(Context ctx, AuthResult result) {
-        ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
-            .putString(PREF_SESSION_TOKEN, result.sessionToken)
-            .putString(PREF_REFRESH_TOKEN, result.refreshToken)
-            .putLong(PREF_USER_ID, result.userId)
-            .putString(PREF_DISPLAY_NAME, result.displayName)
-            .putString(PREF_WS_URI, result.wsUri)
+    static void saveSession(Context ctx, String serverId, AuthResult result) {
+        prefs(ctx).edit()
+            .putString(prefKey(serverId, PREF_SESSION_TOKEN), result.sessionToken)
+            .putString(prefKey(serverId, PREF_REFRESH_TOKEN), result.refreshToken)
+            .putLong(prefKey(serverId, PREF_USER_ID), result.userId)
+            .putString(prefKey(serverId, PREF_DISPLAY_NAME), result.displayName)
+            .putString(prefKey(serverId, PREF_WS_URI), result.wsUri)
             .apply();
 
-        // Plain marker file for native code -- one "key=value" per line, no
-        // secrets beyond what's already only readable by this app's own uid.
+        writeSelectedServerMarker(ctx, serverId);
+
         File marker = new File(ctx.getFilesDir(), SESSION_MARKER_NAME);
         try (FileWriter w = new FileWriter(marker, false)) {
+            w.write("server_id=" + serverId + "\n");
             w.write("session_token=" + result.sessionToken + "\n");
             w.write("user_id=" + result.userId + "\n");
             w.write("display_name=" + result.displayName + "\n");
             w.write("ws_uri=" + result.wsUri + "\n");
         } catch (IOException e) {
-            // Not fatal: the game will report the connection failure itself.
+            Log.w(TAG, "could not write native session marker", e);
         }
     }
 
-    static void clearSession(Context ctx) {
-        ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().clear().apply();
-        new File(ctx.getFilesDir(), SESSION_MARKER_NAME).delete();
+    static void writeSelectedServerMarker(Context ctx, String serverId) {
+        File marker = new File(ctx.getFilesDir(), SERVER_MARKER_NAME);
+        try (FileWriter w = new FileWriter(marker, false)) {
+            w.write(serverId);
+            w.write("\n");
+        } catch (IOException e) {
+            Log.w(TAG, "could not write selected-server marker", e);
+        }
     }
 
-    /**
-     * Fire-and-forget session refresh at game launch: if a refresh_token is
-     * cached, trade it for a fresh session token and rewrite the marker file
-     * BEFORE the player can reach the Online button (one small HTTPS POST vs
-     * tens of seconds of engine startup -- the race is theoretical). On any
-     * failure the existing marker is left untouched: if the old token is
-     * still valid the game works as before, and if it expired the game shows
-     * the same connect error it always did (nothing gets worse offline).
-     */
+    static void clearSession(Context ctx, String serverId) {
+        SharedPreferences.Editor e = prefs(ctx).edit();
+        e.remove(prefKey(serverId, PREF_SESSION_TOKEN));
+        e.remove(prefKey(serverId, PREF_REFRESH_TOKEN));
+        e.remove(prefKey(serverId, PREF_USER_ID));
+        e.remove(prefKey(serverId, PREF_DISPLAY_NAME));
+        e.remove(prefKey(serverId, PREF_WS_URI));
+
+        // Remove legacy unscoped keys left by Build #11 when the selected
+        // server is GeneralsX; other servers never used those keys.
+        if (GeneralsOnlineServer.GENERALSX.equals(serverId)) {
+            e.remove(PREF_SESSION_TOKEN);
+            e.remove(PREF_REFRESH_TOKEN);
+            e.remove(PREF_USER_ID);
+            e.remove(PREF_DISPLAY_NAME);
+            e.remove(PREF_WS_URI);
+        }
+        e.apply();
+
+        File marker = new File(ctx.getFilesDir(), SESSION_MARKER_NAME);
+        marker.delete();
+        writeSelectedServerMarker(ctx, serverId);
+    }
+
+    static String getRefreshToken(Context ctx, String serverId) {
+        return getString(ctx, serverId, PREF_REFRESH_TOKEN);
+    }
+
+    static String getSessionToken(Context ctx, String serverId) {
+        return getString(ctx, serverId, PREF_SESSION_TOKEN);
+    }
+
+    static String getDisplayName(Context ctx, String serverId) {
+        return getString(ctx, serverId, PREF_DISPLAY_NAME);
+    }
+
     static void refreshSessionAsync(Context appContext) {
         final Context ctx = appContext.getApplicationContext();
+        final String serverId = GeneralsOnlineServer.getSelected(ctx);
+
         new Thread(() -> {
-            SharedPreferences prefs = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-            String refreshToken = prefs.getString(PREF_REFRESH_TOKEN, null);
+            String refreshToken = getRefreshToken(ctx, serverId);
             if (refreshToken == null || refreshToken.isEmpty()) {
-                Log.i(TAG, "no cached refresh_token; skipping launch-time session refresh");
+                Log.i(TAG, "no cached refresh_token for server=" + serverId);
                 return;
             }
-            AuthResult result = loginWithToken(refreshToken);
+
+            AuthResult result = loginWithToken(serverId, refreshToken);
             if (result != null && result.state == 1) {
-                saveSession(ctx, result);
-                Log.i(TAG, "session refreshed at launch for user " + result.userId);
+                saveSession(ctx, serverId, result);
+                Log.i(TAG, "session refreshed at launch for server=" + serverId + ", user=" + result.userId);
             } else {
-                Log.w(TAG, "launch-time session refresh failed (state="
-                    + (result != null ? result.state : "network-error")
+                Log.w(TAG, "launch-time refresh failed for server=" + serverId
+                    + " (state=" + (result != null ? result.state : "network-error")
                     + "); keeping existing session marker");
             }
         }, "GeneralsOnlineSessionRefresh").start();
