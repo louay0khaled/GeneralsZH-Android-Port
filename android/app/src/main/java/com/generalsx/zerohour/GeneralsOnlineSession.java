@@ -228,6 +228,72 @@ final class GeneralsOnlineSession {
         return buf.toString("UTF-8");
     }
 
+    // The official GeneralsOnline client does NOT invent the browser code locally.
+    // It first asks the service for LoginCode, which creates a PendingLoginEntry
+    // server-side. CheckLogin can only consume a code that exists there.
+    //
+    // This was the missing link in the Android port: it generated a random 32-character
+    // code locally, so after Discord authentication the server could not find that code
+    // and correctly returned HTTP 403 {"result":2,...,"ws_uri":""}.
+    static String getLoginCode() {
+        StringBuilder errors = new StringBuilder();
+        String code = getLoginCodeOnce(API_BASE, errors);
+        if (code.isEmpty()) {
+            Log.w(TAG, "primary LoginCode endpoint failed; retrying via alternate endpoint");
+            code = getLoginCodeOnce(API_BASE_ALT, errors);
+        }
+        lastNetworkErrorDetail = errors.toString().trim();
+        if (!code.isEmpty()) {
+            lastNetworkErrorDetail = "";
+        }
+        return code;
+    }
+
+    private static String getLoginCodeOnce(String base, StringBuilder errorOut) {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(base + "LoginCode");
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
+
+            int status = conn.getResponseCode();
+            java.io.InputStream in = (status >= 200 && status < 300)
+                ? conn.getInputStream() : conn.getErrorStream();
+            String body = in == null ? "" : readAll(in);
+
+            if (status < 200 || status >= 300) {
+                errorOut.append(hostOf(base)).append(": HTTP ").append(status);
+                String snippet = body.replaceAll("\\\\s+", " ").trim();
+                if (snippet.length() > 200) snippet = snippet.substring(0, 200) + "...";
+                if (!snippet.isEmpty()) errorOut.append(" ").append(snippet);
+                errorOut.append("; ");
+                return "";
+            }
+
+            JSONObject json = new JSONObject(body);
+            if (!json.optBoolean("success", false)) {
+                errorOut.append(hostOf(base)).append(": LoginCode returned success=false; ");
+                return "";
+            }
+
+            String code = json.optString("login_code", "");
+            if (code.isEmpty()) {
+                errorOut.append(hostOf(base)).append(": LoginCode returned an empty login_code; ");
+            }
+            return code;
+        } catch (Exception e) {
+            errorOut.append(hostOf(base)).append(": ").append(e.getClass().getSimpleName());
+            if (e.getMessage() != null) errorOut.append(": ").append(e.getMessage());
+            errorOut.append("; ");
+            return "";
+        } finally {
+            if (conn != null) conn.disconnect();
+        }
+    }
+
     // Runs on a background thread. Mirrors the reference client's
     // GetCredentials()/LoginWithToken silent-reauth branch.
     static AuthResult loginWithToken(String refreshToken) {
