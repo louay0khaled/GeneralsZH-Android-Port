@@ -94,38 +94,38 @@ namespace
 const char* GeneralsOnline_GetSelectedServerId()
 {
 #if defined(__ANDROID__)
-\tstatic std::string selectedServer = "generalsx";
-\tconst char* internalPath = SDL_GetAndroidInternalStoragePath();
-\tif (internalPath == nullptr)
-\t{
-\t\treturn selectedServer.c_str();
-\t}
+	static std::string selectedServer = "generalsx";
+	const char* internalPath = SDL_GetAndroidInternalStoragePath();
+	if (internalPath == nullptr)
+	{
+	\treturn selectedServer.c_str();
+	}
 
-\tchar markerPath[1024];
-\tsnprintf(markerPath, sizeof(markerPath), "%s/generalsonline_server.txt", internalPath);
-\tFILE* f = fopen(markerPath, "r");
-\tif (f == nullptr)
-\t{
-\t\treturn selectedServer.c_str();
-\t}
+	char markerPath[1024];
+	snprintf(markerPath, sizeof(markerPath), "%s/generalsonline_server.txt", internalPath);
+	FILE* f = fopen(markerPath, "r");
+	if (f == nullptr)
+	{
+	\treturn selectedServer.c_str();
+	}
 
-\tchar line[128];
-\tif (fgets(line, sizeof(line), f) != nullptr)
-\t{
-\t\tsize_t len = strlen(line);
-\t\twhile (len > 0 && (line[len - 1] == '\\n' || line[len - 1] == '\\r'))
-\t\t{
-\t\t\tline[--len] = '\\0';
-\t\t}
-\t\tif (strcmp(line, "playgenerals") == 0 || strcmp(line, "generalsx") == 0)
-\t\t{
-\t\t\tselectedServer = line;
-\t\t}
-\t}
-\tfclose(f);
-\treturn selectedServer.c_str();
+	char line[128];
+	if (fgets(line, sizeof(line), f) != nullptr)
+	{
+	\tsize_t len = strlen(line);
+	\twhile (len > 0 && (line[len - 1] == '\n' || line[len - 1] == '\r'))
+	\t{
+	\t\tline[--len] = '\0';
+	\t}
+	\tif (strcmp(line, "playgenerals") == 0 || strcmp(line, "generalsx") == 0)
+	\t{
+	\t\tselectedServer = line;
+	\t}
+	}
+	fclose(f);
+	return selectedServer.c_str();
 #else
-\treturn "generalsx";
+	return "generalsx";
 #endif
 }
 
