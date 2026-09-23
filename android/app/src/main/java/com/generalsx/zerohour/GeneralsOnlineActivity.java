@@ -43,6 +43,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Build;
+import android.provider.Settings;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,7 +53,6 @@ import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONObject;
 
-import java.security.SecureRandom;
 
 public class GeneralsOnlineActivity extends Activity {
 
@@ -60,14 +61,10 @@ public class GeneralsOnlineActivity extends Activity {
     // the session token at game launch (they expire server-side within
     // hours; a stale marker file made the game's Online button fail with
     // "HTTP response code said error"/401 despite a "valid" local session).
-    // GeneralsX @bugfix Android port 10/07/2026 the reference client
-    // (OnlineServices_Auth.cpp BeginLogin) always appends &client=<id> to
-    // this URL -- without it the site apparently doesn't reliably associate
-    // the code with a pending login (the site says "return to the game" but
-    // CheckLogin never resolves it, so the launcher sits on "Not signed in"
-    // with a network-error toast until POLL_MAX_ATTEMPTS gives up).
-    private static final String LOGIN_URL_FMT = "https://login.generalsx.org/login/?gamecode=%s&client=%s";
-    private static final String CLIENT_ID = "custom_third_party_client";
+    // Mirror the official GeneralsOnline game client. The pending game code
+    // is enough for the browser URL; the client identity belongs in CheckLogin.
+    private static final String LOGIN_URL_FMT = "https://login.generalsx.org/login/?gamecode=%s";
+    private static final String CLIENT_ID = "gen_online_60hz";
 
     private static final String PREFS_NAME = GeneralsOnlineSession.PREFS_NAME;
     private static final String PREF_SESSION_TOKEN = GeneralsOnlineSession.PREF_SESSION_TOKEN;
