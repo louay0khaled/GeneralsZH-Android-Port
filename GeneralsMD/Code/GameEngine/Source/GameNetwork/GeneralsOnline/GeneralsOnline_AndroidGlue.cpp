@@ -90,6 +90,45 @@ namespace
 }
 #endif // __ANDROID__
 
+
+const char* GeneralsOnline_GetSelectedServerId()
+{
+#if defined(__ANDROID__)
+	static std::string selectedServer = "generalsx";
+	const char* internalPath = SDL_GetAndroidInternalStoragePath();
+	if (internalPath == nullptr)
+	{
+	\treturn selectedServer.c_str();
+	}
+
+	char markerPath[1024];
+	snprintf(markerPath, sizeof(markerPath), "%s/generalsonline_server.txt", internalPath);
+	FILE* f = fopen(markerPath, "r");
+	if (f == nullptr)
+	{
+	\treturn selectedServer.c_str();
+	}
+
+	char line[128];
+	if (fgets(line, sizeof(line), f) != nullptr)
+	{
+	\tsize_t len = strlen(line);
+	\twhile (len > 0 && (line[len - 1] == '\n' || line[len - 1] == '\r'))
+	\t{
+	\t\tline[--len] = '\0';
+	\t}
+	\tif (strcmp(line, "playgenerals") == 0 || strcmp(line, "generalsx") == 0)
+	\t{
+	\t\tselectedServer = line;
+	\t}
+	}
+	fclose(f);
+	return selectedServer.c_str();
+#else
+	return "generalsx";
+#endif
+}
+
 bool TryStartGeneralsOnline()
 {
 #if defined(__ANDROID__)

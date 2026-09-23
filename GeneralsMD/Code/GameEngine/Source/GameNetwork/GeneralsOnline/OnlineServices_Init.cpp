@@ -1,4 +1,5 @@
 #include "GameNetwork/GeneralsOnline/NGMP_interfaces.h"
+#include "GameNetwork/GeneralsOnline/GeneralsOnline_AndroidGlue.h"
 #include "GameNetwork/GeneralsOnline/HTTP/HTTPManager.h"
 #include "GameNetwork/GeneralsOnline/json.hpp"
 #include "GameClient/MessageBox.h"
@@ -269,14 +270,23 @@ std::string NGMP_OnlineServicesManager::GetAPIEndpoint(const char* szEndpoint)
 	}
 	else // PROD
 	{
+#if defined(__ANDROID__)
+		// Android uses the same backend selected by the launcher/browser login.
+		// This removes the old hard-coded GeneralsX endpoint and prevents a
+		// session from one server being sent to the other server.
+		const std::string selectedServer = GeneralsOnline_GetSelectedServerId();
+		if (selectedServer == "playgenerals")
+		{
+			return std::format("https://api.playgenerals.online/env/prod/contract/1/{}", szEndpoint);
+		}
+		return std::format("https://online.generalsx.org/env/prod/contract/1/{}", szEndpoint);
+#else
 		if (NGMP_OnlineServicesManager::Settings.Network_UseAlternativeEndpoint())
 		{
 			return std::format("https://online.generalsx.org/env/prod/contract/1/{}", szEndpoint);
 		}
-		else
-		{
-			return std::format("https://online.generalsx.org/env/prod/contract/1/{}", szEndpoint);
-		}
+		return std::format("https://api.playgenerals.online/env/prod/contract/1/{}", szEndpoint);
+#endif
 	}
 }
 
@@ -830,8 +840,15 @@ void NGMP_OnlineServicesManager::OnLogin(ELoginResult loginResult, const char* s
 		// connect to WS
 		m_pWebSocket = std::make_shared<WebSocket>();
 
-		// TODO_NGMP: This should come from the service, if the service was russia-aware
-		std::string strWebsocketAddr = NGMP_OnlineServicesManager::Settings.Network_UseAlternativeEndpoint() ? "wss://online.generalsx.org/ws" : std::string(szWSAddr);
+#if defined(__ANDROID__)
+		// The selected server returns its own ws_uri in AuthResponse. Use that
+		// value so PlayGenerals and GeneralsX remain completely independent.
+		std::string strWebsocketAddr = szWSAddr != nullptr ? std::string(szWSAddr) : std::string();
+#else
+		std::string strWebsocketAddr = NGMP_OnlineServicesManager::Settings.Network_UseAlternativeEndpoint()
+			? "wss://online.generalsx.org/ws"
+			: std::string(szWSAddr);
+#endif
 
         m_pWebSocket->Connect(strWebsocketAddr.c_str(), false, [=]()
             {
