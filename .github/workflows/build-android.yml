@@ -20,6 +20,7 @@ on:
   push:
     branches:
       - fix/generalsx-server-20260919
+      - feature/online-server-selector-20260922
 
   # GeneralsX @bugfix Android CI 01/08/2026 dropped the push: trigger that
   # used to fire a full CI build on every push to main/claude/** touching
