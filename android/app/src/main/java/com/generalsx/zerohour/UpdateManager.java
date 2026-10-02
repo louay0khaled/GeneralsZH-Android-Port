@@ -364,6 +364,12 @@ final class UpdateManager {
 
     /** The CDN has a patch version other than the installed one (as of the last check). */
     static boolean datapackNewerAvailable(Context ctx) {
+        if (DataPackInstaller.isManualInstall(ctx)) {
+            // A manually copied package has no trustworthy launcher version metadata.
+            // Do not compare the sentinel against the CDN version and immediately
+            // force a re-download of files that are already present.
+            return false;
+        }
         String installed = DataPackInstaller.installedVersion(ctx);
         String latest = datapackLatestSeen(ctx);
         return installed != null && latest != null && !latest.equals(installed);
@@ -394,6 +400,11 @@ final class UpdateManager {
      * more, so cross-play claims the number of the PC release this device actually has.
      */
     static boolean datapackUpdateWanted(Context ctx) {
+        if (DataPackInstaller.isManualInstall(ctx)) {
+            // The community patch is already present on disk. Its missing launcher
+            // bookkeeping must not turn "manual install" into an endless download loop.
+            return false;
+        }
         String installed = DataPackInstaller.installedVersion(ctx);
         if (installed == null) {
             return false;
