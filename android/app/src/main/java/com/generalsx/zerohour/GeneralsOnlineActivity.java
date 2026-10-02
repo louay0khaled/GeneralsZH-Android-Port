@@ -348,7 +348,7 @@ public class GeneralsOnlineActivity extends Activity {
         // CDN release. The player can remove the manual patch and install a
         // managed release later.
         dataPackButton.setEnabled(signedIn && !dataPackBusy && !manualInstall);
-        dataPackDeleteButton.setEnabled(installed && !dataPackBusy);
+        dataPackDeleteButton.setEnabled(installed && !dataPackBusy && !manualInstall);
         dataPackSwitch.setEnabled(installed);
         dataPackSwitch.setChecked(DataPackInstaller.isEnabled());
 
