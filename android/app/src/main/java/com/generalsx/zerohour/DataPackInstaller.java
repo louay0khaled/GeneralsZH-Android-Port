@@ -360,7 +360,32 @@ final class DataPackInstaller {
             // a half-downloaded package is this app's business and should not
             // survive being killed mid-download.
             tempZip = new File(ctx.getCacheDir(), "generalsonline-datapack.zip");
-            String actualSha = download(downloadUrl, tempZip, expectedSize, progress);
+            String actualSha;
+            try {
+                actualSha = download(downloadUrl, tempZip, expectedSize, progress);
+            } catch (IOException firstDownloadError) {
+                // A stale CDN edge may also expose the previous release's size,
+                // so retry size mismatches through the same fresh-manifest path
+                // used for a SHA mismatch.
+                if (firstDownloadError.getMessage() == null
+                    || !firstDownloadError.getMessage().startsWith("download size mismatch")) {
+                    throw firstDownloadError;
+                }
+                NetworkTrace.write(ctx, "[datapack] size mismatch on first fetch: "
+                    + firstDownloadError.getMessage()
+                    + "; refreshing manifest and retrying");
+                tempZip.delete();
+                progress.onChecking();
+                manifest = new JSONObject(fetchTextFresh(manifestUrl(ctx)));
+                version = manifest.optString("version", "");
+                downloadUrl = manifest.optString("download_url", "");
+                expectedSize = manifest.optLong("size", -1);
+                expectedSha = manifest.optString("sha256", "");
+                if (downloadUrl.isEmpty() || !downloadUrl.startsWith("https://")) {
+                    return Result.failure("manifest has no usable download URL");
+                }
+                actualSha = download(downloadUrl, tempZip, expectedSize, progress);
+            }
 
             if (!expectedSha.isEmpty() && !expectedSha.equalsIgnoreCase(actualSha)) {
                 // A CDN edge can briefly serve an older ZIP while the manifest
