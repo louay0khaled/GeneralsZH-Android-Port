@@ -99,6 +99,8 @@ final class DataPackInstaller {
 
     private static final String PREFS_NAME = "generals_online";
     private static final String PREF_INSTALLED_VERSION = "datapack_version";
+    private static final String PREF_MANUAL_INSTALLED = "datapack_manual_installed";
+    private static final String MANUAL_VERSION = "manual";
 
     /**
      * Presence turns the patch off without removing it, and the engine is the
@@ -127,11 +129,49 @@ final class DataPackInstaller {
     }
 
     static String installedVersion(Context ctx) {
-        String version = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        File patch = communityPatchFile();
+        if (!patch.isFile()) {
+            ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit().remove(PREF_INSTALLED_VERSION).remove(PREF_MANUAL_INSTALLED).apply();
+            return null;
+        }
+
+        if (ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .getBoolean(PREF_MANUAL_INSTALLED, false)) {
+            return MANUAL_VERSION;
+        }
+
+        return ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(PREF_INSTALLED_VERSION, null);
-        // A recorded version with the file gone is worse than no record: it
-        // would report "installed" for data the player has since deleted.
-        return communityPatchFile().isFile() ? version : null;
+    }
+
+    /** Adopt a community patch copied into user data outside this launcher. */
+    static boolean adoptManualInstall(Context ctx) {
+        if (!communityPatchFile().isFile()) {
+            return false;
+        }
+        android.content.SharedPreferences prefs =
+            ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        if (prefs.getString(PREF_INSTALLED_VERSION, null) != null) {
+            return false;
+        }
+        if (prefs.getBoolean(PREF_MANUAL_INSTALLED, false)) {
+            return true;
+        }
+        prefs.edit()
+            .remove(PREF_INSTALLED_VERSION)
+            .putBoolean(PREF_MANUAL_INSTALLED, true)
+            .apply();
+        NetworkTrace.write(ctx,
+            "[datapack] adopted manually installed community data from " +
+            communityPatchFile().getAbsolutePath());
+        return true;
+    }
+
+    static boolean isManualInstall(Context ctx) {
+        return communityPatchFile().isFile()
+            && ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .getBoolean(PREF_MANUAL_INSTALLED, false);
     }
 
     static boolean isEnabled() {
@@ -292,7 +332,7 @@ final class DataPackInstaller {
         File tempZip = null;
         try {
             progress.onChecking();
-            JSONObject manifest = new JSONObject(fetchText(manifestUrl(ctx)));
+            JSONObject manifest = new JSONObject(fetchText(manifestUrl(ctx), false));
             String version = manifest.optString("version", "");
             String downloadUrl = manifest.optString("download_url", "");
             long expectedSize = manifest.optLong("size", -1);
@@ -312,13 +352,27 @@ final class DataPackInstaller {
             String actualSha = download(downloadUrl, tempZip, expectedSize, progress);
 
             if (!expectedSha.isEmpty() && !expectedSha.equalsIgnoreCase(actualSha)) {
-                // The manifest publishes a digest; ignoring it would make this
-                // a download that installs whatever arrived, which for files
-                // the game then treats as authoritative data is not a risk
-                // worth taking for the two lines it saves.
-                NetworkTrace.write(ctx, "[datapack] checksum mismatch: expected "
-                    + expectedSha + " got " + actualSha);
-                return Result.failure("checksum mismatch");
+                // A CDN edge can briefly serve an older ZIP while the manifest
+                // already describes a newer release. Keep verification strict,
+                // but refresh the manifest and retry once before failing.
+                NetworkTrace.write(ctx, "[datapack] checksum mismatch on first fetch: expected "
+                    + expectedSha + " got " + actualSha + "; refreshing manifest and retrying");
+                tempZip.delete();
+                progress.onChecking();
+                manifest = new JSONObject(fetchTextFresh(manifestUrl(ctx)));
+                version = manifest.optString("version", "");
+                downloadUrl = manifest.optString("download_url", "");
+                expectedSize = manifest.optLong("size", -1);
+                expectedSha = manifest.optString("sha256", "");
+                if (downloadUrl.isEmpty() || !downloadUrl.startsWith("https://")) {
+                    return Result.failure("manifest has no usable download URL");
+                }
+                actualSha = download(downloadUrl, tempZip, expectedSize, progress);
+                if (!expectedSha.isEmpty() && !expectedSha.equalsIgnoreCase(actualSha)) {
+                    NetworkTrace.write(ctx, "[datapack] checksum mismatch after refresh: expected "
+                        + expectedSha + " got " + actualSha);
+                    return Result.failure("checksum mismatch");
+                }
             }
 
             progress.onInstalling();
@@ -331,7 +385,10 @@ final class DataPackInstaller {
                 + " file(s) into " + target.getAbsolutePath());
 
             ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .edit().putString(PREF_INSTALLED_VERSION, version).apply();
+                .edit()
+                .remove(PREF_MANUAL_INSTALLED)
+                .putString(PREF_INSTALLED_VERSION, version)
+                .apply();
             UpdateManager.noteDatapackLatest(ctx, version);
 
             return Result.success(version, written.size());
@@ -348,13 +405,17 @@ final class DataPackInstaller {
         }
     }
 
-    private static String fetchText(String url) throws IOException {
+    private static String fetchText(String url, boolean fresh) throws IOException {
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) new URL(url).openConnection();
             conn.setConnectTimeout(15000);
             conn.setReadTimeout(20000);
+            conn.setUseCaches(!fresh);
             conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Cache-Control", fresh ? "no-cache, no-store" : "no-cache");
+            conn.setRequestProperty("Pragma", "no-cache");
+            conn.setRequestProperty("Accept-Encoding", "identity");
 
             int status = conn.getResponseCode();
             if (status != 200) {
@@ -371,6 +432,12 @@ final class DataPackInstaller {
         }
     }
 
+    /** Fetch the manifest with a cache-busting query after an integrity mismatch. */
+    private static String fetchTextFresh(String url) throws IOException {
+        String separator = url.contains("?") ? "&" : "?";
+        return fetchText(url + separator + "_gx_refresh=" + System.currentTimeMillis(), true);
+    }
+
     /** Streams the package to disk and returns its SHA-256, lowercase hex. */
     private static String download(String url, File dest, long expectedSize, Progress progress)
             throws IOException, java.security.NoSuchAlgorithmException {
@@ -379,6 +446,10 @@ final class DataPackInstaller {
             conn = (HttpURLConnection) new URL(url).openConnection();
             conn.setConnectTimeout(15000);
             conn.setReadTimeout(30000);
+            conn.setUseCaches(false);
+            conn.setRequestProperty("Cache-Control", "no-cache, no-store");
+            conn.setRequestProperty("Pragma", "no-cache");
+            conn.setRequestProperty("Accept-Encoding", "identity");
 
             int status = conn.getResponseCode();
             if (status != 200) {
@@ -409,6 +480,11 @@ final class DataPackInstaller {
                         progress.onDownloading(done, total);
                     }
                 }
+            }
+
+            if (expectedSize > 0 && dest.length() != expectedSize) {
+                throw new IOException("download size mismatch: expected "
+                    + expectedSize + " bytes, got " + dest.length());
             }
 
             return toHex(digest.digest());
