@@ -130,19 +130,30 @@ final class DataPackInstaller {
 
     static String installedVersion(Context ctx) {
         File patch = communityPatchFile();
+        android.content.SharedPreferences prefs =
+            ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         if (!patch.isFile()) {
-            ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .edit().remove(PREF_INSTALLED_VERSION).remove(PREF_MANUAL_INSTALLED).apply();
+            prefs.edit().remove(PREF_INSTALLED_VERSION).remove(PREF_MANUAL_INSTALLED).apply();
             return null;
         }
 
-        if (ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .getBoolean(PREF_MANUAL_INSTALLED, false)) {
+        if (prefs.getBoolean(PREF_MANUAL_INSTALLED, false)) {
             return MANUAL_VERSION;
         }
 
-        return ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(PREF_INSTALLED_VERSION, null);
+        String version = prefs.getString(PREF_INSTALLED_VERSION, null);
+        if (version == null || version.isEmpty()) {
+            // The patch is real and readable, but this launcher has no install record.
+            // Treat it as a manual install everywhere, not only on the multiplayer
+            // screen, so no update path can mistake it for missing data.
+            prefs.edit().putBoolean(PREF_MANUAL_INSTALLED, true).apply();
+            NetworkTrace.write(ctx,
+                "[datapack] automatically adopted existing manual community data from " +
+                patch.getAbsolutePath());
+            return MANUAL_VERSION;
+        }
+
+        return version;
     }
 
     /** Adopt a community patch copied into user data outside this launcher. */
