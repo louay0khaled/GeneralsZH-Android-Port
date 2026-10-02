@@ -341,9 +341,10 @@ public class GeneralsOnlineActivity extends Activity {
         // also be the wrong order to learn this in: the data exists to make an
         // account's games joinable, so the account comes first and the card
         // says so rather than failing quietly later.
-        // A manually adopted install is already on disk. Do not expose a button
-        // that can accidentally start the CDN download the user just bypassed.
-        dataPackButton.setEnabled(signedIn && !dataPackBusy && !manualInstall);
+        // Automatic checking will never replace a manually adopted install.
+        // The explicit Update button remains available for a user who later wants
+        // to move that local install to the current CDN release.
+        dataPackButton.setEnabled(signedIn && !dataPackBusy);
         dataPackDeleteButton.setEnabled(installed && !dataPackBusy && !manualInstall);
         dataPackSwitch.setEnabled(installed);
         dataPackSwitch.setChecked(DataPackInstaller.isEnabled());
