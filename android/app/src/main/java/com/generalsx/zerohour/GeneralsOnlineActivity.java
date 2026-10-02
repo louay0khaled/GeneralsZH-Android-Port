@@ -133,6 +133,11 @@ public class GeneralsOnlineActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle(R.string.online_window_title);
+        // GeneralsX @bugfix Android port 02/10/2026 Adopt a community patch that
+        // was copied into the documented user-data directory outside the launcher.
+        // Without this, the files are usable by the engine but the UI keeps saying
+        // "not installed" and the update path attempts to fetch the package again.
+        DataPackInstaller.adoptManualInstall(this);
         buildUi();
         refreshStatus();
         maybeSilentReauth();
@@ -308,6 +313,7 @@ public class GeneralsOnlineActivity extends Activity {
         final boolean signedIn = getSignedInDisplayName(this) != null;
         final String version = DataPackInstaller.installedVersion(this);
         final boolean installed = version != null && !version.isEmpty();
+        final boolean manualInstall = DataPackInstaller.isManualInstall(this);
 
         final java.util.Date settingsDate = UpdateManager.settingsPublished(this);
         networkSettingsStatus.setText(settingsDate != null
@@ -319,6 +325,8 @@ public class GeneralsOnlineActivity extends Activity {
         final String latest = UpdateManager.datapackLatestSeen(this);
         if (!installed) {
             dataPackStatus.setText(R.string.online_datapacks_not_installed);
+        } else if (manualInstall) {
+            dataPackStatus.setText(R.string.online_datapacks_installed_manual);
         } else if (updateWanted && latest != null && !latest.equals(version)) {
             dataPackStatus.setText(getString(R.string.online_datapacks_update_available, version, latest));
         } else if (updateWanted) {
@@ -333,8 +341,10 @@ public class GeneralsOnlineActivity extends Activity {
         // also be the wrong order to learn this in: the data exists to make an
         // account's games joinable, so the account comes first and the card
         // says so rather than failing quietly later.
-        dataPackButton.setEnabled(signedIn && !dataPackBusy);
-        dataPackDeleteButton.setEnabled(installed && !dataPackBusy);
+        // A manually adopted install is already on disk. Do not expose a button
+        // that can accidentally start the CDN download the user just bypassed.
+        dataPackButton.setEnabled(signedIn && !dataPackBusy && !manualInstall);
+        dataPackDeleteButton.setEnabled(installed && !dataPackBusy && !manualInstall);
         dataPackSwitch.setEnabled(installed);
         dataPackSwitch.setChecked(DataPackInstaller.isEnabled());
 
