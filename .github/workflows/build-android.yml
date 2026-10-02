@@ -606,10 +606,10 @@ jobs:
               latest_run[$branch]="${run_id}"
             fi
           done < <(gh api "repos/${{ github.repository }}/actions/artifacts" --paginate \
-            --jq '.artifacts[] | [(.workflow_run.head_branch // ""), .workflow_run.id] | @tsv')
+            --jq '.artifacts[] | select(.name | test("^(GeneralsXZH-android-|android-symbols-|android-build-logs-)")) | [(.workflow_run.head_branch // ""), .workflow_run.id] | @tsv')
 
           gh api "repos/${{ github.repository }}/actions/artifacts" --paginate \
-            --jq '.artifacts[] | [(.workflow_run.head_branch // ""), .workflow_run.id, .id] | @tsv' \
+            --jq '.artifacts[] | select(.name | test("^(GeneralsXZH-android-|android-symbols-|android-build-logs-)")) | [(.workflow_run.head_branch // ""), .workflow_run.id, .id] | @tsv' \
           | while IFS=$'\t' read -r branch run_id artifact_id; do
               [ -z "${branch}" ] && continue
               if [ "${run_id}" != "${latest_run[$branch]:-}" ]; then
