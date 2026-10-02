@@ -84,7 +84,7 @@ final class DataPackInstaller {
     /** The version the GeneralsOnline CDN offers now, or null if it cannot be reached. */
     static String latestVersion(Context ctx) {
         try {
-            String version = new JSONObject(fetchText(manifestUrl(ctx))).optString("version", "");
+            String version = new JSONObject(fetchText(manifestUrl(ctx), false)).optString("version", "");
             return version.isEmpty() ? null : version;
         } catch (Exception e) {
             return null;
