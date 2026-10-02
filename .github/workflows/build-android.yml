@@ -299,8 +299,12 @@ jobs:
           cmake --preset ${{ env.PRESET }} -DSAGE_HIGH_FPS_SIM=ON 2>&1 | tee logs/configure_android_60hz.log
           cmake --build build/${{ env.PRESET }} --target z_generals dxvk_d3d8_install \
             main_hook file_redirect_hook gsl_alloc_hook hook_impl -- -k 0 2>&1 | tee logs/build_android_60hz.log
-          cp "build/${{ env.PRESET }}/GeneralsMD/Code/Main/libmain.so" build/libmain60.so
-          test -s build/libmain60.so
+          GAME_LIB60_STASH="${{ runner.temp }}/libmain60.so"
+          cp "build/${{ env.PRESET }}/GeneralsMD/Code/Main/libmain.so" "$GAME_LIB60_STASH"
+          test -s "$GAME_LIB60_STASH"
+          echo "=== saved 60 Hz engine ==="
+          file "$GAME_LIB60_STASH"
+          "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf" -h "$GAME_LIB60_STASH" | grep -E "Class:|Machine:"
 
           echo "=== pass 2/2: build 30 Hz engine ==="
           cmake --preset ${{ env.PRESET }} -DSAGE_HIGH_FPS_SIM=OFF 2>&1 | tee logs/configure_android_30hz.log
@@ -324,7 +328,7 @@ jobs:
           # own OUTPUT_NAME (GeneralsMD/Code/Main/CMakeLists.txt) makes the
           # real path deterministic, so use it directly instead of searching.
           GAME_LIB="build/${{ env.PRESET }}/GeneralsMD/Code/Main/libmain.so"
-          GAME_LIB60="build/libmain60.so"
+          GAME_LIB60="${{ runner.temp }}/libmain60.so"
           if [ ! -f "$GAME_LIB" ]; then echo "::error::libmain.so not found at $GAME_LIB"; exit 1; fi
           if [ ! -f "$GAME_LIB60" ]; then echo "::error::libmain60.so not found at $GAME_LIB60"; exit 1; fi
           if ! "$READELF" -h "$GAME_LIB60" 2>/dev/null | grep -q AArch64; then
@@ -417,7 +421,7 @@ jobs:
         run: |
           STRIP="$(ls "${ANDROID_NDK_HOME}"/toolchains/llvm/prebuilt/*/bin/llvm-strip | head -1)"
           for lib in "build/${{ env.PRESET }}/GeneralsMD/Code/Main/libmain.so" \
-                     "build/libmain60.so" \
+                     "${{ runner.temp }}/libmain60.so" \
                      "build/${{ env.PRESET }}/_deps/sdl3-build/libSDL3.so" \
                      "build/${{ env.PRESET }}/_deps/sdl3_image-build/libSDL3_image.so" \
                      "build/${{ env.PRESET }}/_deps/openal_soft-build/libopenal.so" \
@@ -455,7 +459,7 @@ jobs:
           GX_ANDROID_STAGING: ${{ github.workspace }}/android-staging
           GX_ANDROID_VERSION_CODE: ${{ steps.artifact.outputs.version_code }}
           GX_ANDROID_VERSION_NAME: ${{ steps.artifact.outputs.version_name }}
-          GX_SECOND_GAME_LIB: ${{ github.workspace }}/build/libmain60.so
+          GX_SECOND_GAME_LIB: ${{ runner.temp }}/libmain60.so
         run: |
           ./scripts/build/android/package-android-zh.sh
 
