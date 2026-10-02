@@ -341,11 +341,14 @@ public class GeneralsOnlineActivity extends Activity {
         // also be the wrong order to learn this in: the data exists to make an
         // account's games joinable, so the account comes first and the card
         // says so rather than failing quietly later.
-        // Automatic checking will never replace a manually adopted install.
-        // The explicit Update button remains available for a user who later wants
-        // to move that local install to the current CDN release.
-        dataPackButton.setEnabled(signedIn && !dataPackBusy);
-        dataPackDeleteButton.setEnabled(installed && !dataPackBusy && !manualInstall);
+        // Automatic checking never replaces a manually adopted install.
+        // Keep the CDN action disabled for that state: there is no trustworthy
+        // release version attached to a manual copy, so treating it as an update
+        // candidate can produce a false "checksum mismatch" against a different
+        // CDN release. The player can remove the manual patch and install a
+        // managed release later.
+        dataPackButton.setEnabled(signedIn && !dataPackBusy && !manualInstall);
+        dataPackDeleteButton.setEnabled(installed && !dataPackBusy);
         dataPackSwitch.setEnabled(installed);
         dataPackSwitch.setChecked(DataPackInstaller.isEnabled());
 
