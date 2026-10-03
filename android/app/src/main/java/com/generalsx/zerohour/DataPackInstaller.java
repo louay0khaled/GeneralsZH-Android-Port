@@ -70,6 +70,39 @@ final class DataPackInstaller {
     private DataPackInstaller() {}
 
     private static final String MANIFEST_URL = "https://cdn.playgenerals.online/manifest.json";
+    // GeneralsX @feature Android port 03/10/2026
+    // The community patch is published independently by TheSuperHackers. The
+    // release asset is allowed to carry the Android-normalized suffix/hash in
+    // its filename; the engine still receives one canonical filename.
+    private static final String COMMUNITY_PATCH_RELEASE_API =
+        "https://api.github.com/repos/TheSuperHackers/GeneralsGamePatch2/releases/latest";
+    private static final String COMMUNITY_PATCH_ASSET_PREFIX =
+        "500_900_CommunityPatch_CoreINI";
+    private static final String COMMUNITY_PATCH_CANONICAL_NAME =
+        "500_900_CommunityPatch_CoreINI.big";
+    private static final String COMMUNITY_PATCH_INSTALLED_RELATIVE =
+        "GeneralsOnlineGameData/" + COMMUNITY_PATCH_CANONICAL_NAME;
+
+    private static final class CommunityPatchRelease {
+        final String version;
+        final String assetName;
+        final String downloadUrl;
+        final long size;
+        final String sha256;
+
+        CommunityPatchRelease(String version, String assetName, String downloadUrl,
+                              long size, String sha256) {
+            this.version = version;
+            this.assetName = assetName;
+            this.downloadUrl = downloadUrl;
+            this.size = size;
+            this.sha256 = sha256;
+        }
+
+        boolean isZip() {
+            return assetName.toLowerCase(Locale.US).endsWith(".zip");
+        }
+    }
 
     /**
      * GeneralsX @feature Android port 27/09/2026 The package's own manifest address can be
@@ -84,11 +117,77 @@ final class DataPackInstaller {
     /** The version the GeneralsOnline CDN offers now, or null if it cannot be reached. */
     static String latestVersion(Context ctx) {
         try {
-            String version = new JSONObject(fetchText(manifestUrl(ctx), false)).optString("version", "");
-            return version.isEmpty() ? null : version;
+            CommunityPatchRelease release = fetchCommunityPatchRelease();
+            return release != null && !release.version.isEmpty() ? release.version : null;
         } catch (Exception e) {
+            NetworkTrace.write(ctx, "[datapack] latest community patch check failed: " + e);
             return null;
         }
+    }
+
+    /** Resolves the latest CommunityPatch Core INI asset from the public community repository. */
+    private static CommunityPatchRelease fetchCommunityPatchRelease() throws IOException {
+        JSONObject release = new JSONObject(fetchText(COMMUNITY_PATCH_RELEASE_API, true));
+        String version = release.optString("tag_name", "").trim();
+        if (version.isEmpty()) {
+            version = release.optString("name", "").trim();
+        }
+
+        JSONArray assets = release.optJSONArray("assets");
+        if (assets == null || assets.length() == 0) {
+            throw new IOException("community release has no assets");
+        }
+
+        CommunityPatchRelease best = null;
+        int bestRank = Integer.MAX_VALUE;
+        for (int i = 0; i < assets.length(); i++) {
+            JSONObject asset = assets.optJSONObject(i);
+            if (asset == null) {
+                continue;
+            }
+            String name = asset.optString("name", "").trim();
+            String lower = name.toLowerCase(Locale.US);
+            String prefix = COMMUNITY_PATCH_ASSET_PREFIX.toLowerCase(Locale.US);
+            if (!lower.startsWith(prefix) || !(lower.endsWith(".zip") || lower.endsWith(".big"))) {
+                continue;
+            }
+
+            String url = asset.optString("browser_download_url", "").trim();
+            if (!url.startsWith("https://")) {
+                continue;
+            }
+
+            // Prefer the release ZIP (the official ModBuilder asset), but accept
+            // a directly published .BIG or a suffixed/hash-named variant too.
+            int rank = lower.endsWith(".zip") ? 0 : 10;
+            if (!lower.equals((COMMUNITY_PATCH_ASSET_PREFIX + ".zip").toLowerCase(Locale.US))
+                    && lower.equals((COMMUNITY_PATCH_ASSET_PREFIX + ".big").toLowerCase(Locale.US))) {
+                rank += 1;
+            }
+
+            if (best == null || rank < bestRank) {
+                String digest = asset.optString("digest", "").trim();
+                if (digest.regionMatches(true, 0, "sha256:", 0, 7)) {
+                    digest = digest.substring(7);
+                }
+                if (digest.isEmpty()) {
+                    digest = asset.optString("sha256", "").trim();
+                }
+                best = new CommunityPatchRelease(
+                    version.isEmpty() ? "unknown" : version,
+                    name,
+                    url,
+                    asset.optLong("size", -1),
+                    digest
+                );
+                bestRank = rank;
+            }
+        }
+
+        if (best == null) {
+            throw new IOException("community release has no Core INI asset");
+        }
+        return best;
     }
 
     /** The only two directories in the package that mean anything here. */
@@ -124,8 +223,54 @@ final class DataPackInstaller {
     }
 
     static File communityPatchFile() {
-        return new File(userDataDir(),
-            "GeneralsOnlineGameData/500_900_CommunityPatch_CoreINI.big");
+        File dir = new File(userDataDir(), "GeneralsOnlineGameData");
+        File canonical = new File(dir, COMMUNITY_PATCH_CANONICAL_NAME);
+        normalizeCommunityPatchName(dir, canonical);
+        return canonical;
+    }
+
+    /**
+     * Community releases sometimes append the INI CRC/hash to the BIG filename
+     * (for example ..._81FB5632.big). The engine intentionally does not: it
+     * opens one canonical path. Normalize any existing compatible file in place.
+     */
+    private static void normalizeCommunityPatchName(File dir, File canonical) {
+        if (canonical.isFile() || !dir.isDirectory()) {
+            return;
+        }
+
+        File[] candidates = dir.listFiles((file, name) ->
+            name.matches("(?i)^500_900_CommunityPatch_CoreINI(?:_[0-9a-f]+)?\\.big$"));
+        if (candidates == null || candidates.length == 0) {
+            return;
+        }
+
+        java.util.Arrays.sort(candidates, (a, b) -> {
+            boolean aKnown = a.getName().equalsIgnoreCase(
+                "500_900_CommunityPatch_CoreINI_81FB5632.big");
+            boolean bKnown = b.getName().equalsIgnoreCase(
+                "500_900_CommunityPatch_CoreINI_81FB5632.big");
+            if (aKnown != bKnown) {
+                return aKnown ? -1 : 1;
+            }
+            return Long.compare(b.lastModified(), a.lastModified());
+        });
+
+        File candidate = candidates[0];
+        if (candidate.renameTo(canonical)) {
+            return;
+        }
+
+        // renameTo() can fail across Android storage providers; copy as a safe fallback.
+        try (InputStream in = new BufferedInputStream(new FileInputStream(candidate));
+             OutputStream out = new FileOutputStream(canonical)) {
+            copy(in, out);
+            if (!candidate.delete()) {
+                // Keeping the original is harmless; the engine uses the canonical copy.
+            }
+        } catch (IOException ignored) {
+            canonical.delete();
+        }
     }
 
     static String installedVersion(Context ctx) {
@@ -335,109 +480,144 @@ final class DataPackInstaller {
 
     static Result install(Context ctx, Progress progress) {
         synchronized (INSTALL_LOCK) {
-            return installLocked(ctx, progress);
+            return installCommunityPatchLocked(ctx, progress);
         }
     }
 
-    private static Result installLocked(Context ctx, Progress progress) {
-        File tempZip = null;
+    /**
+     * Downloads only the current Core INI package from the community repository,
+     * verifies the repository asset, and installs the BIG under the exact filename
+     * the Android engine consumes. This is deliberately independent of the Windows
+     * portable bundle so a PC archive rename cannot break Android.
+     */
+    private static Result installCommunityPatchLocked(Context ctx, Progress progress) {
+        File tempDownload = null;
+        File tempBig = null;
         try {
             progress.onChecking();
-            JSONObject manifest = new JSONObject(fetchText(manifestUrl(ctx), false));
-            String version = manifest.optString("version", "");
-            String downloadUrl = manifest.optString("download_url", "");
-            long expectedSize = manifest.optLong("size", -1);
-            String expectedSha = manifest.optString("sha256", "");
+            CommunityPatchRelease release = fetchCommunityPatchRelease();
 
-            if (downloadUrl.isEmpty() || !downloadUrl.startsWith("https://")) {
-                return Result.failure("manifest has no usable download URL");
-            }
+            tempDownload = new File(ctx.getCacheDir(), "community-core-ini.download");
+            tempBig = new File(ctx.getCacheDir(), "community-core-ini.big.tmp");
 
-            NetworkTrace.write(ctx, "[datapack] manifest version=" + version
-                + " size=" + expectedSize + " url=" + downloadUrl);
-
-            // The cache dir, not the shared storage the data itself goes to:
-            // a half-downloaded package is this app's business and should not
-            // survive being killed mid-download.
-            tempZip = new File(ctx.getCacheDir(), "generalsonline-datapack.zip");
-            String actualSha;
-            try {
-                actualSha = download(downloadUrl, tempZip, expectedSize, progress);
-            } catch (IOException firstDownloadError) {
-                // A stale CDN edge may also expose the previous release's size,
-                // so retry size mismatches through the same fresh-manifest path
-                // used for a SHA mismatch.
-                if (firstDownloadError.getMessage() == null
-                    || !firstDownloadError.getMessage().startsWith("download size mismatch")) {
-                    throw firstDownloadError;
-                }
-                NetworkTrace.write(ctx, "[datapack] size mismatch on first fetch: "
-                    + firstDownloadError.getMessage()
-                    + "; refreshing manifest and retrying");
-                tempZip.delete();
-                progress.onChecking();
-                manifest = new JSONObject(fetchTextFresh(manifestUrl(ctx)));
-                version = manifest.optString("version", "");
-                downloadUrl = manifest.optString("download_url", "");
-                expectedSize = manifest.optLong("size", -1);
-                expectedSha = manifest.optString("sha256", "");
-                if (downloadUrl.isEmpty() || !downloadUrl.startsWith("https://")) {
-                    return Result.failure("manifest has no usable download URL");
-                }
-                actualSha = download(downloadUrl, tempZip, expectedSize, progress);
-            }
-
-            if (!expectedSha.isEmpty() && !expectedSha.equalsIgnoreCase(actualSha)) {
-                // A CDN edge can briefly serve an older ZIP while the manifest
-                // already describes a newer release. Keep verification strict,
-                // but refresh the manifest and retry once before failing.
-                NetworkTrace.write(ctx, "[datapack] checksum mismatch on first fetch: expected "
-                    + expectedSha + " got " + actualSha + "; refreshing manifest and retrying");
-                tempZip.delete();
-                progress.onChecking();
-                manifest = new JSONObject(fetchTextFresh(manifestUrl(ctx)));
-                version = manifest.optString("version", "");
-                downloadUrl = manifest.optString("download_url", "");
-                expectedSize = manifest.optLong("size", -1);
-                expectedSha = manifest.optString("sha256", "");
-                if (downloadUrl.isEmpty() || !downloadUrl.startsWith("https://")) {
-                    return Result.failure("manifest has no usable download URL");
-                }
-                actualSha = download(downloadUrl, tempZip, expectedSize, progress);
-                if (!expectedSha.isEmpty() && !expectedSha.equalsIgnoreCase(actualSha)) {
-                    NetworkTrace.write(ctx, "[datapack] checksum mismatch after refresh: expected "
-                        + expectedSha + " got " + actualSha);
-                    return Result.failure("checksum mismatch");
-                }
+            String actualSha = download(release.downloadUrl, tempDownload, release.size, progress);
+            if (!release.sha256.isEmpty() && !release.sha256.equalsIgnoreCase(actualSha)) {
+                NetworkTrace.write(ctx,
+                    "[datapack] community asset checksum mismatch: expected "
+                        + release.sha256 + " got " + actualSha);
+                return Result.failure("community asset checksum mismatch");
             }
 
             progress.onInstalling();
-            File target = userDataDir();
-            long[] pcExeCrc = new long[] { -1 };
-            List<String> written = extract(tempZip, target, pcExeCrc);
+            tempBig.delete();
+
+            if (release.isZip()) {
+                extractCommunityPatchFromZip(tempDownload, tempBig);
+            } else {
+                try (InputStream in = new BufferedInputStream(new FileInputStream(tempDownload));
+                     OutputStream out = new FileOutputStream(tempBig)) {
+                    copy(in, out);
+                }
+            }
+
+            if (!tempBig.isFile() || tempBig.length() <= 0) {
+                return Result.failure("community package did not contain a Core INI BIG");
+            }
+
+            File target = communityPatchFile();
+            File parent = target.getParentFile();
+            if (parent != null && !parent.isDirectory() && !parent.mkdirs()) {
+                return Result.failure("could not create " + parent.getAbsolutePath());
+            }
+
+            // Replace atomically where the storage provider supports it; otherwise
+            // copy the verified temporary BIG to the fixed destination.
+            File stagedTarget = new File(parent, COMMUNITY_PATCH_CANONICAL_NAME + ".part");
+            stagedTarget.delete();
+            try (InputStream in = new BufferedInputStream(new FileInputStream(tempBig));
+                 OutputStream out = new FileOutputStream(stagedTarget)) {
+                copy(in, out);
+            }
+            if (target.isFile() && !target.delete()) {
+                stagedTarget.delete();
+                return Result.failure("could not replace existing community patch");
+            }
+            if (!stagedTarget.renameTo(target)) {
+                try (InputStream in = new BufferedInputStream(new FileInputStream(stagedTarget));
+                     OutputStream out = new FileOutputStream(target)) {
+                    copy(in, out);
+                }
+                stagedTarget.delete();
+            }
+
+            if (!target.isFile() || target.length() != tempBig.length()) {
+                return Result.failure("installed community patch failed verification");
+            }
+
+            List<String> written = new ArrayList<>();
+            written.add(COMMUNITY_PATCH_INSTALLED_RELATIVE);
             writeInstalledList(ctx, written);
-            writePcExeCrcSeed(ctx, pcExeCrc[0], version);
-            NetworkTrace.write(ctx, "[datapack] installed " + written.size()
-                + " file(s) into " + target.getAbsolutePath());
 
             ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit()
                 .remove(PREF_MANUAL_INSTALLED)
-                .putString(PREF_INSTALLED_VERSION, version)
+                .putString(PREF_INSTALLED_VERSION, release.version)
                 .apply();
-            UpdateManager.noteDatapackLatest(ctx, version);
+            UpdateManager.noteDatapackLatest(ctx, release.version);
 
-            return Result.success(version, written.size());
+            NetworkTrace.write(ctx,
+                "[datapack] installed " + release.assetName + " (" + release.version + ") as "
+                    + target.getAbsolutePath());
+
+            return Result.success(release.version, 1);
         } catch (Exception e) {
             String message = e.getMessage() != null ? e.getMessage() : e.toString();
             NetworkTrace.write(ctx, "[datapack] failed: " + message);
             return Result.failure(message);
         } finally {
-            if (tempZip != null) {
-                // Best effort: 30MB of cache is not worth failing the install
-                // that already succeeded.
-                tempZip.delete();
+            if (tempDownload != null) {
+                tempDownload.delete();
             }
+            if (tempBig != null) {
+                tempBig.delete();
+            }
+            File part = new File(new File(userDataDir(), "GeneralsOnlineGameData"),
+                COMMUNITY_PATCH_CANONICAL_NAME + ".part");
+            part.delete();
+        }
+    }
+
+    /**
+     * Extracts any Core INI BIG whose basename matches the community naming scheme.
+     * The ZIP path itself is never used as an output path, preventing ZIP-slip.
+     */
+    private static void extractCommunityPatchFromZip(File zipFile, File destination)
+            throws IOException {
+        boolean found = false;
+        try (ZipInputStream zip = new ZipInputStream(
+                new BufferedInputStream(new FileInputStream(zipFile)))) {
+            ZipEntry entry;
+            while ((entry = zip.getNextEntry()) != null) {
+                String name = entry.getName().replace('\\', '/');
+                if (entry.isDirectory()) {
+                    continue;
+                }
+                int slash = name.lastIndexOf('/');
+                String basename = slash >= 0 ? name.substring(slash + 1) : name;
+                if (!basename.matches("(?i)^500_900_CommunityPatch_CoreINI(?:_[0-9a-f]+)?\\.big$")) {
+                    continue;
+                }
+
+                try (OutputStream out = new FileOutputStream(destination)) {
+                    copy(zip, out);
+                }
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            throw new IOException("community ZIP contains no Core INI BIG");
         }
     }
 
@@ -448,7 +628,13 @@ final class DataPackInstaller {
             conn.setConnectTimeout(15000);
             conn.setReadTimeout(20000);
             conn.setUseCaches(!fresh);
-            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Accept", url.startsWith("https://api.github.com/")
+                ? "application/vnd.github+json"
+                : "application/json");
+            conn.setRequestProperty("User-Agent", "GeneralsXZH-Android");
+            if (url.startsWith("https://api.github.com/")) {
+                conn.setRequestProperty("X-GitHub-Api-Version", "2022-11-28");
+            }
             conn.setRequestProperty("Cache-Control", fresh ? "no-cache, no-store" : "no-cache");
             conn.setRequestProperty("Pragma", "no-cache");
             conn.setRequestProperty("Accept-Encoding", "identity");
