@@ -881,24 +881,48 @@ void ConnectionManager::processFile(NetFileCommandMsg *msg)
 		return;
 	}
 
+	// GeneralsX @bugfix Android multiplayer 03/10/2026 Never acknowledge a
+	// received map/sidecar as complete until the bytes were actually written and
+	// can be read back from the destination.  The old code sent 100%% even when
+	// open/write failed, which left the sender believing the transfer succeeded
+	// while the Android client later stalled trying to load the missing map.
+	Bool writeOk = FALSE;
 	File *fp = TheFileSystem->openFile(realFileName.str(), File::CREATE | File::BINARY | File::WRITE);
 	if (fp)
 	{
-		fp->write(buf, len);
+		Int bytesWritten = fp->write(buf, len);
 		fp->close();
 		fp = nullptr;
-		DEBUG_LOG(("Wrote %d bytes to file %s!", len, realFileName.str()));
 
+		if (bytesWritten == len)
+		{
+			File *verify = TheFileSystem->openFile(realFileName.str(), File::READ | File::BINARY);
+			if (verify)
+			{
+				const Int storedSize = verify->size();
+				verify->close();
+				writeOk = (storedSize == len);
+			}
+		}
+
+		if (writeOk)
+		{
+			DEBUG_LOG(("Wrote and verified %d bytes to file %s!", len, realFileName.str()));
+		}
+		else
+		{
+			DEBUG_LOG(("Failed to verify %d written bytes for file %s!", len, realFileName.str()));
+		}
 	}
 	else
 	{
-		DEBUG_LOG(("Cannot open file!"));
+		DEBUG_LOG(("Cannot open file '%s' for transfer!", realFileName.str()));
 	}
 
 	DEBUG_LOG(("ConnectionManager::processFile() - sending a NetFileProgressCommandMsg"));
 
 	Int commandID = msg->getID();
-	Int newProgress = 100;
+	Int newProgress = writeOk ? 100 : 0;
 
 	s_fileProgressMap[m_localSlot][commandID] = newProgress;
 
