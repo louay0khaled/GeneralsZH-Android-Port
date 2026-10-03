@@ -31,6 +31,7 @@
 
 #include "Common/AsciiString.h"
 #include "Common/UnicodeString.h"
+#include <string>
 
 #include "Common/STLTypedefs.h"
 
@@ -176,7 +177,7 @@ private:
 	Bool clearUnseenMaps(const AsciiString &mapDir);
 	void loadMapsFromMapCacheINI(const AsciiString &mapDir);
 	Bool loadMapsFromDisk(const AsciiString &mapDir, Bool isOfficial, Bool filterByAllowedMaps = FALSE); // returns true if we needed to (re)parse a map
-	Bool addMap(const AsciiString &mapDir, const AsciiString &fname, const AsciiString &lowerFname, FileInfo &fileInfo, Bool isOfficial); ///< returns true if it had to (re)parse the map
+	Bool addMap(const AsciiString &mapDir, const AsciiString &fname, const AsciiString &lowerFname, FileInfo &fileInfo, Bool isOfficial); ///< returns true if it had to (re)parse a map
 	void writeCacheINI(const AsciiString &mapDir);
 
 	static const char *const m_mapCacheName;
