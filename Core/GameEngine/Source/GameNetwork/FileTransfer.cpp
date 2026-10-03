@@ -32,6 +32,7 @@
 
 #include "GameClient/LoadScreen.h"
 #include "GameClient/Shell.h"
+#include "GameClient/MapUtil.h"
 #include "GameNetwork/FileTransfer.h"
 #include "GameNetwork/networkutil.h"
 
@@ -277,6 +278,31 @@ Bool DoAnyMapTransfers(GameInfo *game)
 		ok = doFileTransfer(game->getMap(), ls, mask);
 	delete ls;
 	ls = nullptr;
+
+	if (ok)
+	{
+		// GeneralsX @bugfix Android multiplayer 03/10/2026 A received custom map
+		// is written to the shared UserData/Maps directory, but TheMapCache can
+		// still contain the pre-transfer snapshot.  That made skirmish work
+		// (the map was already indexed) while a network transfer was followed by
+		// a load against stale metadata.  Refresh once after the complete map
+		// transfer, then re-validate the host CRC/size against the new local map.
+		TheMapCache->updateCache();
+		TheGameInfo->setMapCRC(TheGameInfo->getMapCRC());
+		TheGameInfo->setMapSize(TheGameInfo->getMapSize());
+
+		for (i = 1; i < MAX_SLOTS; ++i)
+		{
+			if (TheGameInfo->getConstSlot(i)->isHuman()
+				&& !TheGameInfo->getConstSlot(i)->hasMap())
+			{
+				DEBUG_LOG(("Map transfer completed but player %d still has no matching map after cache refresh", i));
+				ok = FALSE;
+				break;
+			}
+		}
+	}
+
 	if (!ok)
 		TheShell->showShell();
 	return ok;
