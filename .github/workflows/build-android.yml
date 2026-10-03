@@ -331,7 +331,7 @@ jobs:
           GAME_LIB60="${{ github.workspace }}/libmain60.so"
           if [ ! -f "$GAME_LIB" ]; then echo "::error::libmain.so not found at $GAME_LIB"; exit 1; fi
           if [ ! -f "$GAME_LIB60" ]; then echo "::error::libmain60.so not found at $GAME_LIB60"; exit 1; fi
-          if ! "$READELF" -h "$GAME_LIB60" 2>/dev/null | grep -q AArch64; then
+          if ! "$READELF" -h "$GAME_LIB60" 2>/dev/null | grep AArch64 >/dev/null; then
             echo "::error::libmain60.so is not AArch64"; exit 1
           fi
           # GeneralsX @bugfix Android port 31/07/2026 - the deterministic
@@ -358,7 +358,7 @@ jobs:
           for lib in libdxvk_d3d8.so libdxvk_d3d9.so; do
             [ -f "build/${{ env.PRESET }}/$lib" ] || { echo "::error::$lib missing"; exit 1; }
           done
-          strings "build/${{ env.PRESET }}/libdxvk_d3d9.so" | grep -q Sdl3WsiDriver || {
+          strings "build/${{ env.PRESET }}/libdxvk_d3d9.so" | grep Sdl3WsiDriver >/dev/null || {
             echo "::error::libdxvk_d3d9.so built without the SDL3 WSI (silent fallback)"; exit 1; }
           echo "Artifacts verified: AArch64 libmain.so + DXVK with SDL3 WSI"
 
