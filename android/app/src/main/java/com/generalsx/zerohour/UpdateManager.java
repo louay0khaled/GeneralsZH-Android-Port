@@ -322,23 +322,25 @@ final class UpdateManager {
      */
     private static void checkDatapack(Context ctx, Result r, boolean install,
                                       DataPackInstaller.Progress progress) {
-        if (DataPackInstaller.installedVersion(ctx) == null) {
-            return;
-        }
+        // The community patch is useful even on a first run: the launcher must not
+        // require a pre-existing manual copy before it can discover or install it.
         String latest = DataPackInstaller.latestVersion(ctx);
         if (latest == null) {
             return;
         }
         noteDatapackLatest(ctx, latest);
+
         if (!datapackUpdateWanted(ctx)) {
             return;
         }
+
         if (!install) {
             r.datapackAvailable = latest;
             return;
         }
-        // The Updates card and the data card can both get here at once; the second one waits
-        // for the first and then finds nothing left to do instead of downloading it again.
+
+        // The Updates card and the data card can both get here at once; the second one
+        // waits for the first and then sees the newly recorded installed version.
         synchronized (DataPackInstaller.INSTALL_LOCK) {
             if (!datapackUpdateWanted(ctx)) {
                 return;
@@ -353,26 +355,21 @@ final class UpdateManager {
     }
 
     private static void noticeNewerDatapack(Context ctx, Result r) {
-        if (DataPackInstaller.installedVersion(ctx) == null) {
+        String latest = DataPackInstaller.latestVersion(ctx);
+        if (latest == null) {
             return;
         }
-        noteDatapackLatest(ctx, DataPackInstaller.latestVersion(ctx));
+        noteDatapackLatest(ctx, latest);
         if (datapackNewerAvailable(ctx)) {
-            r.datapackAvailable = datapackLatestSeen(ctx);
+            r.datapackAvailable = latest;
         }
     }
 
     /** The CDN has a patch version other than the installed one (as of the last check). */
     static boolean datapackNewerAvailable(Context ctx) {
-        if (DataPackInstaller.isManualInstall(ctx)) {
-            // A manually copied package has no trustworthy launcher version metadata.
-            // Do not compare the sentinel against the CDN version and immediately
-            // force a re-download of files that are already present.
-            return false;
-        }
         String installed = DataPackInstaller.installedVersion(ctx);
         String latest = datapackLatestSeen(ctx);
-        return installed != null && latest != null && !latest.equals(installed);
+        return latest != null && (installed == null || !latest.equals(installed));
     }
 
     /** The data patch part of check() alone. Blocking; call off the UI thread. */
@@ -400,17 +397,22 @@ final class UpdateManager {
      * more, so cross-play claims the number of the PC release this device actually has.
      */
     static boolean datapackUpdateWanted(Context ctx) {
-        if (DataPackInstaller.isManualInstall(ctx)) {
-            // The community patch is already present on disk. Its missing launcher
-            // bookkeeping must not turn "manual install" into an endless download loop.
-            return false;
-        }
         String installed = DataPackInstaller.installedVersion(ctx);
-        if (installed == null) {
-            return false;
-        }
         String latest = datapackLatestSeen(ctx);
-        return (latest != null && !latest.equals(installed)) || !DataPackInstaller.hasPcExeCrcSeed(ctx);
+
+        // Missing data: install it on the first online check.
+        if (installed == null) {
+            return latest != null;
+        }
+
+        // A file that was already copied manually has no trustworthy release
+        // metadata. Once the repository is reachable, replace it with the
+        // verified repository asset and turn it into a managed installation.
+        if (DataPackInstaller.isManualInstall(ctx)) {
+            return latest != null && !latest.equals(installed);
+        }
+
+        return latest != null && !latest.equals(installed);
     }
 
     static boolean isUnmeteredNetwork(Context ctx) {
