@@ -1,0 +1,55 @@
+name: Publish Run 25 APK Release
+
+on:
+  push:
+    paths:
+      - ".github/workflows/publish-run25-release.yml"
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    if: ${{ contains(github.event.head_commit.message, '[publish-run25]') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download the exact successful Run 25 APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: GeneralsXZH-android-run25.apk
+          path: dist
+          repository: ${{ github.repository }}
+          run-id: 37136324889
+          github-token: ${{ github.token }}
+
+      - name: Verify APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="dist/GeneralsXZH-android-run25.apk"
+          test -s "$APK"
+          echo "APK size: $(stat -c%s "$APK") bytes"
+          echo "APK SHA-256:"
+          sha256sum "$APK"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-run25
+          name: "GeneralsXZH Android — Run 25"
+          body: |
+            GeneralsXZH Android APK — successful Run 25 build.
+
+            Source commit:
+            ddb5bfe4ff8025c4685290a6e493cff133c3dc1c
+
+            Build:
+            GitHub Actions Build Android — Run 25
+
+            APK SHA-256:
+            0aa31d4d2153316ee23bcb4af55d3e4c74444e9b7edc9d1c5d62bf4300bd3b2f
+          files: dist/GeneralsXZH-android-run25.apk
+          make_latest: true
+          prerelease: false
