@@ -126,7 +126,7 @@ final class DataPackInstaller {
     }
 
     /** Resolves the latest CommunityPatch Core INI asset from the public community repository. */
-    private static CommunityPatchRelease fetchCommunityPatchRelease() throws IOException {
+    private static CommunityPatchRelease fetchCommunityPatchRelease() throws Exception {
         JSONObject release = new JSONObject(fetchText(COMMUNITY_PATCH_RELEASE_API, true));
         String version = release.optString("tag_name", "").trim();
         if (version.isEmpty()) {
@@ -245,16 +245,10 @@ final class DataPackInstaller {
             return;
         }
 
-        java.util.Arrays.sort(candidates, (a, b) -> {
-            boolean aKnown = a.getName().equalsIgnoreCase(
-                "500_900_CommunityPatch_CoreINI_81FB5632.big");
-            boolean bKnown = b.getName().equalsIgnoreCase(
-                "500_900_CommunityPatch_CoreINI_81FB5632.big");
-            if (aKnown != bKnown) {
-                return aKnown ? -1 : 1;
-            }
-            return Long.compare(b.lastModified(), a.lastModified());
-        });
+        // Never bake an old CRC suffix into the selector. If several
+        // compatible names were copied manually, prefer the newest file.
+        java.util.Arrays.sort(candidates, (a, b) ->
+            Long.compare(b.lastModified(), a.lastModified()));
 
         File candidate = candidates[0];
         if (candidate.renameTo(canonical)) {
@@ -270,6 +264,20 @@ final class DataPackInstaller {
             }
         } catch (IOException ignored) {
             canonical.delete();
+        }
+    }
+
+    private static void removeSuffixedCommunityPatches(File dir, File canonical) {
+        if (dir == null || !dir.isDirectory()) {
+            return;
+        }
+        File[] stale = dir.listFiles((file, name) ->
+            name.matches("(?i)^500_900_CommunityPatch_CoreINI(?:_[0-9a-f]+)\\.big$")
+                && !file.equals(canonical));
+        if (stale != null) {
+            for (File file : stale) {
+                file.delete();
+            }
         }
     }
 
@@ -553,6 +561,11 @@ final class DataPackInstaller {
             if (!target.isFile() || target.length() != tempBig.length()) {
                 return Result.failure("installed community patch failed verification");
             }
+
+            // Remove stale suffixed copies after the canonical file is verified.
+            // The engine reads only the canonical filename, so keeping old
+            // copies wastes storage and can confuse manual file checks.
+            removeSuffixedCommunityPatches(target.getParentFile(), target);
 
             List<String> written = new ArrayList<>();
             written.add(COMMUNITY_PATCH_INSTALLED_RELATIVE);
