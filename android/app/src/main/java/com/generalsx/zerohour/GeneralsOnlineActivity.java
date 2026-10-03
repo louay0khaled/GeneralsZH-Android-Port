@@ -259,18 +259,18 @@ public class GeneralsOnlineActivity extends Activity {
             return;
         }
         sDataPackCheckedThisProcess = true;
-        final boolean havePatch = DataPackInstaller.installedVersion(this) != null;
-        dataPackBusy = havePatch;
+        // Check and install the community patch even on a clean first run.
+        // The GitHub release is the source of truth; no manual BIG copy is required.
+        dataPackBusy = true;
         refreshDataPackCard();
         final android.content.Context app = getApplicationContext();
         final boolean install = UpdateManager.isUnmeteredNetwork(app);
         new Thread(() -> {
-            // The network settings first: a few lines from the signed manifest, and the ones the
-            // game uses online (servers, the PC checksum). The engine is the home screen's.
+            // Refresh signed network settings first, then independently check/install
+            // the community Core INI from the public community repository.
             UpdateManager.check(app, false);
-            UpdateManager.Result r = havePatch
-                ? UpdateManager.checkDatapackOnly(app, install, cardProgress())
-                : null;
+            UpdateManager.Result r =
+                UpdateManager.checkDatapackOnly(app, install, cardProgress());
             handler.post(() -> {
                 dataPackBusy = false;
                 refreshDataPackCard();
