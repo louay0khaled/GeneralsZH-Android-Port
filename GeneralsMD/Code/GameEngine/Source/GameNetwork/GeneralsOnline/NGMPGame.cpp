@@ -535,6 +535,14 @@ void NGMPGame::launchGame(void)
 
 #if defined(GENERALS_ONLINE_HIGH_FPS_RENDER)
 
+	// GeneralsX @bugfix Android port 02/10/2026 The 60 Hz cross-play build must
+	// render at 60 FPS as well as simulate at 60 Hz. A persisted GeneralsOnline
+	// settings.json can retain the old 30 FPS cap, which otherwise gets copied
+	// into the engine when a match starts.
+#if defined(GENERALS_ONLINE_HIGH_FPS_SERVER)
+	TheWritableGlobalData->m_framesPerSecondLimit = GENERALS_ONLINE_HIGH_FPS_LIMIT;
+	TheWritableGlobalData->m_useFpsLimit = true;
+#else
 	if (NGMP_OnlineServicesManager::Settings.Graphics_LimitFramerate())
 	{
 		TheWritableGlobalData->m_framesPerSecondLimit = NGMP_OnlineServicesManager::Settings.Graphics_GetFPSLimit();
@@ -545,6 +553,7 @@ void NGMPGame::launchGame(void)
 		TheWritableGlobalData->m_framesPerSecondLimit = 30000; // game does this... it's not great
 		TheWritableGlobalData->m_useFpsLimit = false;
 	}
+#endif
 	
 #endif
 	//TheWritableGlobalData->m_useFpsLimit = false;

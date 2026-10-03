@@ -97,7 +97,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           submodules: false
 
       - name: Checkout DXVK fork submodule
@@ -288,22 +288,29 @@ jobs:
             -DANDROID_CI_BUILD_NUMBER=${{ github.run_number }} \
             2>&1 | tee logs/configure_android.log
 
-      - name: Build z_generals (libmain.so) + DXVK d3d8/d3d9
+      - name: Build z_generals (libmain.so + libmain60.so) + DXVK d3d8/d3d9
         run: |
           set -o pipefail
           mkdir -p logs
-          # ninja -k 0: keep going past failures so ONE run surfaces every
-          # cross-compile error in the 1.6M-LOC engine instead of one per
-          # round-trip; the exit code still fails the step when anything broke.
-          # main_hook/file_redirect_hook/gsl_alloc_hook/hook_impl
-          # (cmake/adrenotools.cmake): dlopen()'d by path at runtime, not a
-          # link-time dependency of z_generals, so a targeted build skips them
-          # unless named explicitly -- package-android-zh.sh's jniLibs staging
-          # requires all four to already exist.
+          # The engine simulation tick rate is compile-time state (WWSyncPerSecond),
+          # so the launcher cannot switch 30/60 Hz inside one libmain.so. Build both
+          # variants and package both; GeneralsZHActivity selects libmain60.so for 60 Hz.
+          echo "=== pass 1/2: build 60 Hz engine ==="
+          cmake --preset ${{ env.PRESET }} -DSAGE_HIGH_FPS_SIM=ON 2>&1 | tee logs/configure_android_60hz.log
           cmake --build build/${{ env.PRESET }} --target z_generals dxvk_d3d8_install \
-            main_hook file_redirect_hook gsl_alloc_hook hook_impl -- -k 0 2>&1 | tee logs/build_android.log
-          ccache --show-stats
+            main_hook file_redirect_hook gsl_alloc_hook hook_impl -- -k 0 2>&1 | tee logs/build_android_60hz.log
+          GAME_LIB60_STASH="${{ github.workspace }}/libmain60.so"
+          cp "build/${{ env.PRESET }}/GeneralsMD/Code/Main/libmain.so" "$GAME_LIB60_STASH"
+          test -s "$GAME_LIB60_STASH"
+          echo "=== saved 60 Hz engine ==="
+          file "$GAME_LIB60_STASH"
+          "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf" -h "$GAME_LIB60_STASH" | grep -E "Class:|Machine:"
 
+          echo "=== pass 2/2: build 30 Hz engine ==="
+          cmake --preset ${{ env.PRESET }} -DSAGE_HIGH_FPS_SIM=OFF 2>&1 | tee logs/configure_android_30hz.log
+          cmake --build build/${{ env.PRESET }} --target z_generals dxvk_d3d8_install \
+            main_hook file_redirect_hook gsl_alloc_hook hook_impl -- -k 0 2>&1 | tee logs/build_android_30hz.log
+          ccache --show-stats
       - name: Verify artifacts
         run: |
           set -euo pipefail
@@ -321,7 +328,12 @@ jobs:
           # own OUTPUT_NAME (GeneralsMD/Code/Main/CMakeLists.txt) makes the
           # real path deterministic, so use it directly instead of searching.
           GAME_LIB="build/${{ env.PRESET }}/GeneralsMD/Code/Main/libmain.so"
+          GAME_LIB60="${{ github.workspace }}/libmain60.so"
           if [ ! -f "$GAME_LIB" ]; then echo "::error::libmain.so not found at $GAME_LIB"; exit 1; fi
+          if [ ! -f "$GAME_LIB60" ]; then echo "::error::libmain60.so not found at $GAME_LIB60"; exit 1; fi
+          if ! "$READELF" -h "$GAME_LIB60" 2>/dev/null | grep AArch64 >/dev/null; then
+            echo "::error::libmain60.so is not AArch64"; exit 1
+          fi
           # GeneralsX @bugfix Android port 31/07/2026 - the deterministic
           # OUTPUT_NAME path above (13/07/2026 fix) stopped `head -1` from
           # grabbing the wrong file, but the readelf check itself still
@@ -346,7 +358,7 @@ jobs:
           for lib in libdxvk_d3d8.so libdxvk_d3d9.so; do
             [ -f "build/${{ env.PRESET }}/$lib" ] || { echo "::error::$lib missing"; exit 1; }
           done
-          strings "build/${{ env.PRESET }}/libdxvk_d3d9.so" | grep -q Sdl3WsiDriver || {
+          strings "build/${{ env.PRESET }}/libdxvk_d3d9.so" | grep Sdl3WsiDriver >/dev/null || {
             echo "::error::libdxvk_d3d9.so built without the SDL3 WSI (silent fallback)"; exit 1; }
           echo "Artifacts verified: AArch64 libmain.so + DXVK with SDL3 WSI"
 
@@ -409,6 +421,7 @@ jobs:
         run: |
           STRIP="$(ls "${ANDROID_NDK_HOME}"/toolchains/llvm/prebuilt/*/bin/llvm-strip | head -1)"
           for lib in "build/${{ env.PRESET }}/GeneralsMD/Code/Main/libmain.so" \
+                     "${{ github.workspace }}/libmain60.so" \
                      "build/${{ env.PRESET }}/_deps/sdl3-build/libSDL3.so" \
                      "build/${{ env.PRESET }}/_deps/sdl3_image-build/libSDL3_image.so" \
                      "build/${{ env.PRESET }}/_deps/openal_soft-build/libopenal.so" \
@@ -446,6 +459,7 @@ jobs:
           GX_ANDROID_STAGING: ${{ github.workspace }}/android-staging
           GX_ANDROID_VERSION_CODE: ${{ steps.artifact.outputs.version_code }}
           GX_ANDROID_VERSION_NAME: ${{ steps.artifact.outputs.version_name }}
+          GX_SECOND_GAME_LIB: ${{ github.workspace }}/libmain60.so
         run: |
           ./scripts/build/android/package-android-zh.sh
 
@@ -473,6 +487,12 @@ jobs:
           unzip -q "${APK}" 'lib/arm64-v8a/*' -d "${WORKDIR}"
           echo "Packaged libraries:"
           ls "${WORKDIR}/lib/arm64-v8a/"
+          if [ ! -f "${WORKDIR}/lib/arm64-v8a/libmain.so" ]; then
+            echo "::error::APK is missing libmain.so"; exit 1
+          fi
+          if [ ! -f "${WORKDIR}/lib/arm64-v8a/libmain60.so" ]; then
+            echo "::error::APK is missing libmain60.so (60 Hz engine)"; exit 1
+          fi
           NEEDED="$("${READELF}" -d "${WORKDIR}/lib/arm64-v8a/libmain.so" | grep NEEDED | sed -E 's/.*\[(.*)\]/\1/')"
           missing=0
           for lib in ${NEEDED}; do
@@ -606,10 +626,10 @@ jobs:
               latest_run[$branch]="${run_id}"
             fi
           done < <(gh api "repos/${{ github.repository }}/actions/artifacts" --paginate \
-            --jq '.artifacts[] | [(.workflow_run.head_branch // ""), .workflow_run.id] | @tsv')
+            --jq '.artifacts[] | select((.name | test("^(GeneralsXZH-android-|android-symbols-|android-build-logs-)")) and (.workflow_run.id // 0) < ${{ github.run_id }} and (.workflow_run.head_branch // "") != "") | [(.workflow_run.head_branch // ""), .workflow_run.id] | @tsv')
 
           gh api "repos/${{ github.repository }}/actions/artifacts" --paginate \
-            --jq '.artifacts[] | [(.workflow_run.head_branch // ""), .workflow_run.id, .id] | @tsv' \
+            --jq '.artifacts[] | select((.name | test("^(GeneralsXZH-android-|android-symbols-|android-build-logs-)")) and (.workflow_run.id // 0) < ${{ github.run_id }} and (.workflow_run.head_branch // "") != "") | [(.workflow_run.head_branch // ""), .workflow_run.id, .id] | @tsv' \
           | while IFS=$'\t' read -r branch run_id artifact_id; do
               [ -z "${branch}" ] && continue
               if [ "${run_id}" != "${latest_run[$branch]:-}" ]; then

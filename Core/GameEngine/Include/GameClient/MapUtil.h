@@ -31,6 +31,7 @@
 
 #include "Common/AsciiString.h"
 #include "Common/UnicodeString.h"
+#include <string>
 
 #include "Common/STLTypedefs.h"
 
@@ -112,6 +113,62 @@ public:
 
 	const MapMetaData *findMap(AsciiString mapName);
 
+	// GeneralsX @bugfix Android port 03/10/2026
+	// NGMPGame resolves custom lobby maps using a full Android user-data path,
+	// while MapCache can contain the same path with Windows-style separators
+	// inherited from the original engine. Hide std::map::find and try both
+	// separator spellings so custom maps are recognised as already installed
+	// instead of being incorrectly offered for network transfer.
+	std::map<AsciiString, MapMetaData>::iterator find(const AsciiString &mapName)
+	{
+		std::map<AsciiString, MapMetaData>::iterator it = std::map<AsciiString, MapMetaData>::find(mapName);
+		if (it != std::map<AsciiString, MapMetaData>::end())
+		{
+			return it;
+		}
+
+		std::string variant = mapName.str();
+		for (char &c : variant)
+		{
+			if (c == '\\')
+			{
+				c = '/';
+			}
+			else if (c == '/')
+			{
+				c = '\\';
+			}
+		}
+		AsciiString alternate(variant.c_str());
+		alternate.toLower();
+		return std::map<AsciiString, MapMetaData>::find(alternate);
+	}
+
+	std::map<AsciiString, MapMetaData>::const_iterator find(const AsciiString &mapName) const
+	{
+		std::map<AsciiString, MapMetaData>::const_iterator it = std::map<AsciiString, MapMetaData>::find(mapName);
+		if (it != std::map<AsciiString, MapMetaData>::end())
+		{
+			return it;
+		}
+
+		std::string variant = mapName.str();
+		for (char &c : variant)
+		{
+			if (c == '\\')
+			{
+				c = '/';
+			}
+			else if (c == '/')
+			{
+				c = '\\';
+			}
+		}
+		AsciiString alternate(variant.c_str());
+		alternate.toLower();
+		return std::map<AsciiString, MapMetaData>::find(alternate);
+	}
+
 	// allow us to create a set of shippable maps to be in mapcache.ini.  For use with -buildMapCache.
 	void addShippingMap(AsciiString mapName) { mapName.toLower(); m_allowedMaps.insert(mapName); }
 
@@ -120,7 +177,7 @@ private:
 	Bool clearUnseenMaps(const AsciiString &mapDir);
 	void loadMapsFromMapCacheINI(const AsciiString &mapDir);
 	Bool loadMapsFromDisk(const AsciiString &mapDir, Bool isOfficial, Bool filterByAllowedMaps = FALSE); // returns true if we needed to (re)parse a map
-	Bool addMap(const AsciiString &mapDir, const AsciiString &fname, const AsciiString &lowerFname, FileInfo &fileInfo, Bool isOfficial); ///< returns true if it had to (re)parse the map
+	Bool addMap(const AsciiString &mapDir, const AsciiString &fname, const AsciiString &lowerFname, FileInfo &fileInfo, Bool isOfficial); ///< returns true if it had to (re)parse a map
 	void writeCacheINI(const AsciiString &mapDir);
 
 	static const char *const m_mapCacheName;
@@ -139,7 +196,7 @@ extern TechAndSupplyImages TheSupplyAndTechImageLocations;
 
 Int populateMapListbox( GameWindow *listbox, Bool useSystemMaps, Bool isMultiplayer, AsciiString mapToSelect = AsciiString::TheEmptyString );		/// Read a list of maps from the run directory and fill in the listbox.  Return the selected index
 Int populateMapListboxNoReset( GameWindow *listbox, Bool useSystemMaps, Bool isMultiplayer, AsciiString mapToSelect = AsciiString::TheEmptyString );		/// Read a list of maps from the run directory and fill in the listbox.  Return the selected index
-Bool isValidMap( AsciiString mapName, Bool isMultiplayer );						/// Validate a map
+Bool isValidMap( AsciiString mapName, Bool isMultiplayer);						/// Validate a map
 Image *getMapPreviewImage( AsciiString mapName );
 AsciiString getDefaultMap( Bool isMultiplayer );											/// Find a valid map
 AsciiString getDefaultOfficialMap();

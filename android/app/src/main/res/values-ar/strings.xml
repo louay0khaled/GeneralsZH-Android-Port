@@ -253,6 +253,7 @@
     <string name="online_datapacks_done">تم التحديث إلى %1$s. تم تثبيت %2$d ملفاً.</string>
     <string name="online_datapacks_failed">فشل التحديث: %1$s</string>
     <string name="online_datapacks_installed">مثبّت: الإصدار %1$s</string>
+    <string name="online_datapacks_installed_manual">تم العثور على بيانات المجتمع في مجلد بيانات اللعبة. مثبّتة يدوياً؛ لا حاجة إلى تحديثها.</string>
     <string name="online_datapacks_not_installed">غير مثبّت بعد.</string>
     <string name="online_button_datapacks_delete">حذف</string>
     <string name="online_switch_datapacks">استخدام حزمة بيانات المجتمع</string>

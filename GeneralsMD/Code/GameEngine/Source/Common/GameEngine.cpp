@@ -1217,7 +1217,23 @@ void GameEngine::update()
 			VERIFY_CRC
 
 #if defined(GENERALS_ONLINE_HIGH_FPS_RENDER)
-			// NGMP_NOTE: Lock the shellmap to 30fps until we fix everything
+			// GeneralsX @bugfix Android port 02/10/2026 A persisted GeneralsOnline
+			// settings.json may contain the old 30 FPS renderer limit. The 60 Hz
+			// Android build is selected specifically for PC cross-play, so carrying
+			// that stale client setting into a live match defeats the 60 FPS path
+			// even though the simulation binary itself is the 60 Hz build.
+#if defined(GENERALS_ONLINE_HIGH_FPS_SERVER)
+			if (TheNGMPGame != nullptr && TheGameLogic->isInGame() && !TheShell->isShellActive())
+			{
+				TheFramePacer->setFramesPerSecondLimit(GENERALS_ONLINE_HIGH_FPS_LIMIT);
+				TheWritableGlobalData->m_framesPerSecondLimit = GENERALS_ONLINE_HIGH_FPS_LIMIT;
+				TheWritableGlobalData->m_useFpsLimit = true;
+			}
+			else
+			{
+				TheFramePacer->setFramesPerSecondLimit(GENERALS_ONLINE_HIGH_FPS_LIMIT);
+			}
+#else
 			if (TheNGMPGame != nullptr && TheGameLogic->isInGame() && !TheShell->isShellActive())
 			{
 				TheFramePacer->setFramesPerSecondLimit(NGMP_OnlineServicesManager::Settings.Graphics_GetFPSLimit());
@@ -1227,6 +1243,7 @@ void GameEngine::update()
 			{
 				TheFramePacer->setFramesPerSecondLimit(GENERALS_ONLINE_HIGH_FPS_LIMIT);
 			}
+#endif
 #endif
 
 			if (gxPerfTrace) gxT0 = std::chrono::steady_clock::now();

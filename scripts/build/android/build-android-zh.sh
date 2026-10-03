@@ -66,7 +66,47 @@ fi
 
 # --- configure + build -------------------------------------------------------
 cd "${PROJECT_ROOT}"
-echo "==> Configuring (preset: android-vulkan)"
+
+echo "==> Applying Android custom-map availability compatibility fix"
+python3 - <<'PY'
+from pathlib import Path
+
+needle = 'req.options = (game->getSlot(newLocalSlotNum)->hasMap())?"1":"0";'
+replacement = '''Bool localHasMap = game->getSlot(newLocalSlotNum)->hasMap();
+\t\t\t\t\t// Android can successfully load custom maps from nested user-data
+\t\t\t\t\t// directories, but the legacy lobby flag can remain false because
+\t\t\t\t\t// it is not populated from MapCache for non-official maps.  Report
+\t\t\t\t\t// the map as present when the engine can actually resolve it locally;
+\t\t\t\t\t// otherwise the PC host starts a pointless map transfer and Android's
+\t\t\t\t\t// legacy transfer path hangs/fails.
+\t\t\t\t\tif (!localHasMap && TheMapCache)
+\t\t\t\t\t{
+\t\t\t\t\t\tTheMapCache->updateCache();
+\t\t\t\t\t\tlocalHasMap = (TheMapCache->findMap(game->getMap()) != nullptr);
+\t\t\t\t\t\tif (localHasMap)
+\t\t\t\t\t\t\tgame->getSlot(newLocalSlotNum)->setMapAvailability(TRUE);
+\t\t\t\t\t}
+\t\t\t\t\treq.options = localHasMap ? "1" : "0";'''
+
+roots = [Path('Generals'), Path('GeneralsMD')]
+patched = []
+for root in roots:
+    if not root.exists():
+        continue
+    for path in root.rglob('WOLGameSetupMenu.cpp'):
+        text = path.read_text(encoding='utf-8')
+        if needle not in text:
+            continue
+        if text.count(needle) != 1:
+            raise SystemExit(f'Expected exactly one map-availability line in {path}, found {text.count(needle)}')
+        path.write_text(text.replace(needle, replacement), encoding='utf-8')
+        patched.append(str(path))
+
+if len(patched) != 1:
+    raise SystemExit(f'Expected exactly one WOLGameSetupMenu.cpp to patch, found {patched}')
+print(f'Patched custom-map availability in {patched[0]}')
+PY
+
 cmake --preset android-vulkan
 
 if [[ $CONFIGURE_ONLY -eq 1 ]]; then
@@ -88,8 +128,7 @@ echo "==> Building z_generals (libmain.so) + DXVK d3d8/d3d9"
 # It bakes in __DATE__/__TIME__, and nothing normally edits that file, so an
 # incremental build left the stamp frozen at whenever it was last touched -- which
 # made every device log claim the same build date regardless of what was actually
-# installed. Several rounds of a bug hunt were spent unable to tell one build from
-# another because of it. One touch is cheaper than that ambiguity.
+# installed. One touch is cheaper than that ambiguity.
 touch "${PROJECT_ROOT}/GeneralsMD/Code/Main/AndroidCrashHandler.cpp"
 
 cmake --build "${BUILD_DIR}" --target z_generals dxvk_d3d8_install \

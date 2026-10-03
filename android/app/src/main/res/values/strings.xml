@@ -224,6 +224,7 @@
     <string name="online_datapacks_done">Updated to %1$s. %2$d files installed.</string>
     <string name="online_datapacks_failed">Update failed: %1$s</string>
     <string name="online_datapacks_installed">Installed: version %1$s</string>
+    <string name="online_datapacks_installed_manual">Community data found in the game data folder. Installed manually; no update is needed.</string>
     <string name="online_datapacks_not_installed">Not installed yet.</string>
     <string name="online_button_datapacks_delete">Delete</string>
     <string name="online_switch_datapacks">Use the community data patch</string>
