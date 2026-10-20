@@ -51,8 +51,11 @@
 
 package com.generalsx.zerohour;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
@@ -68,6 +71,9 @@ import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
@@ -89,7 +95,112 @@ final class UiKit {
     }
 
     static int color(Context c, int colorRes) {
-        return ContextCompat.getColor(c, colorRes);
+        int themed = themedColorRes(c, colorRes);
+        return ContextCompat.getColor(c, themed != 0 ? themed : colorRes);
+    }
+
+    /**
+     * Maps a base gzh_* colour resource to the active theme's variant,
+     * or 0 when the resource is not a themed launcher token. Results are
+     * cached per resource id; the cache is dropped on every theme change.
+     */
+    private static int themedColorRes(Context c, int colorRes) {
+        int theme = themeIndex(c);
+        if (theme == THEME_TACTICAL) {
+            return 0;
+        }
+        Integer cached = themedResCache.get(colorRes);
+        if (cached != null) {
+            return cached;
+        }
+        int resolved = 0;
+        try {
+            Resources res = c.getResources();
+            if (c.getPackageName().equals(res.getResourcePackageName(colorRes))) {
+                String name = res.getResourceEntryName(colorRes);
+                if (name.startsWith("gzh_")) {
+                    resolved = res.getIdentifier(
+                        THEME_PREFIX[theme] + name.substring(4), "color", c.getPackageName());
+                }
+            }
+        } catch (Resources.NotFoundException ignored) {
+            resolved = 0;
+        }
+        themedResCache.put(colorRes, resolved);
+        return resolved;
+    }
+
+    // GeneralsX @feature Android port launcher-themes 20/10/2026
+    // Runtime launcher themes: four presets whose colour tokens live in
+    // values/colors.xml (gzhg_* / gzh_* / gzhm_* / gzhc_*), chosen in
+    // Setup's Interface tab, persisted in the setup SharedPreferences
+    // and re-applied on every launch. color() re-points every gzh_*
+    // token at the active theme's variant, so existing call sites follow
+    // the theme without knowing it exists; the XML drawables that cannot
+    // be re-pointed that way (page background, hero plate) ship per-theme
+    // variants picked by the *Res() helpers below; and Material/framework
+    // widgets follow through the ThemeOverlay.ZeroHour.* styles applied
+    // by applyThemeOverlay(). The default (no saved choice) is Generals,
+    // the palette of the app icon: royal blue + eagle gold.
+    static final int THEME_GENERALS = 0;
+    static final int THEME_TACTICAL = 1;
+    static final int THEME_MIDNIGHT = 2;
+    static final int THEME_CRIMSON = 3;
+    static final int THEME_COUNT = 4;
+    private static final String THEME_PREFS = "generalszh_setup";
+    private static final String THEME_KEY = "ui_theme";
+    private static final String[] THEME_PREFIX = { "gzhg_", "gzh_", "gzhm_", "gzhc_" };
+
+    private static int activeTheme = -1;
+    private static final Map<Integer, Integer> themedResCache = new HashMap<>();
+
+    static int themeIndex(Context c) {
+        if (activeTheme < 0) {
+            int saved = c.getSharedPreferences(THEME_PREFS, Context.MODE_PRIVATE)
+                .getInt(THEME_KEY, THEME_GENERALS);
+            activeTheme = saved >= 0 && saved < THEME_COUNT ? saved : THEME_GENERALS;
+        }
+        return activeTheme;
+    }
+
+    static void setThemeIndex(Context c, int index) {
+        activeTheme = index >= 0 && index < THEME_COUNT ? index : THEME_GENERALS;
+        themedResCache.clear();
+        SharedPreferences prefs = c.getSharedPreferences(THEME_PREFS, Context.MODE_PRIVATE);
+        prefs.edit().putInt(THEME_KEY, activeTheme).apply();
+    }
+
+    /** Applies the active theme's Material overlay; call first in onCreate. */
+    static void applyThemeOverlay(Activity activity) {
+        int res;
+        switch (themeIndex(activity)) {
+            case THEME_TACTICAL: res = R.style.ThemeOverlay_ZeroHour_Tactical; break;
+            case THEME_MIDNIGHT: res = R.style.ThemeOverlay_ZeroHour_Midnight; break;
+            case THEME_CRIMSON: res = R.style.ThemeOverlay_ZeroHour_Crimson; break;
+            case THEME_GENERALS:
+            default: res = R.style.ThemeOverlay_ZeroHour_Generals; break;
+        }
+        activity.getTheme().applyStyle(res, true);
+    }
+
+    private static int pageBackgroundRes(Context c) {
+        switch (themeIndex(c)) {
+            case THEME_GENERALS: return R.drawable.gzh_page_background_g;
+            case THEME_MIDNIGHT: return R.drawable.gzh_page_background_m;
+            case THEME_CRIMSON: return R.drawable.gzh_page_background_c;
+            case THEME_TACTICAL:
+            default: return R.drawable.gzh_page_background;
+        }
+    }
+
+    private static int heroBackgroundRes(Context c) {
+        switch (themeIndex(c)) {
+            case THEME_GENERALS: return R.drawable.gzh_hero_background_g;
+            case THEME_MIDNIGHT: return R.drawable.gzh_hero_background_m;
+            case THEME_CRIMSON: return R.drawable.gzh_hero_background_c;
+            case THEME_TACTICAL:
+            default: return R.drawable.gzh_hero_background;
+        }
     }
 
     static ColorStateList tint(Context c, int colorRes) {
@@ -156,7 +267,7 @@ final class UiKit {
      */
     static void applyPageBackground(View view) {
         view.setBackground(ContextCompat.getDrawable(view.getContext(),
-            R.drawable.gzh_page_background));
+            pageBackgroundRes(view.getContext())));
     }
 
     /**
@@ -356,7 +467,7 @@ final class UiKit {
         Context c = parent.getContext();
         LinearLayout panel = new LinearLayout(c);
         panel.setOrientation(LinearLayout.VERTICAL);
-        panel.setBackground(ContextCompat.getDrawable(c, R.drawable.gzh_hero_background));
+        panel.setBackground(ContextCompat.getDrawable(c, heroBackgroundRes(c)));
 
         LinearLayout body = new LinearLayout(c);
         body.setOrientation(LinearLayout.VERTICAL);

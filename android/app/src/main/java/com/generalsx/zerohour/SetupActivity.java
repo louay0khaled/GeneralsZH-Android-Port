@@ -146,6 +146,7 @@ public class SetupActivity extends Activity {
         // Setup -> Launch rotation race that used to be sidestepped by never
         // rotating Setup at all.
         super.onCreate(savedInstanceState);
+        UiKit.applyThemeOverlay(this);
         setTitle(R.string.setup_window_title);
 
         // GeneralsX @feature Android port launcher-ui-2026 08/09/2026 Which
@@ -397,6 +398,7 @@ public class SetupActivity extends Activity {
                 }
                 break;
             case TAB_INTERFACE:
+                buildThemeSection(page);
                 buildLanguageSection(page);
                 buildUiScaleSection(page);
                 buildInterfaceScaleSection(page);
@@ -569,6 +571,49 @@ public class SetupActivity extends Activity {
     // -- see LocaleHelper for why it's a manual attachBaseContext() wrap
     // rather than androidx.appcompat's per-app language API, and why
     // "System Default" needs no explicit handling.
+    private TextView themeValueView;
+
+    // GeneralsX @feature Android port launcher-themes 20/10/2026 Launcher
+    // theme picker (Interface tab): the presets defined in UiKit, shown
+    // with their localized names; UiKit persists the choice and the
+    // recreate() below repaints the whole launcher in the new palette.
+    private void buildThemeSection(LinearLayout page) {
+        LinearLayout body = UiKit.card(page);
+        themeValueView = UiKit.sectionHeader(body, R.drawable.ic_gzh_display,
+            getString(R.string.setup_card_theme), true);
+        themeValueView.setText(themeName(UiKit.themeIndex(this)));
+        UiKit.button(body, UiKit.BTN_TONAL, 0,
+            getString(R.string.setup_button_change_theme), this::onChangeTheme);
+    }
+
+    private String themeName(int index) {
+        switch (index) {
+            case UiKit.THEME_TACTICAL: return getString(R.string.theme_name_tactical);
+            case UiKit.THEME_MIDNIGHT: return getString(R.string.theme_name_midnight);
+            case UiKit.THEME_CRIMSON: return getString(R.string.theme_name_crimson);
+            case UiKit.THEME_GENERALS:
+            default: return getString(R.string.theme_name_generals);
+        }
+    }
+
+    private void onChangeTheme() {
+        final CharSequence[] names = new CharSequence[UiKit.THEME_COUNT];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = themeName(i);
+        }
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.setup_theme_dialog_title)
+            .setSingleChoiceItems(names, UiKit.themeIndex(this), (dialog, which) -> {
+                dialog.dismiss();
+                if (which != UiKit.themeIndex(this)) {
+                    UiKit.setThemeIndex(this, which);
+                    recreate();
+                }
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .show();
+    }
+
     private void buildLanguageSection(LinearLayout root) {
         LinearLayout content = UiKit.card(root);
         // The current language is the value the header carries, so the card
@@ -2034,7 +2079,7 @@ public class SetupActivity extends Activity {
                 }
             }
             int statusEnd = sb.length();
-            sb.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, statusColorRes)),
+            sb.setSpan(new ForegroundColorSpan(UiKit.color(this, statusColorRes)),
                 statusStart, statusEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new StyleSpan(Typeface.BOLD), statusStart, statusEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new UnderlineSpan(), statusStart, statusEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);

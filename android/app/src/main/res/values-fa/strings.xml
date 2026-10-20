@@ -245,4 +245,11 @@
     <string name="setup_hero_folder_ready">Game folder ready</string>
     <string name="setup_hero_folder_missing">Game folder not set</string>
     <string name="setup_hero_folder_check">Game folder needs attention</string>
+    <string name="setup_card_theme">پوسته</string>
+    <string name="setup_button_change_theme">تغییر پوسته</string>
+    <string name="setup_theme_dialog_title">انتخاب پوسته</string>
+    <string name="theme_name_generals">جنرالز</string>
+    <string name="theme_name_tactical">فرماندهی تاکتیکی</string>
+    <string name="theme_name_midnight">فولاد نیمه‌شب</string>
+    <string name="theme_name_crimson">فرماندهی سرخ</string>
 </resources>

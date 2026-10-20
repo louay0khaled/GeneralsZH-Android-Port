@@ -245,4 +245,11 @@
     <string name="setup_hero_folder_ready">Game folder ready</string>
     <string name="setup_hero_folder_missing">Game folder not set</string>
     <string name="setup_hero_folder_check">Game folder needs attention</string>
+    <string name="setup_card_theme">테마</string>
+    <string name="setup_button_change_theme">테마 변경</string>
+    <string name="setup_theme_dialog_title">테마 선택</string>
+    <string name="theme_name_generals">제너럴스</string>
+    <string name="theme_name_tactical">택티컬 커맨드</string>
+    <string name="theme_name_midnight">미드나이트 스틸</string>
+    <string name="theme_name_crimson">크림슨 커맨드</string>
 </resources>

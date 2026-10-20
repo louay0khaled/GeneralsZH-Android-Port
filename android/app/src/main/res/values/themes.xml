@@ -125,4 +125,202 @@
     <style name="ThemeOverlay.GeneralsZH.OutlinedField" parent="">
         <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
     </style>
+
+    <!-- GeneralsX @feature Android port launcher-themes 20/10/2026
+         Runtime theme overlays, applied by UiKit.applyThemeOverlay()
+         at the start of every launcher Activity's onCreate. Each one
+         re-points the Material/framework colour slots at that
+         theme's token set; UiKit.color() does the same for every
+         colour the launcher resolves in code. -->
+    <style name="ThemeOverlay.ZeroHour.Generals" parent="">
+        <item name="colorPrimary">@color/gzhg_primary</item>
+        <item name="colorOnPrimary">@color/gzhg_on_primary</item>
+        <item name="colorPrimaryContainer">@color/gzhg_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/gzhg_on_primary_container</item>
+        <item name="colorSecondary">@color/gzhg_secondary</item>
+        <item name="colorOnSecondary">@color/gzhg_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/gzhg_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/gzhg_on_secondary_container</item>
+        <item name="colorTertiary">@color/gzhg_tertiary</item>
+        <item name="colorOnTertiary">@color/gzhg_on_tertiary</item>
+        <item name="colorTertiaryContainer">@color/gzhg_tertiary_container</item>
+        <item name="colorOnTertiaryContainer">@color/gzhg_on_tertiary_container</item>
+        <item name="colorError">@color/gzhg_error</item>
+        <item name="colorOnError">@color/gzhg_on_error</item>
+        <item name="colorErrorContainer">@color/gzhg_error_container</item>
+        <item name="colorOnErrorContainer">@color/gzhg_on_error_container</item>
+        <item name="colorSurface">@color/gzhg_surface</item>
+        <item name="colorOnSurface">@color/gzhg_on_surface</item>
+        <item name="colorSurfaceVariant">@color/gzhg_surface_container_high</item>
+        <item name="colorOnSurfaceVariant">@color/gzhg_on_surface_variant</item>
+        <item name="colorOutline">@color/gzhg_outline</item>
+        <item name="colorPrimaryDark">@color/gzhg_primary_dark</item>
+        <item name="colorAccent">@color/gzhg_accent</item>
+        <item name="android:colorBackground">@color/gzhg_background</item>
+        <item name="colorOnBackground">@color/gzhg_on_surface</item>
+        <item name="android:windowBackground">@drawable/gzh_page_background_g</item>
+        <item name="android:textColorPrimary">@color/gzhg_on_surface</item>
+        <item name="android:textColorSecondary">@color/gzhg_on_surface_variant</item>
+        <item name="android:textColorTertiary">@color/gzhg_on_surface_faint</item>
+        <item name="android:textColorHint">@color/gzhg_on_surface_faint</item>
+        <item name="android:textColorHighlight">@color/gzhg_primary_container</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.GeneralsZH.Dialog.Generals</item>
+        <item name="android:alertDialogTheme">@style/Theme.GeneralsZH.AlertDialog.Generals</item>
+    </style>
+    <style name="ThemeOverlay.ZeroHour.Tactical" parent="">
+        <item name="colorPrimary">@color/gzh_primary</item>
+        <item name="colorOnPrimary">@color/gzh_on_primary</item>
+        <item name="colorPrimaryContainer">@color/gzh_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/gzh_on_primary_container</item>
+        <item name="colorSecondary">@color/gzh_secondary</item>
+        <item name="colorOnSecondary">@color/gzh_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/gzh_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/gzh_on_secondary_container</item>
+        <item name="colorTertiary">@color/gzh_tertiary</item>
+        <item name="colorOnTertiary">@color/gzh_on_tertiary</item>
+        <item name="colorTertiaryContainer">@color/gzh_tertiary_container</item>
+        <item name="colorOnTertiaryContainer">@color/gzh_on_tertiary_container</item>
+        <item name="colorError">@color/gzh_error</item>
+        <item name="colorOnError">@color/gzh_on_error</item>
+        <item name="colorErrorContainer">@color/gzh_error_container</item>
+        <item name="colorOnErrorContainer">@color/gzh_on_error_container</item>
+        <item name="colorSurface">@color/gzh_surface</item>
+        <item name="colorOnSurface">@color/gzh_on_surface</item>
+        <item name="colorSurfaceVariant">@color/gzh_surface_container_high</item>
+        <item name="colorOnSurfaceVariant">@color/gzh_on_surface_variant</item>
+        <item name="colorOutline">@color/gzh_outline</item>
+        <item name="colorPrimaryDark">@color/gzh_primary_dark</item>
+        <item name="colorAccent">@color/gzh_accent</item>
+        <item name="android:colorBackground">@color/gzh_background</item>
+        <item name="colorOnBackground">@color/gzh_on_surface</item>
+        <item name="android:windowBackground">@drawable/gzh_page_background</item>
+        <item name="android:textColorPrimary">@color/gzh_on_surface</item>
+        <item name="android:textColorSecondary">@color/gzh_on_surface_variant</item>
+        <item name="android:textColorTertiary">@color/gzh_on_surface_faint</item>
+        <item name="android:textColorHint">@color/gzh_on_surface_faint</item>
+        <item name="android:textColorHighlight">@color/gzh_primary_container</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.GeneralsZH.Dialog</item>
+        <item name="android:alertDialogTheme">@style/Theme.GeneralsZH.AlertDialog</item>
+    </style>
+    <style name="ThemeOverlay.ZeroHour.Midnight" parent="">
+        <item name="colorPrimary">@color/gzhm_primary</item>
+        <item name="colorOnPrimary">@color/gzhm_on_primary</item>
+        <item name="colorPrimaryContainer">@color/gzhm_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/gzhm_on_primary_container</item>
+        <item name="colorSecondary">@color/gzhm_secondary</item>
+        <item name="colorOnSecondary">@color/gzhm_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/gzhm_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/gzhm_on_secondary_container</item>
+        <item name="colorTertiary">@color/gzhm_tertiary</item>
+        <item name="colorOnTertiary">@color/gzhm_on_tertiary</item>
+        <item name="colorTertiaryContainer">@color/gzhm_tertiary_container</item>
+        <item name="colorOnTertiaryContainer">@color/gzhm_on_tertiary_container</item>
+        <item name="colorError">@color/gzhm_error</item>
+        <item name="colorOnError">@color/gzhm_on_error</item>
+        <item name="colorErrorContainer">@color/gzhm_error_container</item>
+        <item name="colorOnErrorContainer">@color/gzhm_on_error_container</item>
+        <item name="colorSurface">@color/gzhm_surface</item>
+        <item name="colorOnSurface">@color/gzhm_on_surface</item>
+        <item name="colorSurfaceVariant">@color/gzhm_surface_container_high</item>
+        <item name="colorOnSurfaceVariant">@color/gzhm_on_surface_variant</item>
+        <item name="colorOutline">@color/gzhm_outline</item>
+        <item name="colorPrimaryDark">@color/gzhm_primary_dark</item>
+        <item name="colorAccent">@color/gzhm_accent</item>
+        <item name="android:colorBackground">@color/gzhm_background</item>
+        <item name="colorOnBackground">@color/gzhm_on_surface</item>
+        <item name="android:windowBackground">@drawable/gzh_page_background_m</item>
+        <item name="android:textColorPrimary">@color/gzhm_on_surface</item>
+        <item name="android:textColorSecondary">@color/gzhm_on_surface_variant</item>
+        <item name="android:textColorTertiary">@color/gzhm_on_surface_faint</item>
+        <item name="android:textColorHint">@color/gzhm_on_surface_faint</item>
+        <item name="android:textColorHighlight">@color/gzhm_primary_container</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.GeneralsZH.Dialog.Midnight</item>
+        <item name="android:alertDialogTheme">@style/Theme.GeneralsZH.AlertDialog.Midnight</item>
+    </style>
+    <style name="ThemeOverlay.ZeroHour.Crimson" parent="">
+        <item name="colorPrimary">@color/gzhc_primary</item>
+        <item name="colorOnPrimary">@color/gzhc_on_primary</item>
+        <item name="colorPrimaryContainer">@color/gzhc_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/gzhc_on_primary_container</item>
+        <item name="colorSecondary">@color/gzhc_secondary</item>
+        <item name="colorOnSecondary">@color/gzhc_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/gzhc_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/gzhc_on_secondary_container</item>
+        <item name="colorTertiary">@color/gzhc_tertiary</item>
+        <item name="colorOnTertiary">@color/gzhc_on_tertiary</item>
+        <item name="colorTertiaryContainer">@color/gzhc_tertiary_container</item>
+        <item name="colorOnTertiaryContainer">@color/gzhc_on_tertiary_container</item>
+        <item name="colorError">@color/gzhc_error</item>
+        <item name="colorOnError">@color/gzhc_on_error</item>
+        <item name="colorErrorContainer">@color/gzhc_error_container</item>
+        <item name="colorOnErrorContainer">@color/gzhc_on_error_container</item>
+        <item name="colorSurface">@color/gzhc_surface</item>
+        <item name="colorOnSurface">@color/gzhc_on_surface</item>
+        <item name="colorSurfaceVariant">@color/gzhc_surface_container_high</item>
+        <item name="colorOnSurfaceVariant">@color/gzhc_on_surface_variant</item>
+        <item name="colorOutline">@color/gzhc_outline</item>
+        <item name="colorPrimaryDark">@color/gzhc_primary_dark</item>
+        <item name="colorAccent">@color/gzhc_accent</item>
+        <item name="android:colorBackground">@color/gzhc_background</item>
+        <item name="colorOnBackground">@color/gzhc_on_surface</item>
+        <item name="android:windowBackground">@drawable/gzh_page_background_c</item>
+        <item name="android:textColorPrimary">@color/gzhc_on_surface</item>
+        <item name="android:textColorSecondary">@color/gzhc_on_surface_variant</item>
+        <item name="android:textColorTertiary">@color/gzhc_on_surface_faint</item>
+        <item name="android:textColorHint">@color/gzhc_on_surface_faint</item>
+        <item name="android:textColorHighlight">@color/gzhc_primary_container</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.GeneralsZH.Dialog.Crimson</item>
+        <item name="android:alertDialogTheme">@style/Theme.GeneralsZH.AlertDialog.Crimson</item>
+    </style>
+    <style name="MaterialAlertDialog.GeneralsZH.Body.Generals" parent="MaterialAlertDialog.GeneralsZH.Body">
+        <item name="android:textColor">@color/gzhg_on_surface_variant</item>
+    </style>
+    <style name="ThemeOverlay.GeneralsZH.Dialog.Generals" parent="ThemeOverlay.GeneralsZH.Dialog">
+        <item name="colorSurface">@color/gzhg_glass_surface_high</item>
+        <item name="colorPrimary">@color/gzhg_primary</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.GeneralsZH.Body.Generals</item>
+        <item name="android:textColorPrimary">@color/gzhg_on_surface</item>
+        <item name="android:textColorSecondary">@color/gzhg_on_surface_variant</item>
+    </style>
+    <style name="Theme.GeneralsZH.AlertDialog.Generals" parent="Theme.GeneralsZH.AlertDialog">
+        <item name="android:windowBackground">@drawable/gzh_dialog_background_g</item>
+        <item name="android:colorAccent">@color/gzhg_primary</item>
+        <item name="android:textColorPrimary">@color/gzhg_on_surface</item>
+        <item name="android:textColorSecondary">@color/gzhg_on_surface_variant</item>
+        <item name="android:textColorAlertDialogListItem">@color/gzhg_on_surface</item>
+    </style>
+    <style name="MaterialAlertDialog.GeneralsZH.Body.Midnight" parent="MaterialAlertDialog.GeneralsZH.Body">
+        <item name="android:textColor">@color/gzhm_on_surface_variant</item>
+    </style>
+    <style name="ThemeOverlay.GeneralsZH.Dialog.Midnight" parent="ThemeOverlay.GeneralsZH.Dialog">
+        <item name="colorSurface">@color/gzhm_glass_surface_high</item>
+        <item name="colorPrimary">@color/gzhm_primary</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.GeneralsZH.Body.Midnight</item>
+        <item name="android:textColorPrimary">@color/gzhm_on_surface</item>
+        <item name="android:textColorSecondary">@color/gzhm_on_surface_variant</item>
+    </style>
+    <style name="Theme.GeneralsZH.AlertDialog.Midnight" parent="Theme.GeneralsZH.AlertDialog">
+        <item name="android:windowBackground">@drawable/gzh_dialog_background_m</item>
+        <item name="android:colorAccent">@color/gzhm_primary</item>
+        <item name="android:textColorPrimary">@color/gzhm_on_surface</item>
+        <item name="android:textColorSecondary">@color/gzhm_on_surface_variant</item>
+        <item name="android:textColorAlertDialogListItem">@color/gzhm_on_surface</item>
+    </style>
+    <style name="MaterialAlertDialog.GeneralsZH.Body.Crimson" parent="MaterialAlertDialog.GeneralsZH.Body">
+        <item name="android:textColor">@color/gzhc_on_surface_variant</item>
+    </style>
+    <style name="ThemeOverlay.GeneralsZH.Dialog.Crimson" parent="ThemeOverlay.GeneralsZH.Dialog">
+        <item name="colorSurface">@color/gzhc_glass_surface_high</item>
+        <item name="colorPrimary">@color/gzhc_primary</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.GeneralsZH.Body.Crimson</item>
+        <item name="android:textColorPrimary">@color/gzhc_on_surface</item>
+        <item name="android:textColorSecondary">@color/gzhc_on_surface_variant</item>
+    </style>
+    <style name="Theme.GeneralsZH.AlertDialog.Crimson" parent="Theme.GeneralsZH.AlertDialog">
+        <item name="android:windowBackground">@drawable/gzh_dialog_background_c</item>
+        <item name="android:colorAccent">@color/gzhc_primary</item>
+        <item name="android:textColorPrimary">@color/gzhc_on_surface</item>
+        <item name="android:textColorSecondary">@color/gzhc_on_surface_variant</item>
+        <item name="android:textColorAlertDialogListItem">@color/gzhc_on_surface</item>
+    </style>
 </resources>

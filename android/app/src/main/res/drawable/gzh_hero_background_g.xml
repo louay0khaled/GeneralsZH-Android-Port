@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- GeneralsX @feature Android port tactical-command-ui 20/10/2026
+     Setup hero panel (UiKit.heroPanel): a flat dark-olive plate with a
+     khaki hairline border, sharp 4dp corners, and signal-amber corner
+     tick marks at all four corners — the targeting-reticle language of
+     the Tactical Command identity. Ticks are symmetric, so they read
+     identically in LTR and RTL. Item width/height/gravity are API 23+,
+     safe at minSdk 28. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Plate. -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="@color/gzhg_hero_start"
+                android:endColor="@color/gzhg_hero_end" />
+            <stroke
+                android:width="1dp"
+                android:color="@color/gzhg_glass_stroke" />
+            <corners android:radius="4dp" />
+        </shape>
+    </item>
+    <!-- Corner ticks: horizontal arms. -->
+    <item
+        android:width="16dp"
+        android:height="3dp"
+        android:gravity="top|left">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gzhg_amber" />
+        </shape>
+    </item>
+    <item
+        android:width="16dp"
+        android:height="3dp"
+        android:gravity="top|right">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gzhg_amber" />
+        </shape>
+    </item>
+    <item
+        android:width="16dp"
+        android:height="3dp"
+        android:gravity="bottom|left">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gzhg_amber" />
+        </shape>
+    </item>
+    <item
+        android:width="16dp"
+        android:height="3dp"
+        android:gravity="bottom|right">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gzhg_amber" />
+        </shape>
+    </item>
+    <!-- Corner ticks: vertical arms. -->
+    <item
+        android:width="3dp"
+        android:height="16dp"
+        android:gravity="top|left">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gzhg_amber" />
+        </shape>
+    </item>
+    <item
+        android:width="3dp"
+        android:height="16dp"
+        android:gravity="top|right">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gzhg_amber" />
+        </shape>
+    </item>
+    <item
+        android:width="3dp"
+        android:height="16dp"
+        android:gravity="bottom|left">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gzhg_amber" />
+        </shape>
+    </item>
+    <item
+        android:width="3dp"
+        android:height="16dp"
+        android:gravity="bottom|right">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gzhg_amber" />
+        </shape>
+    </item>
+</layer-list>

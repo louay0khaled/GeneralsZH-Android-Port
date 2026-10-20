@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- GeneralsX @feature Android port tactical-command-ui 20/10/2026
+     Blueprint grid tile for the Tactical Command page backdrop: faint
+     warm-white hairlines on a 36-unit lattice, drawn in a 360x640
+     viewport and stretched to fill the window by @drawable/
+     gzh_page_background. Pure vector — no bitmap, identical on API 28+. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="640dp"
+    android:viewportWidth="360"
+    android:viewportHeight="640">
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M36,0 h0.8 v640 h-0.8 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M72,0 h0.8 v640 h-0.8 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M108,0 h0.8 v640 h-0.8 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M144,0 h0.8 v640 h-0.8 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M180,0 h0.8 v640 h-0.8 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M216,0 h0.8 v640 h-0.8 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M252,0 h0.8 v640 h-0.8 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M288,0 h0.8 v640 h-0.8 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M324,0 h0.8 v640 h-0.8 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,36 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,72 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,108 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,144 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,180 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,216 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,252 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,288 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,324 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,360 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,396 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,432 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,468 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,504 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,540 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,576 h360 v0.8 h-360 Z" />
+    <path android:fillColor="@color/gzhm_grid_line" android:pathData="M0,612 h360 v0.8 h-360 Z" />
+</vector>

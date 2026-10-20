@@ -133,6 +133,7 @@ public class GeneralsOnlineActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        UiKit.applyThemeOverlay(this);
         setTitle(R.string.online_window_title);
         buildUi();
         refreshStatus();
@@ -360,7 +361,7 @@ public class GeneralsOnlineActivity extends Activity {
         if (chip == null) {
             return;
         }
-        int tint = androidx.core.content.ContextCompat.getColor(this, colorRes);
+        int tint = UiKit.color(this, colorRes);
         chip.setText(labelRes);
         chip.setTextColor(tint);
         android.graphics.drawable.Drawable icon =

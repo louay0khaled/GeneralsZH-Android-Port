@@ -245,4 +245,11 @@
     <string name="setup_hero_folder_ready">Game folder ready</string>
     <string name="setup_hero_folder_missing">Game folder not set</string>
     <string name="setup_hero_folder_check">Game folder needs attention</string>
+    <string name="setup_card_theme">Design</string>
+    <string name="setup_button_change_theme">Design ändern</string>
+    <string name="setup_theme_dialog_title">Design wählen</string>
+    <string name="theme_name_generals">Generals</string>
+    <string name="theme_name_tactical">Taktisches Kommando</string>
+    <string name="theme_name_midnight">Mitternachtsstahl</string>
+    <string name="theme_name_crimson">Purpur-Kommando</string>
 </resources>

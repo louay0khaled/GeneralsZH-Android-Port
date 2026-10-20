@@ -245,4 +245,11 @@
     <string name="setup_hero_folder_ready">Game folder ready</string>
     <string name="setup_hero_folder_missing">Game folder not set</string>
     <string name="setup_hero_folder_check">Game folder needs attention</string>
+    <string name="setup_card_theme">主题</string>
+    <string name="setup_button_change_theme">更改主题</string>
+    <string name="setup_theme_dialog_title">选择主题</string>
+    <string name="theme_name_generals">将军</string>
+    <string name="theme_name_tactical">战术指挥</string>
+    <string name="theme_name_midnight">午夜钢铁</string>
+    <string name="theme_name_crimson">绯红指挥</string>
 </resources>

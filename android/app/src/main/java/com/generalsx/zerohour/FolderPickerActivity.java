@@ -68,6 +68,7 @@ public class FolderPickerActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        UiKit.applyThemeOverlay(this);
         setTitle(R.string.folderpicker_title);
 
         File start = Environment.getExternalStorageDirectory();

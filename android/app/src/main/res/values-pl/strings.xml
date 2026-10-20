@@ -245,4 +245,11 @@
     <string name="setup_hero_folder_ready">Game folder ready</string>
     <string name="setup_hero_folder_missing">Game folder not set</string>
     <string name="setup_hero_folder_check">Game folder needs attention</string>
+    <string name="setup_card_theme">Motyw</string>
+    <string name="setup_button_change_theme">Zmień motyw</string>
+    <string name="setup_theme_dialog_title">Wybierz motyw</string>
+    <string name="theme_name_generals">Generals</string>
+    <string name="theme_name_tactical">Dowództwo taktyczne</string>
+    <string name="theme_name_midnight">Stal północy</string>
+    <string name="theme_name_crimson">Karmazynowe dowództwo</string>
 </resources>
