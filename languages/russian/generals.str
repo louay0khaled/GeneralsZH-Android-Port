@@ -25728,6 +25728,26 @@ GX:ToolTipBuilderPageBack
 "Вернуться к списку построек"
 END
 
+GX:SelectInfantry
+"Пехота"
+END
+
+GX:SelectVehicles
+"Техника"
+END
+
+GX:SelectJets
+"Истребители"
+END
+
+GX:SelectHelicopters
+"Вертолёты"
+END
+
+GX:SelectAllArmy
+"Вся армия"
+END
+
 GUI:LoadReplayLong
 "ЗАГРУЗИТЬ ПОВТОР"
 END
