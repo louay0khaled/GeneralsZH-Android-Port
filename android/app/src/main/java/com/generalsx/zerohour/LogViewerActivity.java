@@ -108,7 +108,7 @@ public class LogViewerActivity extends Activity {
         // the app having failed to draw anything.
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(UiKit.color(this, R.color.gzh_background));
+        UiKit.applyPageBackground(root);
 
         UiKit.appBar(root, getString(R.string.setup_window_title),
             getString(R.string.logviewer_title), 0, null, null);
@@ -142,9 +142,10 @@ public class LogViewerActivity extends Activity {
 
         MaterialCardView logCard = new MaterialCardView(this);
         logCard.setRadius(UiKit.dim(this, R.dimen.gzh_radius_card));
-        logCard.setCardElevation(0f);
-        logCard.setCardBackgroundColor(UiKit.color(this, R.color.gzh_surface_container));
-        logCard.setStrokeWidth(0);
+        logCard.setCardElevation(UiKit.dp(this, 6));
+        logCard.setCardBackgroundColor(UiKit.color(this, R.color.gzh_glass_surface));
+        logCard.setStrokeColor(UiKit.color(this, R.color.gzh_glass_stroke));
+        logCard.setStrokeWidth(Math.max(1, UiKit.dp(this, 1)));
         logCard.setUseCompatPadding(false);
         logCard.setPreventCornerOverlap(false);
 

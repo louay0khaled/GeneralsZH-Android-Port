@@ -268,7 +268,7 @@ public class SetupActivity extends Activity {
 
         LinearLayout shell = new LinearLayout(this);
         shell.setOrientation(LinearLayout.VERTICAL);
-        shell.setBackgroundColor(UiKit.color(this, R.color.gzh_background));
+        UiKit.applyPageBackground(shell);
         setContentView(shell);
         // Edge-to-edge still handled the same way: pad the outermost view by
         // the system bars/cutout so the app bar clears the status bar and the
@@ -305,8 +305,9 @@ public class SetupActivity extends Activity {
         nav.setLayoutDirection(android.view.View.LAYOUT_DIRECTION_LTR);
         nav.setTextDirection(android.view.View.TEXT_DIRECTION_LOCALE);
 
-        nav.setBackgroundColor(UiKit.color(this, R.color.gzh_surface_container_low));
-        nav.setElevation(0f);
+        // Glass nav: translucent navy sheet + top glass hairline (UiKit).
+        UiKit.applyGlassNavBackground(nav);
+        nav.setElevation(UiKit.dp(this, 8));
         nav.setLabelVisibilityMode(NavigationBarView.LABEL_VISIBILITY_LABELED);
         nav.setItemIconSize(UiKit.dp(this, 22));
         // Checked/unchecked pair: the selected item is the one sitting in the

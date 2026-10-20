@@ -70,7 +70,7 @@ public class NetworkDiagnosticsActivity extends Activity {
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(UiKit.color(this, R.color.gzh_background));
+        UiKit.applyPageBackground(root);
 
         UiKit.appBar(root, getString(R.string.setup_window_title),
             getString(R.string.netdiag_title), 0, null, null);
@@ -95,9 +95,10 @@ public class NetworkDiagnosticsActivity extends Activity {
 
         MaterialCardView card = new MaterialCardView(this);
         card.setRadius(UiKit.dim(this, R.dimen.gzh_radius_card));
-        card.setCardElevation(0f);
-        card.setCardBackgroundColor(UiKit.color(this, R.color.gzh_surface_container));
-        card.setStrokeWidth(0);
+        card.setCardElevation(UiKit.dp(this, 6));
+        card.setCardBackgroundColor(UiKit.color(this, R.color.gzh_glass_surface));
+        card.setStrokeColor(UiKit.color(this, R.color.gzh_glass_stroke));
+        card.setStrokeWidth(Math.max(1, UiKit.dp(this, 1)));
         card.setUseCompatPadding(false);
         card.setPreventCornerOverlap(false);
 

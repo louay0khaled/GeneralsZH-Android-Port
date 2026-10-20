@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- GeneralsX @feature Android port material3-glass-ui 20/10/2026
+     Layered glass backdrop for every launcher page: a deep-navy linear
+     base, a soft teal/cyan glow bleeding in from the top, a violet glow
+     from the bottom corner, and a faint gold warmth. Glass cards and rows
+     (translucent fills + hairline strokes in UiKit) float over this.
+     Pure gradient shapes — no blur, so it is identical on API 28+. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Base: deep navy, lighter at the top. -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="@color/gzh_gradient_start"
+                android:centerColor="@color/gzh_gradient_mid"
+                android:endColor="@color/gzh_gradient_end" />
+        </shape>
+    </item>
+    <!-- Teal glow, top. -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="420dp"
+                android:centerX="0.85"
+                android:centerY="0.05"
+                android:startColor="#402DD4E8"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+    <!-- Violet glow, bottom start corner. -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="480dp"
+                android:centerX="0.05"
+                android:centerY="0.95"
+                android:startColor="#338B7CFF"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+    <!-- Gold warmth, bottom end corner (very subtle). -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="360dp"
+                android:centerX="0.95"
+                android:centerY="0.9"
+                android:startColor="#1AF2C14E"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+    <!-- Top sheen: the faintest white wash, like light on glass. -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="#14FFFFFF"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+</layer-list>

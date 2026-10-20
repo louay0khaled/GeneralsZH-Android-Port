@@ -1,57 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- GeneralsX @feature Android port launcher-ui-2026 08/09/2026 Design
+    <!-- GeneralsX @feature Android port material3-glass-ui 20/10/2026 Design
          tokens for the launcher (Setup / GeneralsOnline / Log Viewer /
-         Folder Picker). A Material 3 dark colour-role set: one near-black
-         ground, a small ladder of "surface container" greys for cards and
-         rows on top of it, a soft lavender primary for headings/active
-         state and a muted pastel for destructive actions.
+         Folder Picker / ReplayCheck / NetworkDiagnostics).
 
-         GeneralsZHActivity (the game surface itself) never references any of
-         these — it stays on its own plain fullscreen theme.
+         Deep-navy glass palette: a very dark navy ground (reached through
+         @drawable/gzh_page_background, a layered gradient), translucent
+         white/navy glass fills with hairline strokes floating on top of it,
+         a vibrant cyan-teal primary (futuristic-military, fits an RTS) and
+         a gold/amber secondary accent. All pre-existing gzh_* names are
+         kept with retuned values so Java and themes.xml compile unchanged;
+         glass/gradient/glow tokens below them are new.
 
-         The gzh_primary/gzh_accent/gzh_surface/... names below predate this
-         palette and are kept (they are referenced from themes.xml and from
-         Java) — only their values were retuned to the new palette. -->
+         GeneralsZHActivity (the game surface itself) never references any
+         of these — it stays on its own plain fullscreen theme. -->
 
-    <!-- Ground + surface ladder (M3 surface container roles) -->
-    <color name="gzh_background">#0E0E11</color>
-    <color name="gzh_surface">#131318</color>
-    <color name="gzh_surface_container_low">#16161C</color>
-    <color name="gzh_surface_container">#1A1A21</color>
-    <color name="gzh_surface_container_high">#22222B</color>
-    <color name="gzh_surface_container_highest">#2B2B36</color>
+    <!-- Ground + surface ladder (M3 surface container roles, deep navy) -->
+    <color name="gzh_background">#060B1A</color>
+    <color name="gzh_surface">#0A1226</color>
+    <color name="gzh_surface_container_low">#0C152E</color>
+    <color name="gzh_surface_container">#101B36</color>
+    <color name="gzh_surface_container_high">#182747</color>
+    <color name="gzh_surface_container_highest">#22335C</color>
 
-    <!-- Content on those surfaces -->
-    <color name="gzh_on_surface">#ECEBF2</color>
-    <color name="gzh_on_surface_variant">#A5A2B4</color>
-    <!-- The faintest tier still has to clear WCAG AA (4.5:1) at 12sp against
-         gzh_surface_container, which #7C798C did not (3.9:1). -->
-    <color name="gzh_on_surface_faint">#8F8CA0</color>
-    <color name="gzh_outline">#3A3846</color>
-    <color name="gzh_outline_variant">#26252F</color>
+    <!-- Content on those surfaces. gzh_on_surface / _variant / _faint all
+         clear WCAG AA (4.5:1) against gzh_surface_container (#101B36):
+         approx. 14.9:1, 8.7:1 and 6.8:1 respectively. -->
+    <color name="gzh_on_surface">#F2F6FF</color>
+    <color name="gzh_on_surface_variant">#B8C2D9</color>
+    <color name="gzh_on_surface_faint">#A8B6D3</color>
+    <color name="gzh_outline">#46587E</color>
+    <color name="gzh_outline_variant">#26365C</color>
 
-    <!-- Primary: the soft lavender accent (headings, active nav item,
+    <!-- Primary: vibrant cyan-teal accent (headings, active nav item,
          selected segment, hero action). -->
-    <color name="gzh_primary">#B9AEEA</color>
-    <color name="gzh_on_primary">#231B3F</color>
-    <color name="gzh_primary_container">#38305C</color>
-    <color name="gzh_on_primary_container">#E4DDFF</color>
-    <!-- Kept for the themes.xml colorPrimaryDark slot (pre-API-23 status bar). -->
-    <color name="gzh_primary_dark">#0E0E11</color>
-    <color name="gzh_accent">#B9AEEA</color>
+    <color name="gzh_primary">#2DD4E8</color>
+    <color name="gzh_on_primary">#022A33</color>
+    <color name="gzh_primary_container">#10455C</color>
+    <color name="gzh_on_primary_container">#C7F5FF</color>
+    <!-- Kept for the themes.xml colorPrimaryDark slot. -->
+    <color name="gzh_primary_dark">#060B1A</color>
+    <color name="gzh_accent">#2DD4E8</color>
 
-    <!-- Secondary: a desaturated companion for tonal chips/containers. -->
-    <color name="gzh_secondary">#C9C4DC</color>
-    <color name="gzh_on_secondary">#302C42</color>
-    <color name="gzh_secondary_container">#393450</color>
-    <color name="gzh_on_secondary_container">#E6E1F6</color>
+    <!-- Secondary: gold/amber accent — tonal chips/containers, highlights. -->
+    <color name="gzh_secondary">#F2C14E</color>
+    <color name="gzh_on_secondary">#332700</color>
+    <color name="gzh_secondary_container">#4A3A10</color>
+    <color name="gzh_on_secondary_container">#FFE9A8</color>
 
     <!-- Tertiary: the muted pastel used for destructive / "clear" actions. -->
-    <color name="gzh_tertiary">#F3C9C6</color>
-    <color name="gzh_on_tertiary">#4A2523</color>
-    <color name="gzh_tertiary_container">#5C3835</color>
-    <color name="gzh_on_tertiary_container">#FFDAD7</color>
+    <color name="gzh_tertiary">#FFB59E</color>
+    <color name="gzh_on_tertiary">#4A2517</color>
+    <color name="gzh_tertiary_container">#5C3325</color>
+    <color name="gzh_on_tertiary_container">#FFDAD0</color>
 
     <color name="gzh_error">#FFB4AB</color>
     <color name="gzh_on_error">#690005</color>
@@ -59,16 +60,36 @@
     <color name="gzh_on_error_container">#FFDAD6</color>
 
     <!-- Disabled state (M3: 38% of on-surface for content, 12% for containers) -->
-    <color name="gzh_on_surface_disabled">#61ECEBF2</color>
-    <color name="gzh_container_disabled">#1FECEBF2</color>
-    <color name="gzh_ripple_light">#1FECEBF2</color>
-    <color name="gzh_ripple_primary">#33B9AEEA</color>
+    <color name="gzh_on_surface_disabled">#61F2F6FF</color>
+    <color name="gzh_container_disabled">#1FF2F6FF</color>
+    <color name="gzh_ripple_light">#1FF2F6FF</color>
+    <color name="gzh_ripple_primary">#332DD4E8</color>
 
-    <!-- GeneralsX @feature Android port game-folder-integrity-check 07/09/2026
-         Semantic status colours for the game-folder validity line (see
-         refreshStatus() in SetupActivity.java) — retuned for the near-black
-         ground above so they stay legible without shouting. -->
-    <color name="gzh_status_ok">#7FDCA4</color>
-    <color name="gzh_status_warn">#F2C97D</color>
+    <!-- Semantic status colours, legible on the navy ground. -->
+    <color name="gzh_status_ok">#4ADE80</color>
+    <color name="gzh_status_warn">#F2C14E</color>
     <color name="gzh_status_error">#FFB4AB</color>
+
+    <!-- Glassmorphism tokens (new). Glass is simulated with translucency,
+         gradient and stroke — no RenderEffect blur, so API 28-30 are safe. -->
+    <color name="gzh_glass_fill">#2EFFFFFF</color>
+    <color name="gzh_glass_fill_high">#3DFFFFFF</color>
+    <color name="gzh_glass_fill_low">#1AFFFFFF</color>
+    <color name="gzh_glass_surface">#CC0D1830</color>
+    <color name="gzh_glass_surface_high">#D9162747</color>
+    <color name="gzh_glass_stroke">#33FFFFFF</color>
+    <color name="gzh_glass_stroke_strong">#59FFFFFF</color>
+    <color name="gzh_glass_highlight">#1FFFFFFF</color>
+    <color name="gzh_glass_nav">#D9081122</color>
+    <color name="gzh_glass_scrim">#99040912</color>
+
+    <!-- Gradient / glow accents for the page background and primary fills. -->
+    <color name="gzh_gradient_start">#0A1834</color>
+    <color name="gzh_gradient_mid">#081226</color>
+    <color name="gzh_gradient_end">#04060F</color>
+    <color name="gzh_glow_teal">#2DD4E8</color>
+    <color name="gzh_glow_cyan">#38BDF8</color>
+    <color name="gzh_glow_violet">#8B7CFF</color>
+    <color name="gzh_glow_gold">#F2C14E</color>
+    <color name="gzh_accent_gold">#F2C14E</color>
 </resources>

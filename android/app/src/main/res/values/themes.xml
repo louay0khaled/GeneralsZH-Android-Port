@@ -12,6 +12,21 @@
          designed for one, and committing to it means the contrast of every
          colour pair below can be reasoned about once instead of twice. -->
     <style name="Theme.GeneralsZHSettings" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- GeneralsX @feature Android port material3-glass-ui 20/10/2026
+             Professional Arabic typography for every widget that inherits
+             the theme font: IBM Plex Sans Arabic body family (bundled in
+             res/font/). Display/headings opt into Tajawal via UiKit. -->
+        <item name="fontFamily">@font/gzh_font_body</item>
+        <item name="android:fontFamily">@font/gzh_font_body</item>
+
+        <!-- M3 shape scale: large-component (dialogs/sheets) and
+             medium-component (cards) get the glass radii from
+             res/values/dimens.xml; small components (buttons/chips/fields)
+             get the row radius. -->
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.GeneralsZH.ExtraLarge</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.GeneralsZH.ExtraLarge</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.GeneralsZH.Large</item>
+
         <!-- M3 colour roles -->
         <item name="colorPrimary">@color/gzh_primary</item>
         <item name="colorOnPrimary">@color/gzh_on_primary</item>
@@ -41,7 +56,7 @@
              anchors, ListView, EditText) still read. -->
         <item name="colorPrimaryDark">@color/gzh_primary_dark</item>
         <item name="colorAccent">@color/gzh_accent</item>
-        <item name="android:windowBackground">@color/gzh_background</item>
+        <item name="android:windowBackground">@drawable/gzh_page_background</item>
         <item name="android:textColorPrimary">@color/gzh_on_surface</item>
         <item name="android:textColorSecondary">@color/gzh_on_surface_variant</item>
         <item name="android:textColorTertiary">@color/gzh_on_surface_faint</item>
@@ -61,8 +76,25 @@
         <item name="android:alertDialogTheme">@style/Theme.GeneralsZH.AlertDialog</item>
     </style>
 
+    <!-- M3 shape appearances referenced by Theme.GeneralsZHSettings. -->
+    <style name="ShapeAppearance.GeneralsZH.ExtraLarge" parent="ShapeAppearance.Material3.Corner.ExtraLarge">
+        <item name="cornerSize">28dp</item>
+    </style>
+    <style name="ShapeAppearance.GeneralsZH.Large" parent="ShapeAppearance.Material3.Corner.Large">
+        <item name="cornerSize">20dp</item>
+    </style>
+
+    <style name="MaterialAlertDialog.GeneralsZH.Body" parent="MaterialAlertDialog.Material3.Body.Text">
+        <item name="fontFamily">@font/gzh_font_body</item>
+        <item name="android:fontFamily">@font/gzh_font_body</item>
+        <item name="android:textColor">@color/gzh_on_surface_variant</item>
+    </style>
+
     <style name="ThemeOverlay.GeneralsZH.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="colorSurface">@color/gzh_surface_container_high</item>
+        <item name="colorSurface">@color/gzh_glass_surface_high</item>
+        <item name="fontFamily">@font/gzh_font_body</item>
+        <item name="android:fontFamily">@font/gzh_font_body</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.GeneralsZH.Body</item>
         <item name="colorPrimary">@color/gzh_primary</item>
         <item name="android:textColorPrimary">@color/gzh_on_surface</item>
         <item name="android:textColorSecondary">@color/gzh_on_surface_variant</item>

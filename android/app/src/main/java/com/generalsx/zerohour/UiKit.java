@@ -43,7 +43,9 @@ package com.generalsx.zerohour;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -54,6 +56,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
@@ -89,6 +92,101 @@ final class UiKit {
             new int[] { color(c, disabledRes), color(c, enabledRes) });
     }
 
+    // GeneralsX @feature Android port material3-glass-ui 20/10/2026
+    // Bundled Arabic typefaces (res/font/): IBM Plex Sans Arabic for body
+    // text, Tajawal for display/headings. Loaded once and cached; weighted
+    // faces come from Typeface.create(family, weight, italic), API 28+,
+    // which is exactly this app's minSdk. Any load failure falls back to
+    // the platform faces, so a font problem can never break a screen.
+    private static Typeface bodyFamily;
+    private static Typeface bodyMedium;
+    private static Typeface bodySemibold;
+    private static Typeface displayFamily;
+    private static Typeface displayBold;
+
+    private static Typeface family(Context c, int fontRes) {
+        try {
+            Typeface f = ResourcesCompat.getFont(c, fontRes);
+            return f != null ? f : Typeface.DEFAULT;
+        } catch (RuntimeException e) {
+            return Typeface.DEFAULT;
+        }
+    }
+
+    /** Regular body face (IBM Plex Sans Arabic 400). */
+    static Typeface fontBody(Context c) {
+        if (bodyFamily == null) bodyFamily = family(c, R.font.gzh_font_body);
+        return bodyFamily;
+    }
+
+    /** Medium body face (500) — overlines, supporting emphasis. */
+    static Typeface fontMedium(Context c) {
+        if (bodyMedium == null) bodyMedium = Typeface.create(fontBody(c), 500, false);
+        return bodyMedium;
+    }
+
+    /** Semibold face (600) — headings, buttons, row titles (was DEFAULT_BOLD). */
+    static Typeface fontSemibold(Context c) {
+        if (bodySemibold == null) bodySemibold = Typeface.create(fontBody(c), 600, false);
+        return bodySemibold;
+    }
+
+    /** Display face (Tajawal ExtraBold 800) — app-bar titles. */
+    static Typeface fontDisplay(Context c) {
+        if (displayFamily == null) displayFamily = family(c, R.font.gzh_font_display);
+        if (displayBold == null) displayBold = Typeface.create(displayFamily, 800, false);
+        return displayBold;
+    }
+
+    /**
+     * The layered glass page backdrop (@drawable/gzh_page_background)
+     * applied to a page's root view, replacing the old solid
+     * gzh_background fill. Glass cards/rows float over this gradient.
+     */
+    static void applyPageBackground(View view) {
+        view.setBackground(ContextCompat.getDrawable(view.getContext(),
+            R.drawable.gzh_page_background));
+    }
+
+    /**
+     * Glass treatment for SetupActivity's bottom navigation: a translucent
+     * navy fill with a 1dp glass hairline along its top edge, so the bar
+     * reads as a glass sheet over the page gradient rather than a solid
+     * slab. Layer gravity/height are API 23+, safe at minSdk 28.
+     */
+    static void applyGlassNavBackground(View view) {
+        Context c = view.getContext();
+        GradientDrawable fill = new GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            new int[] { color(c, R.color.gzh_glass_highlight),
+                        color(c, R.color.gzh_glass_nav),
+                        color(c, R.color.gzh_glass_nav) });
+        ColorDrawable hairline = new ColorDrawable(color(c, R.color.gzh_glass_stroke));
+        LayerDrawable layers = new LayerDrawable(
+            new android.graphics.drawable.Drawable[] { fill, hairline });
+        layers.setLayerGravity(1, Gravity.TOP);
+        layers.setLayerHeight(1, Math.max(1, dp(c, 1)));
+        view.setBackground(layers);
+    }
+
+    /**
+     * A translucent glass fill: a gentle top-light gradient over a glass
+     * colour, with a 1dp hairline glass stroke and rounded corners.
+     * Simulated glass (translucency/gradient/stroke) — no RenderEffect
+     * blur, so it renders identically and safely on API 28-30.
+     */
+    private static GradientDrawable glassDrawable(Context c, float radius, int fillRes) {
+        GradientDrawable bg = new GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            new int[] { color(c, R.color.gzh_glass_highlight),
+                        color(c, fillRes),
+                        color(c, R.color.gzh_glass_fill_low) });
+        bg.setShape(GradientDrawable.RECTANGLE);
+        bg.setCornerRadius(radius);
+        bg.setStroke(Math.max(1, dp(c, 1)), color(c, R.color.gzh_glass_stroke));
+        return bg;
+    }
+
     /** checked/unchecked pair, for segmented buttons. */
     private static ColorStateList checkedTint(Context c, int checkedRes, int uncheckedRes) {
         return new ColorStateList(
@@ -105,6 +203,7 @@ final class UiKit {
      */
     static LinearLayout scrollingPage(ViewGroup host) {
         Context c = host.getContext();
+        applyPageBackground(host);
         ScrollView scroll = new ScrollView(c);
         scroll.setClipToPadding(false);
         scroll.setFillViewport(true);
@@ -143,7 +242,8 @@ final class UiKit {
             TextView over = new TextView(c);
             over.setText(overline);
             over.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_overline));
-            over.setTextColor(color(c, R.color.gzh_on_surface_faint));
+            over.setTextColor(color(c, R.color.gzh_primary));
+            over.setTypeface(fontMedium(c));
             over.setAllCaps(true);
             over.setLetterSpacing(0.09f);
             over.setMaxLines(1);
@@ -155,7 +255,7 @@ final class UiKit {
         titleView.setText(title);
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_display));
         titleView.setTextColor(color(c, R.color.gzh_on_surface));
-        titleView.setTypeface(Typeface.DEFAULT_BOLD);
+        titleView.setTypeface(fontDisplay(c));
         titleView.setLineSpacing(0f, 1.05f);
         text.addView(titleView);
 
@@ -178,9 +278,12 @@ final class UiKit {
         int pad = dp(c, 11);
         button.setPadding(pad, pad, pad, pad);
         button.setContentDescription(description);
-        GradientDrawable bg = new GradientDrawable();
+        GradientDrawable bg = new GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            new int[] { color(c, R.color.gzh_glass_fill_high),
+                        color(c, R.color.gzh_glass_surface_high) });
         bg.setShape(GradientDrawable.OVAL);
-        bg.setColor(color(c, R.color.gzh_surface_container_high));
+        bg.setStroke(Math.max(1, dp(c, 1)), color(c, R.color.gzh_glass_stroke));
         button.setBackground(bg);
         button.setClickable(true);
         button.setFocusable(true);
@@ -201,9 +304,13 @@ final class UiKit {
         Context c = parent.getContext();
         MaterialCardView card = new MaterialCardView(c);
         card.setRadius(dim(c, R.dimen.gzh_radius_card));
-        card.setCardElevation(0f);
-        card.setCardBackgroundColor(color(c, R.color.gzh_surface_container));
-        card.setStrokeWidth(0);
+        // Glass card: translucent navy fill so the page gradient glows
+        // through, a hairline glass stroke, and a soft elevation so the
+        // card floats over the backdrop instead of sitting flat on it.
+        card.setCardElevation(dp(c, 6));
+        card.setCardBackgroundColor(color(c, R.color.gzh_glass_surface));
+        card.setStrokeColor(color(c, R.color.gzh_glass_stroke));
+        card.setStrokeWidth(Math.max(1, dp(c, 1)));
         card.setUseCompatPadding(false);
         card.setPreventCornerOverlap(false);
 
@@ -247,7 +354,7 @@ final class UiKit {
         titleView.setText(title);
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_title));
         titleView.setTextColor(color(c, R.color.gzh_on_surface));
-        titleView.setTypeface(Typeface.DEFAULT_BOLD);
+        titleView.setTypeface(fontSemibold(c));
         row.addView(titleView, new LinearLayout.LayoutParams(0,
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
@@ -256,7 +363,7 @@ final class UiKit {
             value = new TextView(c);
             value.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_title));
             value.setTextColor(color(c, R.color.gzh_primary));
-            value.setTypeface(Typeface.DEFAULT_BOLD);
+            value.setTypeface(fontSemibold(c));
             value.setGravity(Gravity.END);
             LinearLayout.LayoutParams vlp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -297,6 +404,7 @@ final class UiKit {
         }
         view.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, sizeDimen));
         view.setTextColor(color(c, colorRes));
+        view.setTypeface(fontBody(c));
         view.setLineSpacing(0f, 1.25f);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -321,7 +429,7 @@ final class UiKit {
     static View divider(LinearLayout parent) {
         Context c = parent.getContext();
         View line = new View(c);
-        line.setBackgroundColor(color(c, R.color.gzh_outline_variant));
+        line.setBackgroundColor(color(c, R.color.gzh_glass_stroke));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, Math.max(1, dp(c, 1)));
         lp.topMargin = dim(c, R.dimen.gzh_item_gap);
@@ -347,9 +455,9 @@ final class UiKit {
         b.setText(label);
         b.setAllCaps(false);
         b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
-        b.setTypeface(Typeface.DEFAULT_BOLD);
+        b.setTypeface(fontSemibold(c));
         b.setLetterSpacing(0f);
-        b.setCornerRadius(dp(c, 26));
+        b.setCornerRadius(dp(c, 28));
         b.setInsetTop(0);
         b.setInsetBottom(0);
         b.setMinHeight(dim(c, R.dimen.gzh_button_height));
@@ -471,10 +579,10 @@ final class UiKit {
             b.setText(labels[i]);
             b.setAllCaps(false);
             b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
-            b.setTypeface(Typeface.DEFAULT_BOLD);
+            b.setTypeface(fontSemibold(c));
             b.setMaxLines(1);
             b.setEllipsize(android.text.TextUtils.TruncateAt.END);
-            b.setCornerRadius(dp(c, 22));
+            b.setCornerRadius(dp(c, 24));
             b.setInsetTop(0);
             b.setInsetBottom(0);
             b.setMinWidth(0);
@@ -534,13 +642,14 @@ final class UiKit {
         titleView.setText(title);
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_body));
         titleView.setTextColor(color(c, R.color.gzh_on_surface));
-        titleView.setTypeface(Typeface.DEFAULT_BOLD);
+        titleView.setTypeface(fontSemibold(c));
         textColumn.addView(titleView);
 
         TextView descView = new TextView(c);
         descView.setText(description);
         descView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_caption));
         descView.setTextColor(color(c, R.color.gzh_on_surface_faint));
+        descView.setTypeface(fontBody(c));
         descView.setLineSpacing(0f, 1.25f);
         LinearLayout.LayoutParams dlp = new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -588,11 +697,8 @@ final class UiKit {
         int padV = dp(c, 14);
         row.setPadding(padH, padV, padH, padV);
 
-        GradientDrawable bg = new GradientDrawable();
-        bg.setShape(GradientDrawable.RECTANGLE);
-        bg.setCornerRadius(dim(c, R.dimen.gzh_radius_row));
-        bg.setColor(color(c, R.color.gzh_surface_container_high));
-        row.setBackground(bg);
+        row.setBackground(glassDrawable(c, dim(c, R.dimen.gzh_radius_row),
+            R.color.gzh_glass_fill));
         if (onClick != null) {
             row.setClickable(true);
             row.setFocusable(true);
@@ -627,13 +733,14 @@ final class UiKit {
         titleView.setText(title);
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_body));
         titleView.setTextColor(color(c, R.color.gzh_on_surface));
-        titleView.setTypeface(Typeface.DEFAULT_BOLD);
+        titleView.setTypeface(fontSemibold(c));
         textColumn.addView(titleView);
 
         TextView supportingView = new TextView(c);
         supportingView.setText(supporting);
         supportingView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_caption));
         supportingView.setTextColor(color(c, R.color.gzh_on_surface_variant));
+        supportingView.setTypeface(fontBody(c));
         supportingView.setLineSpacing(0f, 1.25f);
         LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -669,7 +776,7 @@ final class UiKit {
         chip.setText(label);
         chip.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_caption));
         chip.setTextColor(color(c, textColorRes));
-        chip.setTypeface(Typeface.DEFAULT_BOLD);
+        chip.setTypeface(fontSemibold(c));
         chip.setGravity(Gravity.CENTER_VERTICAL);
         chip.setPadding(dp(c, 12), dp(c, 7), dp(c, 12), dp(c, 7));
         chip.setMaxLines(2);
@@ -688,6 +795,7 @@ final class UiKit {
         bg.setShape(GradientDrawable.RECTANGLE);
         bg.setCornerRadius(dp(c, 999));
         bg.setColor(color(c, backgroundColorRes));
+        bg.setStroke(Math.max(1, dp(c, 1)), color(c, R.color.gzh_glass_stroke));
         chip.setBackground(bg);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(

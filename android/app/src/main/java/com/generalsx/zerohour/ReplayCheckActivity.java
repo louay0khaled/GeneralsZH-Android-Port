@@ -85,7 +85,7 @@ public class ReplayCheckActivity extends Activity {
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(UiKit.color(this, R.color.gzh_background));
+        UiKit.applyPageBackground(root);
         UiKit.appBar(root, getString(R.string.setup_window_title),
             getString(R.string.replaycheck_title), R.drawable.ic_gzh_refresh,
             getString(R.string.replaycheck_refresh), this::refresh);

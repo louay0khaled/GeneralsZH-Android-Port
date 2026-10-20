@@ -160,7 +160,7 @@ public class GeneralsOnlineActivity extends Activity {
     private void buildUi() {
         LinearLayout shell = new LinearLayout(this);
         shell.setOrientation(LinearLayout.VERTICAL);
-        shell.setBackgroundColor(UiKit.color(this, R.color.gzh_background));
+        UiKit.applyPageBackground(shell);
         setContentView(shell);
         InsetUtil.applySafeInsets(shell);
 
