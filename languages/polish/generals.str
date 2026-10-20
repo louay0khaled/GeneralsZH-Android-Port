@@ -25729,6 +25729,26 @@ GX:ToolTipBuilderPageBack
 "Powrót do listy budynków"
 END
 
+GX:SelectInfantry
+"Piechota"
+END
+
+GX:SelectVehicles
+"Pojazdy"
+END
+
+GX:SelectJets
+"Odrzutowce"
+END
+
+GX:SelectHelicopters
+"Śmigłowce"
+END
+
+GX:SelectAllArmy
+"Cała armia"
+END
+
 GUI:LoadReplayLong
 "WCZYTAJ POWTÓRKĘ"
 END

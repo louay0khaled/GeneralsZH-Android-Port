@@ -25729,6 +25729,26 @@ GX:ToolTipBuilderPageBack
 "건물 목록으로 돌아갑니다"
 END
 
+GX:SelectInfantry
+"보병"
+END
+
+GX:SelectVehicles
+"차량"
+END
+
+GX:SelectJets
+"제트기"
+END
+
+GX:SelectHelicopters
+"헬리콥터"
+END
+
+GX:SelectAllArmy
+"전군"
+END
+
 GUI:LoadReplayLong
 "리플레이 불러오기"
 END
