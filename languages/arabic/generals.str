@@ -25729,6 +25729,26 @@ GX:ToolTipBuilderPageBack
 "العودة إلى قائمة المباني"
 END
 
+GX:SelectInfantry
+"مشاة"
+END
+
+GX:SelectVehicles
+"مركبات"
+END
+
+GX:SelectJets
+"طائرات مقاتلة"
+END
+
+GX:SelectHelicopters
+"مروحيات"
+END
+
+GX:SelectAllArmy
+"كل الجيش"
+END
+
 GUI:LoadReplayLong
 "تحميل إعادة"
 END
