@@ -25731,6 +25731,26 @@ GX:ToolTipBuilderPageBack
 "Vråtiti se k spisku zgrad"
 END
 
+GX:SelectInfantry
+"Pehota"
+END
+
+GX:SelectVehicles
+"Vozila"
+END
+
+GX:SelectJets
+"Dzety"
+END
+
+GX:SelectHelicopters
+"Helikoptery"
+END
+
+GX:SelectAllArmy
+"Cela armija"
+END
+
 GUI:LoadReplayLong
 "NAGRUZITI REPLAY"
 END
