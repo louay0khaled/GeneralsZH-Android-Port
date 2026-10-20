@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Zero Hour</string>
+    <string name="setup_developer_credit">Louay Khaled</string>
+
     <string name="common_cancel">Cancelar</string>
 
     <!-- SetupActivity: title / fallback -->
@@ -13,7 +15,6 @@
     <string name="setup_card_game_folder">Carpeta del juego</string>
     <string name="setup_button_select_game_folder">Seleccionar carpeta del juego</string>
     <string name="setup_button_launch_game">Iniciar juego</string>
-    <string name="setup_button_view_logs">Ver registros</string>
     <string name="setup_button_clear_game_folder">Restablecer carpeta del juego</string>
 
     <!-- SetupActivity: status text -->
@@ -27,7 +28,6 @@
     <string name="setup_folder_issue_bad_header">%1$s no parece un archivo de juego válido</string>
     <string name="setup_folder_issue_missing_data">A %1$s le faltan datos del juego esperados — probablemente una copia incompleta</string>
     <string name="setup_folder_issue_no_base_game">Faltan datos del juego base Generals:%1$s\n\nO indica en Setup la carpeta donde ya están: el botón «Carpeta del juego base Generals…» de abajo (normalmente ZH_Generals o Command and Conquer Generals).</string>
-    <string name="setup_status_logs_note">Los registros de fallos y del motor se guardan en el almacenamiento privado de la app y solo son accesibles mediante \"Ver registros\" — Android los oculta intencionadamente de los gestores de archivos normales (esto es el aislamiento estándar de Android, no algo específico de esta app).</string>
 
     <!-- SetupActivity: Language card -->
     <string name="setup_card_language">Idioma</string>
@@ -92,17 +92,7 @@
     <string name="setup_toast_driver_imported">Controlador importado: %1$s. Se aplicará en el próximo inicio.</string>
 
     <!-- SetupActivity: Diagnostics card -->
-    <string name="setup_card_diagnostics">Diagnóstico</string>
-    <string name="setup_diagnostics_help">Estos interruptores activan registros adicionales para informes de errores — déjalos todos apagados durante el juego normal, pueden ralentizar el juego o generar registros muy grandes. Si alguien que reporta un problema te pide activar uno, actívalo, reproduce el problema y luego usa "Ver registros" arriba para enviar el resultado.</string>
     <string name="setup_diagnostics_no_folder">Selecciona primero una carpeta de juego (arriba) para usar estos interruptores</string>
-    <string name="setup_switch_gx_trace">Registro de rastreo detallado</string>
-    <string name="setup_switch_gx_trace_desc">Registro interno muy detallado (interfaz, fuentes, archivos INI) para rastrear un bloqueo o error específico. Puede crecer hasta 50-100+ MB en una sesión larga — usa "Resumen de rendimiento" en su lugar si solo necesitas los números de FPS. (gx_trace.txt)</string>
-    <string name="setup_switch_touch_debug">Superposición de entrada táctil</string>
-    <string name="setup_switch_touch_debug_desc">Dibuja sobre el juego el estado de la capa táctil: gesto actual, dónde está tu dedo, dónde cree el motor que está el puntero y el ancla de desplazamiento de la cámara. Actívalo para informar de problemas de control: mapa que se desplaza solo, edificio fantasma en el lugar equivocado, habilidad que apunta a donde no tocaste. (gx_touch_debug.txt)</string>
-    <string name="setup_switch_gx_perf">Resumen de rendimiento</string>
-    <string name="setup_switch_gx_perf_desc">Añade una línea corta por segundo mostrando en qué se gasta el tiempo de cuadro (radar, audio, red, lógica del juego, renderizado). Seguro dejarlo activado toda la sesión — actívalo para informes de FPS/ralentización. (gx_perf.txt)</string>
-    <string name="setup_switch_gx_audio_trace">Registro de audio</string>
-    <string name="setup_switch_gx_audio_trace_desc">Registra lo que hace el sistema de sonido: nivel de los búferes de música y voz, audio de los vídeos y cada fuente que se inicia o se detiene. Actívalo si te piden un registro de audio tras informar de sonido ausente, entrecortado o mudo. (gx_audio_trace.txt)</string>
     <string name="setup_button_download_langpack">Descargar paquete de idioma</string>
     <string name="setup_langpack_downloading">Descargando el paquete de idioma…</string>
     <string name="setup_langpack_done">Paquete de idioma instalado. El juego lo usará en el próximo inicio.</string>
@@ -121,12 +111,6 @@
     <string name="setup_game_text_status_default">Texto del juego: inglés, salvo que un .big de tu carpeta lo sustituya</string>
     <string name="setup_game_text_none_found">Aún no hay paquetes de idioma en la carpeta del juego. Descarga uno primero.</string>
     <string name="setup_langpack_dialog_title">¿Qué idioma?</string>
-    <string name="setup_switch_dxvk_hud">Superposición de rendimiento en pantalla</string>
-    <string name="setup_switch_dxvk_hud_desc">Muestra FPS, draw calls, envíos y número de pipelines directamente en pantalla y en el registro. Actívalo para informes de rendimiento de la GPU. (dxvk_hud.txt)</string>
-    <string name="setup_switch_dxvk_validation">Capa de validación de Vulkan</string>
-    <string name="setup_switch_dxvk_validation_desc">Comprueba la corrección de cada llamada gráfica — detecta errores de renderizado reales pero ralentiza notablemente el juego. Actívalo solo cuando te pidan reproducir un fallo o glitch específico, no para jugar normalmente. (dxvk_validation.txt)</string>
-    <string name="setup_switch_dxvk_verbose_log">Registro detallado del renderizador</string>
-    <string name="setup_switch_dxvk_verbose_log_desc">Añade detalles adicionales al iniciar sobre cómo el juego se comunica con el controlador de tu GPU (formato de pantalla exacto y ajustes negociados). Actívalo cuando te pidan investigar un glitch gráfico específico de tu dispositivo. (dxvk_verbose_log.txt)</string>
 
     <!-- SetupActivity: Online Multiplayer card -->
     <string name="setup_card_online">Multijugador en línea</string>
@@ -135,8 +119,6 @@
     <string name="setup_online_signed_out">Sesión no iniciada — necesaria para partidas en línea.</string>
 
     <!-- SetupActivity: How this works card -->
-    <string name="setup_card_how_it_works">Cómo funciona</string>
-    <string name="setup_how_it_works_body">1. \"Seleccionar carpeta del juego\" abre un explorador de carpetas en el almacenamiento de tu teléfono. Navega hasta donde copiaste tu propia instalación de Command &amp; Conquer Generals Zero Hour (la carpeta que contiene INIZH.big, Data\\, ZH_Generals\\, etc.) y toca \"Usar esta carpeta\".\n\n2. Si la lista aparece vacía, Android está pidiendo primero el permiso \"Acceso a todos los archivos\" — concédelo en la pantalla que se abre (es un permiso normal de Android, no requiere root).\n\n3. \"Ver registros\" muestra el registro del motor y, si el juego falló, un registro de fallo nativo — sin necesidad de ordenador ni adb. Usa el botón Compartir de ahí para enviarte el registro a ti mismo.\n\n4. \"Iniciar juego\" inicia el juego con la carpeta que elegiste.</string>
 
     <!-- SetupActivity: folder selection / misc toasts -->
     <string name="setup_toast_grant_all_files">Concede \"Permitir acceso para administrar todos los archivos\" en la siguiente pantalla, luego vuelve y toca de nuevo Seleccionar carpeta del juego.</string>
@@ -158,26 +140,6 @@
     <string name="folderpicker_toast_cant_read_legacy">No se puede leer esta carpeta. En Android 9–10, concede a la aplicación el permiso de Almacenamiento (Ajustes → Aplicaciones → GeneralsZH → Permisos → Almacenamiento) y vuelve a intentarlo.</string>
 
     <!-- LogViewerActivity -->
-    <string name="logviewer_title">Registros</string>
-    <string name="logviewer_button_clear">Borrar registros</string>
-    <string name="logviewer_button_copy">Copiar</string>
-    <string name="logviewer_button_share">Compartir</string>
-    <string name="logviewer_toast_copied">Copiado al portapapeles.</string>
-    <string name="logviewer_section_crash_log">=== crash.log (gestor de fallos nativo, almacenamiento interno) ===\n</string>
-    <string name="logviewer_crash_log_absent">(no presente — no se registró ningún fallo nativo desde la instalación, o la app nunca se ha ejecutado más allá de cargar la biblioteca)</string>
-    <string name="logviewer_section_stderr_log">=== generals-stderr.log (registro del motor, almacenamiento externo) ===\n</string>
-    <string name="logviewer_stderr_log_absent">(no presente — main() del motor aún no se ha iniciado, o el almacenamiento externo no está disponible)</string>
-    <string name="logviewer_section_prev_log">=== generals-stderr-prev.log (sesión anterior) ===\n</string>
-    <string name="logviewer_prev_log_absent">(no presente)</string>
-    <string name="logviewer_dialog_clear_title">Borrar registros</string>
-    <string name="logviewer_dialog_clear_message">¿Eliminar el registro de fallos y los archivos de registro del motor? Esto no se puede deshacer.</string>
-    <string name="logviewer_dialog_clear_confirm">Borrar</string>
-    <string name="logviewer_dialog_clear_cancel">Cancelar</string>
-    <string name="logviewer_toast_cleared">Registros borrados.</string>
-    <string name="logviewer_share_subject">Registro de GeneralsZH Android</string>
-    <string name="logviewer_share_chooser_title">Compartir registro</string>
-    <string name="logviewer_toast_share_failed">No se pudo preparar el archivo de registro para compartir: %1$s</string>
-    <string name="logviewer_read_failed">(no se pudo leer %1$s: %2$s)</string>
 
     <!-- GeneralsOnlineActivity -->
     <string name="online_window_title">Cuenta de GeneralsOnline</string>
@@ -204,10 +166,6 @@
     <string name="setup_toast_base_generals_cleared">Carpeta del juego base borrada</string>
     <string name="setup_base_generals_not_here">En %1$s no hay archivos del juego base Generals — elige la carpeta que contiene Terrain.big, Textures.big y W3D.big.</string>
     <string name="setup_status_base_generals_line">Generals base: %1$s\n</string>
-    <string name="logviewer_crash_prev_log_absent">(no presente)</string>
-    <string name="logviewer_elided_notice">\n...(%1$d caracteres omitidos aquí; se conservan el inicio de sesión de arriba y la salida más reciente de abajo)...\n\n</string>
-    <string name="logviewer_section_crash_prev_log">=== crash-prev.log (gestor de fallos nativo, sesión anterior) ===\n</string>
-    <string name="logviewer_toast_share_none">Aún no hay archivos de registro para compartir.</string>
     <string name="setup_button_dxvk_config_reset">Restablecer</string>
     <string name="setup_button_dxvk_config_save">Guardar</string>
     <string name="setup_card_dxvk_config">Configuración de DXVK (dxvk.conf, avanzado)</string>
@@ -222,24 +180,10 @@
     <string name="nav_tab_home">Inicio</string>
     <string name="nav_tab_graphics">Gráficos</string>
     <string name="nav_tab_interface">Interfaz</string>
-    <string name="nav_tab_tools">Herramientas</string>
     <string name="nav_tab_help">Ayuda</string>
     <string name="setup_render_backend_gles_short">GLES</string>
     <string name="setup_render_backend_gles_angle_short">ANGLE</string>
     <string name="setup_render_backend_vulkan_short">Vulkan</string>
-    <string name="setup_switch_gx_net_trace">Registro de red en línea</string>
-    <string name="setup_switch_gx_net_trace_desc">Registra cada petición del juego a los servidores de GeneralsOnline y la respuesta recibida. Actívalo si el inicio de sesión, la sala o el emparejamiento fallan ya dentro del juego. Las peticiones del lanzador se registran siempre; esto añade las del juego. También activa el diagnóstico de desincronización en el juego multiplataforma: las sumas de comprobación de la simulación que se comparan en cada intervalo y, en una repetición, la de cada objeto. (gx_net_trace.txt)</string>
-    <string name="netdiag_title">Diagnóstico de red</string>
-    <string name="netdiag_row_note">Comprobar si este dispositivo llega a los servidores de GeneralsOnline y generar un informe para adjuntar a un reporte.</string>
-    <string name="netdiag_intro">Comprueba, por orden: si hay red funcionando, si los nombres de los servidores de GeneralsOnline se resuelven, si los servidores responden y qué dicen sobre el inicio de sesión.\n\nNo se envía nada. Toca «Ejecutar» para empezar.</string>
-    <string name="netdiag_running">Ejecutando…</string>
-    <string name="netdiag_running_step">Ejecutando… (%1$s)</string>
-    <string name="netdiag_button_run">Ejecutar diagnóstico</string>
-    <string name="netdiag_button_share">Compartir informe</string>
-    <string name="netdiag_button_copy">Copiar</string>
-    <string name="netdiag_toast_copied">Informe copiado al portapapeles.</string>
-    <string name="netdiag_toast_share_failed">No se pudo compartir el informe: %1$s</string>
-    <string name="netdiag_share_subject">Registro de red de GeneralsZH</string>
     <string name="online_status_banned">Esta cuenta está baneada en GeneralsOnline. Puedes apelar en su Discord.</string>
     <string name="online_status_banned_reason">Esta cuenta está baneada en GeneralsOnline: %1$s</string>
     <string name="online_status_requesting_code">Solicitando un código de inicio de sesión al servidor…</string>
@@ -278,55 +222,7 @@
     <string name="online_crossplay_patch_missing">Falta el parche de la comunidad: pulse Actualizar</string>
     <string name="online_switch_crossplay">Jugar con jugadores de PC</string>
     <string name="online_switch_crossplay_desc">Informa la suma de comprobación EXE del cliente de Windows para que sus partidas te acepten. Esa suma no es un antitrampas: impide que jueguen juntas máquinas que calcularían la partida de forma distinta, así que esto puede desincronizar la partida para toda la sala. Actívalo para un PC tuyo y solo tras copiar sus datos INI a esta carpeta del juego.</string>
-    <string name="replaycheck_title">Comprobar repetición</string>
-    <string name="replaycheck_row_note">Reproduce una repetición del PC con esta compilación sin mirarla, o salta a un fotograma, y ve dónde se separan las sumas de control.</string>
-    <string name="replaycheck_refresh">Actualizar</string>
-    <string name="replaycheck_last_result">Último resultado</string>
-    <string name="replaycheck_no_result">Todavía no se ha ejecutado ninguna comprobación.</string>
-    <string name="replaycheck_result_match">%1$s: coincide con la grabación en los %2$s de %3$s puntos de control (%4$s fotogramas, %5$s s).</string>
-    <string name="replaycheck_result_mismatch">%1$s: primera discrepancia en el fotograma %2$s, última coincidencia en %3$s. Coincidieron %4$s de %5$s puntos de control (%6$s fotogramas, %7$s s). Envía los registros.</string>
-    <string name="replaycheck_mode">Modo</string>
-    <string name="replaycheck_mode_run">Ejecutar completa</string>
-    <string name="replaycheck_mode_watch">Ver desde fotograma</string>
-    <string name="replaycheck_mode_help">Ejecutar completa: la repetición se simula tan rápido como permite el teléfono, se detiene poco después de la primera discrepancia o al final y vuelve aquí con el resultado. Ver desde fotograma: avanza rápido hasta el fotograma y luego se reproduce normalmente.</string>
-    <string name="replaycheck_frame_label">Fotograma</string>
-    <string name="replaycheck_pick">Repeticiones (toca para iniciar)</string>
-    <string name="replaycheck_none">No hay archivos .rep en %1$s</string>
-    <string name="replaycheck_no_game_folder">Primero elige la carpeta del juego en el lanzador.</string>
-    <string name="replaycheck_need_frame">Introduce el fotograma hasta el que avanzar.</string>
-    <string name="replaycheck_trace_enabled">Rastreo de red activado para la comprobación.</string>
-    <string name="replaycheck_trace_failed">No se pudo activar el rastreo de red; el registro no tendrá los detalles de las sumas de control.</string>
-    <string name="replaycheck_crc_every_frame">Suma de control de cada fotograma</string>
-    <string name="replaycheck_crc_every_frame_help">Además escribe en el registro la suma de control de la lógica de cada fotograma. Sirve para crear una copia de la repetición que el cliente de PC comprueba fotograma a fotograma. Más lento.</string>
     <string name="setup_online_anticheat_note">Los clientes móviles no tienen antitrampas. Para jugar juntos, el jugador de PC debe desactivar el antitrampas (GeneralsOnline AntiCheat o Easy Anti-Cheat) en el lanzador de GeneralsOnline: no se puede entrar desde un móvil a una sala con otro antitrampas, ni al revés.</string>
-    <string name="setup_switch_logging">Recopilar registros</string>
-    <string name="setup_switch_logging_desc">Guardar en el dispositivo los registros del juego, de fallos y de red. Desactívalo para no guardar nada en segundo plano hasta que lo vuelvas a activar. Necesario para informar de errores.</string>
-    <string name="setup_card_updates">Actualizaciones</string>
-    <string name="setup_updates_help">Las nuevas versiones del motor llegan directamente del GitHub del proyecto, sin reinstalar el APK. Cada actualización está firmada; lo que no tenga una firma válida se ignora. Los ajustes de red y los datos del juego en línea están en Cuenta de GeneralsOnline.</string>
-    <string name="setup_updates_status">Motor: %1$s · Última comprobación: %2$s</string>
-    <string name="setup_updates_engine_bundled">integrado, versión %1$d</string>
-    <string name="setup_updates_engine_updated">actualizado, versión %1$d</string>
-    <string name="setup_updates_never">nunca</string>
-    <string name="setup_button_check_updates">Buscar actualizaciones</string>
-    <string name="setup_switch_auto_updates">Comprobar automáticamente</string>
-    <string name="setup_switch_auto_updates_desc">Al abrir el lanzador.</string>
-    <string name="setup_updates_checking">Buscando actualizaciones…</string>
-    <string name="setup_updates_none">Todo está al día.</string>
-    <string name="setup_updates_engine_ready">Se ha descargado un motor más reciente (versión %1$d). Se usará la próxima vez que inicies el juego.</string>
-    <string name="setup_updates_engine_needs_apk">Un motor más reciente (versión %1$d) necesita un APK nuevo. Descárgalo de la página del proyecto.</string>
-    <string name="setup_updates_failed">No se pudo comprobar: %1$s</string>
-    <string name="setup_updates_not_published">Aún no se han publicado actualizaciones.</string>
-    <string name="setup_updates_offline">Sin conexión a Internet. El lanzador y el juego funcionan sin conexión; las actualizaciones se comprobarán la próxima vez.</string>
-    <string name="setup_updates_datapack_installed">Parche de datos de la comunidad actualizado a la versión %1$s.</string>
-    <string name="setup_updates_datapack_available">Hay una nueva versión de los datos de juego en red (%1$s). Actualízala en Cuenta de GeneralsOnline → Datos del juego en línea.</string>
-    <string name="setup_updates_datapack_line_new">Hay una nueva versión de los datos de juego en red: %1$s.</string>
-    <string name="setup_button_open_online_data">Actualizar datos de red</string>
-    <string name="online_datapacks_update_available">Instalada: versión %1$s. Hay una versión nueva: %2$s.</string>
-    <string name="online_datapacks_update_for_crc">Instalada: versión %1$s. Actualiza una vez para que el dispositivo calcule con él la suma de verificación del cliente de PC.</string>
-    <string name="online_datapacks_up_to_date">Instalada: versión %1$s, la más reciente.</string>
-    <string name="online_network_settings">Ajustes de red (servidores, compatibilidad con PC): del %1$s, actualizados automáticamente desde el GitHub del proyecto y firmados.</string>
-    <string name="online_network_settings_builtin">Ajustes de red (servidores, compatibilidad con PC): incluidos en esta versión; los nuevos llegarán automáticamente desde el GitHub del proyecto.</string>
-    <string name="online_datapacks_chip_update">Actualización disponible</string>
     <string name="setup_card_upscale">Reescalado (Snapdragon GSR)</string>
     <string name="setup_upscale_off_short">No</string>
     <string name="setup_upscale_ultra_short">Ultra</string>

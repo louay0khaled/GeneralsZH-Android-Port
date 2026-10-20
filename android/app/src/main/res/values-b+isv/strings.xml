@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Zero Hour</string>
+    <string name="setup_developer_credit">Louay Khaled</string>
+
     <string name="common_cancel">Otkazati</string>
 
     <!-- SetupActivity: title / fallback -->
@@ -13,7 +15,6 @@
     <string name="setup_card_game_folder">Papka igry</string>
     <string name="setup_button_select_game_folder">Izbrati papku igry</string>
     <string name="setup_button_launch_game">Spustiti igru</string>
-    <string name="setup_button_view_logs">Prokazati logi</string>
     <string name="setup_button_clear_game_folder">Izbrisati nastojenje papky igry</string>
 
     <!-- SetupActivity: status text -->
@@ -27,7 +28,6 @@
     <string name="setup_folder_issue_bad_header">%1$s ne izgledaje kako validny arhiv igry</string>
     <string name="setup_folder_issue_missing_data">V %1$s ne dostaje očekyvanyh dat igry — najvěrojatno nekompletna kopija</string>
     <string name="setup_folder_issue_no_base_game">Ne dostajut dannyh osnovnoj igry Generals:%1$s\n\nAbo ukaži papku, v kojej oni uže sut — gomba „Papka osnovnoj igry Generals…“ nizše (obyčno ZH_Generals abo Command and Conquer Generals).</string>
-    <string name="setup_status_logs_note">Logi padu/jadra sut v privatnom skladišču aplikacije i dostupni tolko čerez \"Prokazati logi\" vyše — Android namerno skryva jih od normalnyh upravitelev datotek (to jest standardny Android peskovnik, ne osobitost sej aplikacije).</string>
 
     <!-- SetupActivity: Language card -->
     <string name="setup_card_language">Jezyk</string>
@@ -92,17 +92,7 @@
     <string name="setup_toast_driver_imported">Draiver importovan: %1$s. Dějstvovati bude pri sledujućem spuštěniju.</string>
 
     <!-- SetupActivity: Diagnostics card -->
-    <string name="setup_card_diagnostics">Diagnostika</string>
-    <string name="setup_diagnostics_help">Ti pereklopniki uklapjaju dodatno logovanje za izvěšćenja o greškah — pri normalnoj igrě děrjte ih vsi vyklopjeni, oni mogu zapovolniti igru ili stvoriti věliki log. Jesli izvěstitelj problema prosi uklopiti někotory, uklopte jego, reproducirajte problem, potom upotrěbte "Prikazati logi" vyše da pošlete rezultat.</string>
     <string name="setup_diagnostics_no_folder">Naprvo izběrte papku igry (vyše) da upotrěbite ti pereklopniki</string>
-    <string name="setup_switch_gx_trace">Podrobny log tracovanja</string>
-    <string name="setup_switch_gx_trace_desc">Věoma podrobno vnutrněje logovanje (interfejs, šrifti, INI datoteki) za iskanje konkretnogo zavisanja ili greški. Za dolgu sesiju log može narosti do vělikoj věličiny (50-100+ MB) — upotrěbte město togo "Rezimě proizvoditelnosti" jesli trěbujete tolko čisla FPS. (gx_trace.txt)</string>
-    <string name="setup_switch_touch_debug">Nakladka sensornogo vvoda</string>
-    <string name="setup_switch_touch_debug_desc">Risuje sostojanje sensornogo sloja poverh igry: tekuщij žest, gdě tvoj palec, gdě dvižok sčitaje ukazatelj, i jakorj prokrutki kamery. Vklučaj, kogda soobщaješ o problemah upravlenja — karta uhodi sama, prizračnoje zdanje ne na svojem městu, sposobnostj cělitsja tuda, gdě ty ne kasal sę. (gx_touch_debug.txt)</string>
-    <string name="setup_switch_gx_perf">Rezimě proizvoditelnosti</string>
-    <string name="setup_switch_gx_perf_desc">Dodaje odnu kratku liniju na sekundu, kotora pokazuje kde ide vrěmě kadra (radar, zvuk, sěť, logika igry, renderovanje). Bezpečno ostaviti uklopjeno za cělu sesiju igry — uklopte za izvěšćenja o FPS/zapovolnjenjih. (gx_perf.txt)</string>
-    <string name="setup_switch_gx_audio_trace">Dnevnik zvuka</string>
-    <string name="setup_switch_gx_audio_trace_desc">Zapisyvaje, čto dělaje zvukova sistema: napolnjenje buferov muziky i govora, zvuk video i vsakoje počenje i zastavjenje izvora. Vključite, ako po žalobě na izgubjeny, preryvny ili tihy zvuk od vas poprosjut dnevnik zvuka. (gx_audio_trace.txt)</string>
     <string name="setup_button_download_langpack">Sņeti jezyčny paket</string>
     <string name="setup_langpack_downloading">Sņimaje se jezyčny paket…</string>
     <string name="setup_langpack_done">Jezyčny paket instalovany. Igra jego upotrěbi pri slědujučem pusku.</string>
@@ -121,12 +111,6 @@
     <string name="setup_game_text_status_default">Tekst igry: anglijsky — ako jego ne zaměnjaje .big v papkě igry</string>
     <string name="setup_game_text_none_found">V papkě igry hče ne jest jezyčnyh paketov. Najprvo sņimite jedin.</string>
     <string name="setup_langpack_dialog_title">Kotory jezyk?</string>
-    <string name="setup_switch_dxvk_hud">Ekranny overlej proizvoditelnosti</string>
-    <string name="setup_switch_dxvk_hud_desc">Pokazuje FPS, čislo draw call, otprav i pajplajnov prěmo na ekranu i v logu. Uklopte za izvěšćenja o proizvoditelnosti GPU. (dxvk_hud.txt)</string>
-    <string name="setup_switch_dxvk_validation">Sloj validacije Vulkan</string>
-    <string name="setup_switch_dxvk_validation_desc">Prověrjaje sekoj vyzov Vulkan na korektnosť — nahodi realne greški renderovanja, no zamětno zapovolnjaje igru. Uklopte tolko kogda prošeno reproducirati konkretny padnjenje ili grafičny glič, ne za normalnu igru. (dxvk_validation.txt)</string>
-    <string name="setup_switch_dxvk_verbose_log">Podrobny log renderera</string>
-    <string name="setup_switch_dxvk_verbose_log_desc">Dodaje v log dodatne podrobnosti o tom, kako igra obćuje sę s draiverom vašego GPU (točny format ekrana i dogovorene nastavjenja). Uklopte kogda prošeno razrěšiti grafičny glič konkretno na vašej děvici. (dxvk_verbose_log.txt)</string>
 
     <!-- SetupActivity: Online Multiplayer card -->
     <string name="setup_card_online">Onlajn multiigra</string>
@@ -135,8 +119,6 @@
     <string name="setup_online_signed_out">Prijava ne izvršena — trěbovana za onlajn igry.</string>
 
     <!-- SetupActivity: How this works card -->
-    <string name="setup_card_how_it_works">Kako to dějstvuje</string>
-    <string name="setup_how_it_works_body">1. \"Izbrati papku igry\" otvorjaje pregledovatelj papok v pamjati vašego telefona. Idi tamo, kde ste kopirovali svoju sobstvenu instalaciju Command &amp; Conquer Generals Zero Hour (papku sodrživšu INIZH.big, Data\\, ZH_Generals\\ itd.) i klikni \"Upotrěbiti tu papku\".\n\n2. Jestli spisok vygledaje prazny, Android snačala prosi dozvolu \"Dostup ko vsim datotekam\" — daj ju na ekranu, kotory sę otvorja (to jest normalna dozvola Android, root ne trěbuje sę).\n\n3. \"Prokazati logi\" pokazuje log jadra i, jestli igra padla, log padu — bez komputera ili adb. Upotrěbi tam gumb \"Poděliti sę\", aby poslati log sebě.\n\n4. \"Spustiti igru\" spuštaje igru s izbranu papku.</string>
 
     <!-- SetupActivity: folder selection / misc toasts -->
     <string name="setup_toast_grant_all_files">Daj dozvolu \"Pozvoliti dostup ko upravjenju vsimi datotekami\" na sledujućem ekranu, potom vrni sę i znova klikni Izbrati papku igry.</string>
@@ -158,26 +140,6 @@
     <string name="folderpicker_toast_cant_read_legacy">Ne možno pročitati tu papku. Na Androidu 9–10 dozvolite aplikaciji dostup k pamęti (Nastavjenja → Aplikacije → GeneralsZH → Dozvoly → Pamęť) i poprobujte znovu.</string>
 
     <!-- LogViewerActivity -->
-    <string name="logviewer_title">Logi</string>
-    <string name="logviewer_button_clear">Izbrisati logi</string>
-    <string name="logviewer_button_copy">Kopirovati</string>
-    <string name="logviewer_button_share">Poděliti sę</string>
-    <string name="logviewer_toast_copied">Kopirovano v mežuskladišče.</string>
-    <string name="logviewer_section_crash_log">=== crash.log (nativny obradnik padu, vnutrěšnje skladišče) ===\n</string>
-    <string name="logviewer_crash_log_absent">(ne prisutny — nijeden nativny pad ne zapisan od instalacije, ili aplikacija nikada ne byla spuštena dalje zagruzky biblioteky)</string>
-    <string name="logviewer_section_stderr_log">=== generals-stderr.log (log jadra, vnějšnje skladišče) ===\n</string>
-    <string name="logviewer_stderr_log_absent">(ne prisutny — main() jadra ješče ne spuščeny, ili vnějšnje skladišče ne dostupno)</string>
-    <string name="logviewer_section_prev_log">=== generals-stderr-prev.log (prědhodna sesija) ===\n</string>
-    <string name="logviewer_prev_log_absent">(ne prisutny)</string>
-    <string name="logviewer_dialog_clear_title">Izbrisati logi</string>
-    <string name="logviewer_dialog_clear_message">Izbrisati datoteky loga padu i loga jadra? To ne može biti otvrnjeno.</string>
-    <string name="logviewer_dialog_clear_confirm">Izbrisati</string>
-    <string name="logviewer_dialog_clear_cancel">Otkazati</string>
-    <string name="logviewer_toast_cleared">Logi izbrisani.</string>
-    <string name="logviewer_share_subject">Log GeneralsZH Android</string>
-    <string name="logviewer_share_chooser_title">Poděliti log</string>
-    <string name="logviewer_toast_share_failed">Ne uspělo prigotoviti datoteku loga za dělenje: %1$s</string>
-    <string name="logviewer_read_failed">(ne uspělo pročitati %1$s: %2$s)</string>
 
     <!-- GeneralsOnlineActivity -->
     <string name="online_window_title">Konto GeneralsOnline</string>
@@ -204,10 +166,6 @@
     <string name="setup_toast_base_generals_cleared">Papka osnovnoj igry odstranjena</string>
     <string name="setup_base_generals_not_here">V %1$s ne ima arhivov osnovnoj igry Generals — izberi papku, v kojej sut Terrain.big, Textures.big i W3D.big.</string>
     <string name="setup_status_base_generals_line">Osnovna Generals: %1$s\n</string>
-    <string name="logviewer_crash_prev_log_absent">(néma)</string>
-    <string name="logviewer_elided_notice">\n...(%1$d znakov tut propuščeno; početok sesije vyše i najnovějši vyvod nižeje sohranjeni)...\n\n</string>
-    <string name="logviewer_section_crash_prev_log">=== crash-prev.log (nativny obrabotnik padenij, prědiduča sesija) ===\n</string>
-    <string name="logviewer_toast_share_none">Ješče něma fajlov žurnala za dělenje.</string>
     <string name="setup_button_dxvk_config_reset">Vrnuti izhodno</string>
     <string name="setup_button_dxvk_config_save">Sohraniti</string>
     <string name="setup_card_dxvk_config">Konfiguracija DXVK (dxvk.conf, naprědno)</string>
@@ -222,24 +180,10 @@
     <string name="nav_tab_home">Glavna</string>
     <string name="nav_tab_graphics">Grafika</string>
     <string name="nav_tab_interface">Interfejs</string>
-    <string name="nav_tab_tools">Orudja</string>
     <string name="nav_tab_help">Pomoč</string>
     <string name="setup_render_backend_gles_short">GLES</string>
     <string name="setup_render_backend_gles_angle_short">ANGLE</string>
     <string name="setup_render_backend_vulkan_short">Vulkan</string>
-    <string name="setup_switch_gx_net_trace">Mrežny log online</string>
-    <string name="setup_switch_gx_net_trace_desc">Zapisuje kojžde zaprošenje igry do serverov GeneralsOnline i odpoved, ktora prišla. Vključite, ako vhod, lobby ili podbiranje igry ne rabotaje uže vnutri igry. Zaprošenja samogo launchera zapisujut se vsegda; to dodaje zaprošenja igry. Takože vključaje diagnostiku rozsinhronizacije v krossplatformnoj igre: kontrolne sumy simulacije, ktore sut porovnjane na vsakom intervale, a v repleju — kontrolnu sumu vsakogo objekta. (gx_net_trace.txt)</string>
-    <string name="netdiag_title">Diagnostika mreže</string>
-    <string name="netdiag_row_note">Proveriti, jestli to ustrojstvo dohodi do serverov GeneralsOnline, i sobrati raport za soobčenje o greške.</string>
-    <string name="netdiag_intro">Proverjaje po redu: jest li rabotajuča mreža, razrešajut li se imena serverov GeneralsOnline, odpovedajut li servery i čto oni govoret o vhode.\n\nNičto nikuda ne posylaje se. Tisnite «Pustiti».</string>
-    <string name="netdiag_running">Rabotaje…</string>
-    <string name="netdiag_running_step">Rabotaje… (%1$s)</string>
-    <string name="netdiag_button_run">Pustiti diagnostiku</string>
-    <string name="netdiag_button_share">Podeliti raport</string>
-    <string name="netdiag_button_copy">Kopirovati</string>
-    <string name="netdiag_toast_copied">Raport kopirovany do bufera.</string>
-    <string name="netdiag_toast_share_failed">Ne udalo se podeliti raport: %1$s</string>
-    <string name="netdiag_share_subject">Mrežny log GeneralsZH</string>
     <string name="online_status_banned">Toj akaunt jest blokovany na GeneralsOnline. Apelaciju možete podati v ihnem Discorde.</string>
     <string name="online_status_banned_reason">Toj akaunt jest blokovany na GeneralsOnline: %1$s</string>
     <string name="online_status_requesting_code">Zaprašajemo kod vhoda od servera…</string>
@@ -278,55 +222,7 @@
     <string name="online_crossplay_patch_missing">Nema zajedničej zaplaty — pritisnite «Obnoviti»</string>
     <string name="online_switch_crossplay">Igrati s igračami na PC</string>
     <string name="online_switch_crossplay_desc">Soobčaje kontrolnu sumu EXE Windows-klienta, aby jego igry vas puščali. Ta suma ne jest antičit — ona ne dozvoljaje igrati vmeste mašinam, ktore bi sčitali meč različno, tako to može razvaliti igru vsem v lobby. Vključite za svoj PC i samo poslě kopirovanja jego INI-dannyh v tu papku igry.</string>
-    <string name="replaycheck_title">Provrka replaja</string>
-    <string name="replaycheck_row_note">Prognati replaj s PK na tutoj versiji bez gledanja ili skočiti do kadra i viděti, kde se razhodet kontrolne sumy.</string>
-    <string name="replaycheck_refresh">Obnoviti</string>
-    <string name="replaycheck_last_result">Poslědnji rezultat</string>
-    <string name="replaycheck_no_result">Provrka ješče ne byla zapuščena.</string>
-    <string name="replaycheck_result_match">%1$s: sovpada s zapisom na vsih %2$s iz %3$s kontrolnyh točkah (%4$s kadrov, %5$s s).</string>
-    <string name="replaycheck_result_mismatch">%1$s: prvy rozsinhron na kadru %2$s, poslědnje sovpadenje na %3$s. Sovpalo %4$s iz %5$s kontrolnyh točok (%6$s kadrov, %7$s s). Pošljite logi.</string>
-    <string name="replaycheck_mode">Režim</string>
-    <string name="replaycheck_mode_run">Prognati cělo</string>
-    <string name="replaycheck_mode_watch">Gledati od kadra</string>
-    <string name="replaycheck_mode_help">Prognati cělo: replaj se računaje tako hitro, kako dozvoljaje telefon, zastavjaje se malo po prvom rozsinhronu ili na koncu i vraćaje sjuda s rezultatom. Gledati od kadra: prěmotka do kadra, potom običajno gledanje.</string>
-    <string name="replaycheck_frame_label">Kadr</string>
-    <string name="replaycheck_pick">Replaji (tisnite, da zapustiti)</string>
-    <string name="replaycheck_none">V %1$s nema datotek .rep</string>
-    <string name="replaycheck_no_game_folder">Najprvo izberite papku igry v lanćeru.</string>
-    <string name="replaycheck_need_frame">Vpišite kadr, do kotorogo prěmotati.</string>
-    <string name="replaycheck_trace_enabled">Dlja provrky je vključeno mrěžno slědženje.</string>
-    <string name="replaycheck_trace_failed">Ne udalo se vključiti mrěžno slědženje; v logu ne bude podrobnostij o kontrolnyh sumah.</string>
-    <string name="replaycheck_crc_every_frame">Kontrolna suma každogo kadra</string>
-    <string name="replaycheck_crc_every_frame_help">Dodatno piše v log kontrolnu sumu logiky na každom kadru. Treba, da sobrati kopiju replaja, ktoru klient PK prověri po kadram. Počasněje.</string>
     <string name="setup_online_anticheat_note">Mobilny klient ne imaje anti-čita. Za igru vměsto igrač na PC musi izključiti anti-čit (GeneralsOnline AntiCheat ili Easy Anti-Cheat) v launcheru GeneralsOnline: v lobi s drugym anti-čitom ne jest možno vstupiti s telefona i obratno.</string>
-    <string name="setup_switch_logging">Sbirati logy</string>
-    <string name="setup_switch_logging_desc">Zapisyvati na ustrojstvo logy igry, padov i mreže. Izključite, da by ničto ne bylo hranjeno v fonu, dokolě ne vključite znova. Trěbuje se za otčety o grěškah.</string>
-    <string name="setup_card_updates">Aktualizacije</string>
-    <string name="setup_updates_help">Nove versije motora prihodęt prěmo iz GitHub projekta, bez novoj ustanovky APK. Každo obnovljenje jest podpisano; vse bez pravilnogo podpisa sę ignoruje. Mrežne nastavjenja i podatky mrežnoj igry sut v «Konto GeneralsOnline».</string>
-    <string name="setup_updates_status">Motor: %1$s · Poslědnja provědka: %2$s</string>
-    <string name="setup_updates_engine_bundled">vstrojeny, versija %1$d</string>
-    <string name="setup_updates_engine_updated">aktualizovany, versija %1$d</string>
-    <string name="setup_updates_never">nikogda</string>
-    <string name="setup_button_check_updates">Prověriti aktualizacije</string>
-    <string name="setup_switch_auto_updates">Prověrjati avtomatično</string>
-    <string name="setup_switch_auto_updates_desc">Pri otvorjenju launchera.</string>
-    <string name="setup_updates_checking">Prověrjam aktualizacije…</string>
-    <string name="setup_updates_none">Vse jest aktualno.</string>
-    <string name="setup_updates_engine_ready">Novějši motor (versija %1$d) jest skačany. Bude uživany pri slědujučem zapusku igry.</string>
-    <string name="setup_updates_engine_needs_apk">Novějši motor (versija %1$d) trěbuje novy APK. Skačajte ga so stranice projekta.</string>
-    <string name="setup_updates_failed">Prověrka ne udala se: %1$s</string>
-    <string name="setup_updates_not_published">Aktualizacije jesče ne byli publikovane.</string>
-    <string name="setup_updates_offline">Nema svezi s internetom. Launcher i igra rabotajut i bez njego; aktualizacije budut prověrjene slědujuči raz.</string>
-    <string name="setup_updates_datapack_installed">Obnova danyh obščiny aktualizovana do versije %1$s.</string>
-    <string name="setup_updates_datapack_available">Jest nova versija podatkov mrežnoj igry (%1$s). Obnovite ju v «Konto GeneralsOnline» → «Podatky mrežnoj igry».</string>
-    <string name="setup_updates_datapack_line_new">Jest nova versija podatkov mrežnoj igry: %1$s.</string>
-    <string name="setup_button_open_online_data">Obnoviti podatky mrěže</string>
-    <string name="online_datapacks_update_available">Ustanovjena versija %1$s. Jest nova versija: %2$s.</string>
-    <string name="online_datapacks_update_for_crc">Ustanovjena versija %1$s. Obnovite jedin raz, da pristroj izčisli iz nje kontrolnu sumu komputernogo klienta.</string>
-    <string name="online_datapacks_up_to_date">Ustanovjena versija %1$s, najnovějša.</string>
-    <string name="online_network_settings">Mrežne nastavjenja (servery, sųglasnost s komputerom): od %1$s, obnovjajut sę avtomatično iz GitHub projekta i sut podpisane.</string>
-    <string name="online_network_settings_builtin">Mrežne nastavjenja (servery, sųglasnost s komputerom): vstrojene v tutu versiju; nove prijdut avtomatično iz GitHub projekta.</string>
-    <string name="online_datapacks_chip_update">Jest obnovljenje</string>
     <string name="setup_card_upscale">Uvečenje (Snapdragon GSR)</string>
     <string name="setup_upscale_off_short">Vyklj.</string>
     <string name="setup_upscale_ultra_short">Ultra</string>
