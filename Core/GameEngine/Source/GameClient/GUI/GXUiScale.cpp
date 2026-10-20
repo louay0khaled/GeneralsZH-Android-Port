@@ -92,6 +92,9 @@ namespace
 		{ "ControlBar.wnd",                 1.0f, 0.40f, FALSE, { nullptr } },
 		// This port's control group row (Window\\GroupPanel.wnd) rides on the control bar.
 		{ "GroupPanel.wnd",                 1.0f, 1.0f, FALSE, { nullptr }, "ControlBar.wnd" },
+		// GeneralsX @feature Android port 20/10/2026 Same for the unit-category
+		// selection row (Window\\SelectPanel.wnd) docked next to it.
+		{ "SelectPanel.wnd",                1.0f, 1.0f, FALSE, { nullptr }, "ControlBar.wnd" },
 		{ "ControlBarPopupDescription.wnd", 1.0f, 1.0f, TRUE, { nullptr } },
 		// The generals' power buttons stack up from just above the control bar; scaled around their
 		// own box they slid down onto it (owner's photo, 150%).

@@ -107,19 +107,34 @@ extern GameWindowManager *TheWindowManager;
 // the swapchain), which surfaces as multi-second input hangs right
 // after resuming. SDL warns that lifecycle events can arrive outside the
 // normal poll cycle, so they are captured in an event watcher that fires
-// immediately on the delivering thread; the engine update loop checks the
-// flag and skips simulation + rendering while backgrounded.
+// immediately on the delivering thread.
+//
+// GeneralsX @bugfix Android port 20/10/2026 These flags used to gate
+// SDL3GameEngine::update() itself: while either was set, the whole engine --
+// simulation AND network included -- stopped, and because multiplayer is
+// lockstep (nobody advances a frame until everybody confirms it), one phone
+// pulling down its notification shade froze the match for every player.
+// The flags now suspend RENDERING ONLY: W3DDisplay::draw() checks
+// GXMobileRenderingSuspended() and submits nothing at all while suspended,
+// while the simulation, message stream and network keep running in the
+// background, so a short call or a glance at the shade no longer stalls the
+// game. The GPU hazard protection above is not weakened by this -- draw
+// submission is exactly what the flags still suppress, on both graphics
+// backends, before any command can reach a torn-down surface.
 // ---------------------------------------------------------------------------
-// Two independent reasons to halt the render/sim loop:
+// Two independent reasons to suspend rendering:
 //  - BACKGROUNDED (home / switched away): the process is about to be suspended.
 //  - INACTIVE (multitasking switcher open, Control Center, a notification
 //    banner): iOS snapshots the window and owns the CAMetalLayer drawable during
 //    this window — and crucially, opening the app switcher fires resign-active
-//    WITHOUT a full background transition.
+//    WITHOUT a full background transition. iOS only: on Android a focus loss
+//    (notification shade, heads-up popup) leaves the surface alive and owned
+//    by the app, so the watcher no longer sets this flag there at all --
+//    see SDL_EVENT_WINDOW_FOCUS_LOST in mobileLifecycleWatcher() below.
 // Acquiring a Metal drawable during EITHER state fights iOS for the layer; across
 // repeated suspend/switcher cycles MoltenVK is driven into an unrecoverable
 // surface state and the app crashes (the reported "crashes after backgrounding /
-// multitasking a few times"). Pause whenever either is set.
+// multitasking a few times"). Suspend rendering whenever either is set.
 static std::atomic<bool> s_appBackgrounded{false};
 static std::atomic<bool> s_appInactive{false};
 
@@ -173,7 +188,19 @@ static bool SDLCALL mobileLifecycleWatcher(void *userdata, SDL_Event *event)
 		// after DID_ENTER_FOREGROUND.
 		case SDL_EVENT_WINDOW_FOCUS_LOST:
 			logMobileLifecycleEvent("WINDOW_FOCUS_LOST");
+			// GeneralsX @bugfix Android port 20/10/2026 No longer marked
+			// inactive on Android: pulling down the notification shade or a
+			// heads-up popup steals window focus, but the surface stays
+			// alive and owned by the app (Android only tears the
+			// ANativeWindow down on a real background transition), so
+			// rendering -- like the simulation, which never gates on this
+			// any more -- simply carries on behind the shade. iOS keeps the
+			// inactive mark: resign-active there hands the CAMetalLayer to
+			// the OS for its snapshot, which is the hazard described at the
+			// top of this section.
+#if !defined(__ANDROID__)
 			s_appInactive.store(true);
+#endif
 			break;
 		case SDL_EVENT_WINDOW_FOCUS_GAINED:
 			logMobileLifecycleEvent("WINDOW_FOCUS_GAINED");
@@ -2134,6 +2161,21 @@ void applyPendingCameraMotion()
 } // anonymous namespace
 #endif // SAGE_MOBILE_PLATFORM
 
+// GeneralsX @bugfix Android port 20/10/2026 Rendering-suspension query for
+// W3DDisplay::draw(): true while the app is backgrounded (and, on iOS,
+// while inactive). Deliberately NOT a simulation gate -- the simulation
+// and the network keep running while this is true; see
+// SDL3GameEngine::update() and the lifecycle section at the top of this
+// file for why only the rendering is suspended.
+Bool GXMobileRenderingSuspended(void)
+{
+#if defined(SAGE_MOBILE_PLATFORM)
+	return mobileShouldPauseRendering() ? TRUE : FALSE;
+#else
+	return FALSE;
+#endif
+}
+
 namespace {
 
 Bool DecodeNextUtf8Codepoint(const char* text, size_t length, size_t& offset, UnsignedInt& outCodepoint)
@@ -2292,35 +2334,23 @@ void SDL3GameEngine::reset(void)
 void SDL3GameEngine::update(void)
 {
 	pollSDL3Events();
-#if defined(SAGE_MOBILE_PLATFORM)
-	// Pause sim + render while backgrounded OR inactive (see mobileLifecycleWatcher).
-	// Acquiring a drawable in these windows fights the OS for the surface (iOS:
-	// CAMetalLayer/MoltenVK; Android: the ANativeWindow is torn down) and,
-	// across repeated suspend/switcher cycles, crashes the app. Keep polling so
-	// we still catch the resume events; just don't touch the GPU.
-	//
-	// GeneralsX @bugfix Android port 01/08/2026 Only start skipping from the
-	// SECOND consecutive paused update() onward. The very first call where we
-	// observe the transition still safely owns a valid ANativeWindow/swapchain
-	// (pollSDL3Events() just delivered the focus-lost/background event; the OS
-	// tears the surface down some time after that, not synchronously with it),
-	// so let this one call finish a completely normal update+render+present.
-	// Otherwise whatever GPU work was in flight the instant focus was lost is
-	// what stays on screen for as long as we're backgrounded -- and that's
-	// exactly what Android's task-switcher thumbnail and (on at least one
-	// real device, POCO/Snapdragon 8 Elite via HyperOS) its screenshot tool
-	// both read back. Real-device testing found the same "torn"-looking black
-	// patch in the same spot every single time in Recents and in screenshots,
-	// never during actual play -- consistent with the OS snapshotting a
-	// still-mid-render frame rather than a genuine capture-time race.
-	static bool s_wasPausedLastFrame = false;
-	const bool pausedNow = mobileShouldPauseRendering();
-	if (pausedNow && s_wasPausedLastFrame) {
-		SDL_Delay(50);
-		return;
-	}
-	s_wasPausedLastFrame = pausedNow;
-#endif
+	// GeneralsX @bugfix Android port 20/10/2026 No lifecycle gate here any
+	// more. This used to return early from the SECOND consecutive
+	// backgrounded/inactive update() onward (the first one was let through
+	// so the OS task-switcher thumbnail would not snapshot a mid-render
+	// frame), which stopped the simulation and the network along with the
+	// rendering -- and in a lockstep match that froze every player, not
+	// just this phone, for as long as the notification shade was down or a
+	// call lasted. GameEngine::update() now ALWAYS runs: simulation,
+	// message stream, network and GeneralsOnline keep ticking in the
+	// background. The GPU hazard the gate protected against is unchanged
+	// but handled where it actually lives: W3DDisplay::draw() submits
+	// nothing at all while GXMobileRenderingSuspended() is true, so no
+	// draw command and no present can reach the torn-down surface on
+	// either graphics backend (see the lifecycle section at the top of
+	// this file). The old thumbnail concern does not come back with this:
+	// with nothing submitted, what the OS snapshots is the last COMPLETED
+	// presented frame, never a mid-render one.
 #if defined(__ANDROID__)
 	// GeneralsX @bugfix Android port 28/09/2026 Game speed above the screen's refresh rate. The
 	// skirmish Game Speed slider raises the frame-rate limit, and logic runs one step per
@@ -2429,7 +2459,8 @@ void SDL3GameEngine::pollSDL3Events(void)
 
 #if defined(SAGE_MOBILE_PLATFORM)
 			// App suspension/resume: mirror the desktop focus handling so audio
-			// and mouse state pause cleanly (the render gate lives in update()).
+			// and mouse state pause cleanly (rendering itself is suspended
+			// in W3DDisplay::draw() -- see GXMobileRenderingSuspended()).
 			case SDL_EVENT_DID_ENTER_BACKGROUND:
 				m_IsActive = false;
 				if (TheMouse) {
@@ -2443,6 +2474,12 @@ void SDL3GameEngine::pollSDL3Events(void)
 				// stops running and streamed music and speech simply drain their queues
 				// and die -- one of the "sound cuts out" reports. Pausing properly here
 				// is what makes the resume below able to put them back.
+				// GeneralsX @bugfix Android port 20/10/2026 update() no longer
+				// returns early while backgrounded (only rendering is
+				// suspended now), so TheAudio->UPDATE() keeps running -- with
+				// the audio properly paused here, exactly the combination
+				// this fix was written for. The pause/resume itself is
+				// unchanged.
 				if (TheAudio && !s_audioPausedByLifecycle) {
 					s_audioPausedByLifecycle = true;
 					TheAudio->pauseAudio(AudioAffect_All);

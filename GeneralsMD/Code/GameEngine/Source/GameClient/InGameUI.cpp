@@ -5620,6 +5620,210 @@ Bool InGameUI::canSelectedObjectsEffectivelyUseWeapon( const CommandButton *comm
 }
 
 // ------------------------------------------------------------------------------------------------
+// GeneralsX @feature Android port 20/10/2026 Select-panel category selection
+// (SelectPanel.wnd, driven from GUICallbacks/SelectPanel.cpp). The existing
+// selectAllUnitsByType family cannot express two of the panel's categories:
+// there is no KINDOF_HELICOPTER, and the engine's own jet/helicopter split is
+// "has a JetAIUpdate" (jets need runways and parking; helicopters make do
+// with a plain AI update -- the Chinook even has its own), which no KindOf
+// mask can say. So the panel gets its own filter + accumulate pass here,
+// mirroring kindOfUnitSelection and selectAllUnitsByTypeAcrossRegion
+// guarantee for guarantee, plus one of its own: units flagged
+// KINDOF_IGNORES_SELECT_ALL opt out, which the older filter never checked.
+struct PanelSelectionData
+{
+	KindOfMaskType m_mustbeSet;
+	KindOfMaskType m_mustbeClear;
+	Int m_airMode;	// 0 = no air split, 1 = jets only, 2 = helicopters only
+
+	DrawableList newlySelectedDrawables;
+};
+// ------------------------------------------------------------------------------------------------
+static Bool panelCategoryUnitSelection( Drawable *test, void *userData )
+{
+	PanelSelectionData *data = (PanelSelectionData *) userData;
+
+	if( test )
+	{
+		const Object *object = test->getObject();
+		// Only things with objects can be selected, and the code below isn't
+		// safe unless you've verified that there is a valid object.
+		if (!object)
+			return FALSE;
+
+		Bool isKindOfMatch = object->isKindOfMulti(data->m_mustbeSet, data->m_mustbeClear);
+
+		// The jet/helicopter split, the same one the engine itself uses:
+		// only jets carry a JetAIUpdate.
+		if (isKindOfMatch && data->m_airMode != 0)
+		{
+			const AIUpdateInterface *ai = object->getAIUpdateInterface();
+			Bool isJet = (ai != nullptr && ai->getJetAIUpdate() != nullptr);
+			if ((data->m_airMode == 1) != isJet)
+				isKindOfMatch = FALSE;
+		}
+
+		// only select objects if not already selected
+		if( object && isKindOfMatch
+					&& !object->isKindOf(KINDOF_IGNORES_SELECT_ALL)
+					&& object->isLocallyControlled()
+					&& !object->isContained()
+					&& !object->getDrawable()->isSelected()
+					&& !object->isEffectivelyDead()
+					&& object->isMassSelectable()
+					&& !object->isOffMap()
+				)
+		{
+			// enforce optional unit cap
+			if (TheInGameUI->getMaxSelectCount() > 0 && TheInGameUI->getSelectCount() >= TheInGameUI->getMaxSelectCount())
+			{
+				if ( !TheInGameUI->getDisplayedMaxWarning() )
+				{
+					TheInGameUI->setDisplayedMaxWarning( TRUE );
+					UnicodeString msg;
+					msg.format(TheGameText->fetch("GUI:MaxSelectionSize").str(), TheInGameUI->getMaxSelectCount());
+					TheInGameUI->message(msg);
+				}
+			}
+			else
+			{
+				TheInGameUI->selectDrawable( test );
+				TheInGameUI->setDisplayedMaxWarning( FALSE );
+				data->newlySelectedDrawables.push_back(test);
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}
+
+// ------------------------------------------------------------------------------------------------
+// One accumulate pass for the select panel, mirroring
+// selectAllUnitsByTypeAcrossRegion (including its MSG_CREATE_SELECTED_GROUP
+// append) with the panel's own filter. Called once per category -- three
+// times for PANEL_SELECT_ALL_ARMY, whose passes accumulate because the
+// selection is only cleared once, by the caller, before the first pass:
+// the first pass's message is the "create" one (selection was empty) and
+// the later passes' are "add" ones, exactly as the original times them.
+static Int selectPanelCategoryAcrossRegion( IRegion2D *region, KindOfMaskType mustBeSet, KindOfMaskType mustBeClear, Int airMode )
+{
+	PanelSelectionData data;
+	Int newSelectionCount = 0;
+	Int oldSelectionCount = TheInGameUI->getAllSelectedDrawables()->size();
+
+	data.m_mustbeSet = mustBeSet;
+	data.m_mustbeClear = mustBeClear;
+	data.m_airMode = airMode;
+
+	if (region)
+	{
+		TheTacticalView->iterateDrawablesInRegion(region, panelCategoryUnitSelection, (void *)&data);
+		newSelectionCount += data.newlySelectedDrawables.size();
+	}
+	else
+	{
+		// loop over the map
+		Drawable *temp = TheGameClient->firstDrawable();
+		while( temp )
+		{
+			if( panelCategoryUnitSelection( temp, (void *)&data) )
+			{
+				newSelectionCount ++;
+			}
+
+			temp = temp->getNextDrawable();
+		}
+	}
+	TheInGameUI->setDisplayedMaxWarning( FALSE );
+
+	if (newSelectionCount > 0)
+	{
+		// create selected message
+		GameMessage *teamMsg = TheMessageStream->appendMessage( GameMessage::MSG_CREATE_SELECTED_GROUP );
+
+		teamMsg->appendBooleanArgument( (oldSelectionCount == 0) ? TRUE : FALSE );
+
+		const Drawable *draw;
+
+		//Loop through each drawable add append it's objectID to the event.
+		for( DrawableListCIt it = data.newlySelectedDrawables.begin(); it != data.newlySelectedDrawables.end(); ++it )
+		{
+			draw = *it;
+			if( draw && draw->getObject() )
+			{
+				teamMsg->appendObjectIDArgument( draw->getObject()->getID() );
+			}
+		}
+	}
+
+	return newSelectionCount;
+}
+
+// ------------------------------------------------------------------------------------------------
+Int InGameUI::selectPanelCategoryAcrossScreen( Int category )
+{
+	/// When implementing this, obey TheInGameUI->getMaxSelectCount() if it is > 0
+
+	IRegion2D region;
+	ICoord2D origin;
+	ICoord2D size;
+
+	TheTacticalView->getOrigin( &origin.x, &origin.y );
+	size.x = TheTacticalView->getWidth();
+	size.y = TheTacticalView->getHeight();
+
+	buildRegion( &origin, &size, &region );
+
+	// REPLACE semantics: a panel button means "give me these units", not
+	// "add these to whatever I happen to have selected".
+	deselectAllDrawables();
+
+	KindOfMaskType infantrySet = MAKE_KINDOF_MASK(KINDOF_INFANTRY);
+	KindOfMaskType vehicleSet = MAKE_KINDOF_MASK(KINDOF_VEHICLE);
+	KindOfMaskType aircraftSet = MAKE_KINDOF_MASK(KINDOF_AIRCRAFT);
+	KindOfMaskType aircraftClear = MAKE_KINDOF_MASK(KINDOF_AIRCRAFT);
+
+	Int numSelected = 0;
+
+	switch( category )
+	{
+		case PANEL_SELECT_INFANTRY:
+			numSelected = selectPanelCategoryAcrossRegion(&region, infantrySet, KINDOFMASK_NONE, 0);
+			break;
+
+		case PANEL_SELECT_GROUND_VEHICLES:
+			// Game data puts KINDOF_VEHICLE on aircraft too (see KindOf.h),
+			// so "ground vehicles" has to clear it back off.
+			numSelected = selectPanelCategoryAcrossRegion(&region, vehicleSet, aircraftClear, 0);
+			break;
+
+		case PANEL_SELECT_JETS:
+			numSelected = selectPanelCategoryAcrossRegion(&region, aircraftSet, KINDOFMASK_NONE, 1);
+			break;
+
+		case PANEL_SELECT_HELICOPTERS:
+			numSelected = selectPanelCategoryAcrossRegion(&region, aircraftSet, KINDOFMASK_NONE, 2);
+			break;
+
+		case PANEL_SELECT_ALL_ARMY:
+			numSelected += selectPanelCategoryAcrossRegion(&region, infantrySet, KINDOFMASK_NONE, 0);
+			numSelected += selectPanelCategoryAcrossRegion(&region, vehicleSet, aircraftClear, 0);
+			numSelected += selectPanelCategoryAcrossRegion(&region, aircraftSet, KINDOFMASK_NONE, 0);
+			break;
+
+		default:
+			break;
+	}
+
+	if (numSelected > 0)
+	{
+		UnicodeString msgStr = TheGameText->fetch( "GUI:SelectedAcrossScreen" );
+		message( msgStr );
+	}
+	return numSelected;
+}
+
+// ------------------------------------------------------------------------------------------------
 Int InGameUI::selectAllUnitsByTypeAcrossRegion( IRegion2D *region, KindOfMaskType mustBeSet, KindOfMaskType mustBeClear )
 {
 	KindOfSelectionData data;

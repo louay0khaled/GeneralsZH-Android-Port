@@ -960,6 +960,7 @@ ControlBar::ControlBar()
 	m_specialPowerShortcutParent = nullptr;
 	m_specialPowerLayout = nullptr;
 	m_groupPanelLayout = nullptr;
+	m_selectPanelLayout = nullptr;
 	m_scienceLayout = nullptr;
 	m_rightHUDWindow = nullptr;
 	m_rightHUDCameoWindow = nullptr;
@@ -1022,6 +1023,12 @@ ControlBar::~ControlBar()
 		m_groupPanelLayout->destroyWindows();
 		deleteInstance(m_groupPanelLayout);
 		m_groupPanelLayout = nullptr;
+	}
+	if(m_selectPanelLayout)
+	{
+		m_selectPanelLayout->destroyWindows();
+		deleteInstance(m_selectPanelLayout);
+		m_selectPanelLayout = nullptr;
 	}
 	m_genArrow = nullptr;
 
@@ -1168,6 +1175,19 @@ void ControlBar::init()
 			Int barX, barY;
 			m_contextParent[ CP_MASTER ]->winGetScreenPosition(&barX, &barY);
 			GroupPanelCalibrateFollowOffset(barX, barY);
+		}
+
+		// GeneralsX @feature Android port 20/10/2026 Unit-category selection
+		// touch panel -- SelectPanel.wnd is a loose file next to
+		// GroupPanel.wnd, created and calibrated exactly the same way (and
+		// guarded the same way, in case it has not been extracted yet).
+		m_selectPanelLayout = TheWindowManager->winCreateLayout("SelectPanel.wnd");
+		if (m_selectPanelLayout) {
+			m_selectPanelLayout->hide(TRUE);
+
+			Int barX, barY;
+			m_contextParent[ CP_MASTER ]->winGetScreenPosition(&barX, &barY);
+			SelectPanelCalibrateFollowOffset(barX, barY);
 		}
 
 		m_contextParent[ CP_PURCHASE_SCIENCE ] = TheWindowManager->winGetWindowFromId( nullptr, id );//m_scienceLayout->getFirstWindow();
@@ -1527,6 +1547,30 @@ void ControlBar::update()
 		// for this layout at all, matching the m_buildToolTipLayout
 		// precedent just above, so the hold logic silently never fired.
 		m_groupPanelLayout->runUpdate();
+	}
+
+	// GeneralsX @feature Android port 20/10/2026 Unit-category selection
+	// panel: identical visibility rule and bar tracking as the group panel
+	// block above (real gameplay only, and only while the real bar itself
+	// is not hidden) -- it is a sibling strip on the same bar, so anything
+	// less would have the two panels disagreeing about whether they exist.
+	if (m_selectPanelLayout) {
+		Bool gameplayActive = !(TheShell && TheShell->isShellActive())
+			&& TheGameLogic && TheGameLogic->isInInteractiveGame() && TheGameLogic->getFrame() > 0;
+
+		GameWindow *controlBarRoot = TheWindowManager->winGetWindowFromId(nullptr,
+			TheNameKeyGenerator->nameToKey("ControlBar.wnd:ControlBarParent"));
+		Bool barHidden = !controlBarRoot || controlBarRoot->winIsHidden();
+		Bool selectPanelVisible = gameplayActive && !barHidden;
+		m_selectPanelLayout->hide(!selectPanelVisible);
+
+		if (controlBarRoot) {
+			Int barX, barY;
+			controlBarRoot->winGetScreenPosition(&barX, &barY);
+			SelectPanelFollowControlBar(barX, barY, selectPanelVisible);
+		}
+
+		m_selectPanelLayout->runUpdate();
 	}
 
 	getStarImage();

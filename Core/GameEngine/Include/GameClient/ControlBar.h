@@ -939,6 +939,10 @@ protected:
 	// already-started gameplay, same as the Android-overlay version this
 	// replaces was gated (see update()'s use of this).
 	WindowLayout *m_groupPanelLayout;
+	// GeneralsX @feature Android port 20/10/2026 Unit-category selection
+	// touch panel (SelectPanel.wnd, SelectPanel.cpp) -- docked next to the
+	// group panel and shown/hidden under exactly the same conditions.
+	WindowLayout *m_selectPanelLayout;
 	WindowLayout *m_scienceLayout;								///< the Science window layout
 	GameWindow *m_sciencePurchaseWindowsRank1[ MAX_PURCHASE_SCIENCE_RANK_1 ];			///< command window controls for easy access
 	GameWindow *m_sciencePurchaseWindowsRank3[ MAX_PURCHASE_SCIENCE_RANK_3 ];			///< command window controls for easy access

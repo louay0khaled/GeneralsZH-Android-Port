@@ -2265,6 +2265,16 @@ void W3DView::setCameraHeightAboveGroundLimitsToDefault(Real heightScale)
 	}
 
 	m_maxHeightAboveGround = TheGlobalData->m_maxCameraHeight * aspectRatioScale * heightScale;
+#if defined(__ANDROID__)
+	// GeneralsX @feature Android port 20/10/2026 Wider zoom-out on phones:
+	// raise the effective ceiling by 1.5x (equivalent to a 450 base instead
+	// of GameData's 300) so more of the battlefield fits on screen. This is
+	// view-only state -- camera height is read nowhere in the simulation --
+	// so it cannot desync a lockstep match, and the raised ceiling stays
+	// well under the 1000 the engine itself allows a player to pick in
+	// Options.ini / the Extras menu slider.
+	m_maxHeightAboveGround *= 1.5f;
+#endif
 	m_minHeightAboveGround = TheGlobalData->m_minCameraHeight * aspectRatioScale;
 
 	if (m_minHeightAboveGround > m_maxHeightAboveGround)

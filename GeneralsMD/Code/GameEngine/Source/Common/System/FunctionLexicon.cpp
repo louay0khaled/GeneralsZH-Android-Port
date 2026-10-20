@@ -150,6 +150,7 @@ static FunctionLexicon::TableEntry gameWinSystemTable[] =
 	{ NAMEKEY_INVALID, "DownloadMenuSystem",                 (void*)DownloadMenuSystem },
 	{ NAMEKEY_INVALID, "ExtrasMenuSystem",                   (void*)ExtrasMenuSystem },
 	{ NAMEKEY_INVALID, "GroupPanelSystem",                   (void*)GroupPanelSystem },
+	{ NAMEKEY_INVALID, "SelectPanelSystem",                  (void*)SelectPanelSystem },
 
 	{ NAMEKEY_INVALID, nullptr,                              nullptr }
 
@@ -286,6 +287,7 @@ static FunctionLexicon::TableEntry winLayoutInitTable[] =
 	{ NAMEKEY_INVALID, "DownloadMenuInit",              (void*)DownloadMenuInit },
 	{ NAMEKEY_INVALID, "ExtrasMenuInit",                (void*)ExtrasMenuInit },
 	{ NAMEKEY_INVALID, "GroupPanelInit",                (void*)GroupPanelInit },
+	{ NAMEKEY_INVALID, "SelectPanelInit",               (void*)SelectPanelInit },
 	{ NAMEKEY_INVALID, "DifficultySelectInit",          (void*)DifficultySelectInit },
 	{ NAMEKEY_INVALID, "PopupReplayInit",               (void*)PopupReplayInit },
 
@@ -331,6 +333,7 @@ static FunctionLexicon::TableEntry winLayoutUpdateTable[] =
 	{ NAMEKEY_INVALID, "DownloadMenuUpdate",              (void*)DownloadMenuUpdate },
 	{ NAMEKEY_INVALID, "ExtrasMenuUpdate",                (void*)ExtrasMenuUpdate },
 	{ NAMEKEY_INVALID, "GroupPanelUpdate",                (void*)GroupPanelUpdate },
+	{ NAMEKEY_INVALID, "SelectPanelUpdate",               (void*)SelectPanelUpdate },
 	{ NAMEKEY_INVALID, "PopupReplayUpdate",               (void*)PopupReplayUpdate },
 	{ NAMEKEY_INVALID, nullptr,                           nullptr }
 
@@ -374,6 +377,7 @@ static FunctionLexicon::TableEntry winLayoutShutdownTable[] =
 	{ NAMEKEY_INVALID, "DownloadMenuShutdown",              (void*)DownloadMenuShutdown },
 	{ NAMEKEY_INVALID, "ExtrasMenuShutdown",                (void*)ExtrasMenuShutdown },
 	{ NAMEKEY_INVALID, "GroupPanelShutdown",                (void*)GroupPanelShutdown },
+	{ NAMEKEY_INVALID, "SelectPanelShutdown",               (void*)SelectPanelShutdown },
 	{ NAMEKEY_INVALID, "PopupReplayShutdown",               (void*)PopupReplayShutdown },
 	{ NAMEKEY_INVALID, nullptr,                             nullptr }
 
@@ -396,6 +400,7 @@ static const char *const GX_PORT_ONLY_FUNCTIONS[] =
 {
 	"ExtrasMenuSystem", "ExtrasMenuInput", "ExtrasMenuInit", "ExtrasMenuUpdate", "ExtrasMenuShutdown",
 	"GroupPanelSystem", "GroupPanelInit", "GroupPanelUpdate", "GroupPanelShutdown",
+	"SelectPanelSystem", "SelectPanelInit", "SelectPanelUpdate", "SelectPanelShutdown",
 	"W3DGeneralsXCreditDraw",
 };
 

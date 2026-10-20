@@ -40,6 +40,15 @@
 // SDL3 window created in SDL3Main.cpp before GameEngine instantiation (fighter19 pattern)
 extern SDL_Window* TheSDL3Window;
 
+// GeneralsX @bugfix Android port 20/10/2026 True while mobile rendering is
+// suspended (app backgrounded; on iOS also while inactive). Only rendering
+// is suspended -- the simulation and the network deliberately keep running
+// while this is true, so a backgrounded phone no longer stalls a lockstep
+// match for every other player. W3DDisplay::draw() checks this and skips
+// the frame entirely; defined in SDL3GameEngine.cpp, next to the lifecycle
+// watcher that owns the state.
+Bool GXMobileRenderingSuspended(void);
+
 // Forward declarations - full definitions in SDL3GameEngine.cpp
 class StdLocalFileSystem;
 class StdBIGFileSystem;
