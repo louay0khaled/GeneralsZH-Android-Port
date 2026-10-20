@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- GeneralsX @feature Android port material3-glass-ui 20/10/2026
-     Layered glass backdrop for every launcher page: a deep-navy linear
-     base, a soft teal/cyan glow bleeding in from the top, a violet glow
-     from the bottom corner, and a faint gold warmth. Glass cards and rows
-     (translucent fills + hairline strokes in UiKit) float over this.
-     Pure gradient shapes — no blur, so it is identical on API 28+. -->
+<!-- GeneralsX @feature Android port tactical-command-ui 20/10/2026
+     Tactical Command backdrop for every launcher page: a dark
+     olive-charcoal base gradient, a soft signal-amber radial glow
+     bleeding from the top corner (a console light, not the old cyan
+     glass glow), and the faint blueprint grid of @drawable/gzh_bg_grid
+     laid over everything. Flat shapes only — no blur, no translucency
+     glass — identical on API 28+. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Base: deep navy, lighter at the top. -->
+    <!-- Base: dark olive, lighter at the top. -->
     <item>
         <shape android:shape="rectangle">
             <gradient
@@ -17,50 +18,20 @@
                 android:endColor="@color/gzh_gradient_end" />
         </shape>
     </item>
-    <!-- Teal glow, top. -->
+    <!-- Amber glow, top end corner. -->
     <item>
         <shape android:shape="rectangle">
             <gradient
                 android:type="radial"
                 android:gradientRadius="420dp"
-                android:centerX="0.85"
-                android:centerY="0.05"
-                android:startColor="#402DD4E8"
+                android:centerX="0.88"
+                android:centerY="0.02"
+                android:startColor="#2EFFB300"
                 android:endColor="#00000000" />
         </shape>
     </item>
-    <!-- Violet glow, bottom start corner. -->
-    <item>
-        <shape android:shape="rectangle">
-            <gradient
-                android:type="radial"
-                android:gradientRadius="480dp"
-                android:centerX="0.05"
-                android:centerY="0.95"
-                android:startColor="#338B7CFF"
-                android:endColor="#00000000" />
-        </shape>
-    </item>
-    <!-- Gold warmth, bottom end corner (very subtle). -->
-    <item>
-        <shape android:shape="rectangle">
-            <gradient
-                android:type="radial"
-                android:gradientRadius="360dp"
-                android:centerX="0.95"
-                android:centerY="0.9"
-                android:startColor="#1AF2C14E"
-                android:endColor="#00000000" />
-        </shape>
-    </item>
-    <!-- Top sheen: the faintest white wash, like light on glass. -->
-    <item>
-        <shape android:shape="rectangle">
-            <gradient
-                android:type="linear"
-                android:angle="270"
-                android:startColor="#14FFFFFF"
-                android:endColor="#00000000" />
-        </shape>
-    </item>
+    <!-- Blueprint grid over the whole page. -->
+    <item
+        android:drawable="@drawable/gzh_bg_grid"
+        android:gravity="fill" />
 </layer-list>

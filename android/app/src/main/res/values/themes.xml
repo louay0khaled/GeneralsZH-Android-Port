@@ -19,10 +19,11 @@
         <item name="fontFamily">@font/gzh_font_body</item>
         <item name="android:fontFamily">@font/gzh_font_body</item>
 
-        <!-- M3 shape scale: large-component (dialogs/sheets) and
-             medium-component (cards) get the glass radii from
-             res/values/dimens.xml; small components (buttons/chips/fields)
-             get the row radius. -->
+        <!-- GeneralsX @feature Android port tactical-command-ui 20/10/2026
+             Shape scale for the Tactical Command identity: SHARP corners
+             everywhere. Large/medium components (dialogs, cards) get the
+             4dp card radius from res/values/dimens.xml; small components
+             (buttons/chips/fields) get the 3dp row radius. -->
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.GeneralsZH.ExtraLarge</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.GeneralsZH.ExtraLarge</item>
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.GeneralsZH.Large</item>
@@ -76,12 +77,16 @@
         <item name="android:alertDialogTheme">@style/Theme.GeneralsZH.AlertDialog</item>
     </style>
 
-    <!-- M3 shape appearances referenced by Theme.GeneralsZHSettings. -->
+    <!-- M3 shape appearances referenced by Theme.GeneralsZHSettings.
+         GeneralsX @feature Android port tactical-command-ui 20/10/2026
+         Names kept (theme slots point at them); corner sizes are now the
+         sharp tactical radii — 4dp and 3dp — instead of the old glass
+         28dp/20dp. -->
     <style name="ShapeAppearance.GeneralsZH.ExtraLarge" parent="ShapeAppearance.Material3.Corner.ExtraLarge">
-        <item name="cornerSize">28dp</item>
+        <item name="cornerSize">4dp</item>
     </style>
     <style name="ShapeAppearance.GeneralsZH.Large" parent="ShapeAppearance.Material3.Corner.Large">
-        <item name="cornerSize">20dp</item>
+        <item name="cornerSize">3dp</item>
     </style>
 
     <style name="MaterialAlertDialog.GeneralsZH.Body" parent="MaterialAlertDialog.Material3.Body.Text">

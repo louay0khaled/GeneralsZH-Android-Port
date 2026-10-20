@@ -37,6 +37,17 @@
 // Everything here is API 24-safe (see the minSdk note in build.gradle) and
 // start/end-relative rather than left/right, so the Arabic and Farsi
 // translations mirror correctly.
+//
+// GeneralsX @feature Android port tactical-command-ui 20/10/2026 The look
+// itself is now TACTICAL COMMAND — a military command-console HUD —
+// replacing the short-lived navy/cyan glass redesign wholesale: flat
+// dark-olive panels with khaki hairlines and SHARP corners (3-4dp, see
+// dimens.xml), signal-amber primary, olive/khaki secondary, section
+// headers as caps "command labels" with an amber tick and a hairline
+// rule, squared buttons/segments/chips, and a blueprint-grid page
+// backdrop. No glass, no translucency, no pills. Every public method
+// signature from the glass pass is unchanged; only what the widgets
+// look like moved.
 
 package com.generalsx.zerohour;
 
@@ -139,9 +150,9 @@ final class UiKit {
     }
 
     /**
-     * The layered glass page backdrop (@drawable/gzh_page_background)
-     * applied to a page's root view, replacing the old solid
-     * gzh_background fill. Glass cards/rows float over this gradient.
+     * The Tactical Command page backdrop (@drawable/gzh_page_background)
+     * applied to a page's root view: dark olive base, faint blueprint
+     * grid, one amber corner glow. Panels sit flat on it.
      */
     static void applyPageBackground(View view) {
         view.setBackground(ContextCompat.getDrawable(view.getContext(),
@@ -149,39 +160,34 @@ final class UiKit {
     }
 
     /**
-     * Glass treatment for SetupActivity's bottom navigation: a translucent
-     * navy fill with a 1dp glass hairline along its top edge, so the bar
-     * reads as a glass sheet over the page gradient rather than a solid
-     * slab. Layer gravity/height are API 23+, safe at minSdk 28.
+     * GeneralsX @feature Android port tactical-command-ui 20/10/2026
+     * Command-bar treatment for SetupActivity's bottom navigation: a
+     * solid near-black slab (no glass sheet, no floating pill) with a
+     * 2dp signal-amber rule along its top edge. Name kept — SetupActivity
+     * calls it — but the look is the squared command bar now. Layer
+     * gravity/height are API 23+, safe at minSdk 28.
      */
     static void applyGlassNavBackground(View view) {
         Context c = view.getContext();
-        GradientDrawable fill = new GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            new int[] { color(c, R.color.gzh_glass_highlight),
-                        color(c, R.color.gzh_glass_nav),
-                        color(c, R.color.gzh_glass_nav) });
-        ColorDrawable hairline = new ColorDrawable(color(c, R.color.gzh_glass_stroke));
+        ColorDrawable slab = new ColorDrawable(color(c, R.color.gzh_glass_nav));
+        ColorDrawable topRule = new ColorDrawable(color(c, R.color.gzh_amber_dim));
         LayerDrawable layers = new LayerDrawable(
-            new android.graphics.drawable.Drawable[] { fill, hairline });
+            new android.graphics.drawable.Drawable[] { slab, topRule });
         layers.setLayerGravity(1, Gravity.TOP);
-        layers.setLayerHeight(1, Math.max(1, dp(c, 1)));
+        layers.setLayerHeight(1, Math.max(1, dp(c, 2)));
         view.setBackground(layers);
     }
 
     /**
-     * A translucent glass fill: a gentle top-light gradient over a glass
-     * colour, with a 1dp hairline glass stroke and rounded corners.
-     * Simulated glass (translucency/gradient/stroke) — no RenderEffect
-     * blur, so it renders identically and safely on API 28-30.
+     * GeneralsX @feature Android port tactical-command-ui 20/10/2026
+     * A flat tactical panel fill: one solid colour, a 1dp khaki hairline
+     * stroke and sharp corners. Replaces the old translucent glass
+     * gradient outright — no translucency, no top-light sheen.
      */
-    private static GradientDrawable glassDrawable(Context c, float radius, int fillRes) {
-        GradientDrawable bg = new GradientDrawable(
-            GradientDrawable.Orientation.TL_BR,
-            new int[] { color(c, R.color.gzh_glass_highlight),
-                        color(c, fillRes),
-                        color(c, R.color.gzh_glass_fill_low) });
+    private static GradientDrawable panelDrawable(Context c, float radius, int fillRes) {
+        GradientDrawable bg = new GradientDrawable();
         bg.setShape(GradientDrawable.RECTANGLE);
+        bg.setColor(color(c, fillRes));
         bg.setCornerRadius(radius);
         bg.setStroke(Math.max(1, dp(c, 1)), color(c, R.color.gzh_glass_stroke));
         return bg;
@@ -256,7 +262,7 @@ final class UiKit {
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_display));
         titleView.setTextColor(color(c, R.color.gzh_on_surface));
         titleView.setTypeface(fontDisplay(c));
-        titleView.setLineSpacing(0f, 1.05f);
+        titleView.setLineSpacing(0f, 1.0f);
         text.addView(titleView);
 
         if (trailingIconRes != 0 && trailingAction != null) {
@@ -268,7 +274,7 @@ final class UiKit {
         return titleView;
     }
 
-    /** Round, tonal icon-only button — used for the app bar's trailing action. */
+    /** Squared tonal icon-only button — used for the app bar's trailing action. */
     static View iconButton(Context c, int iconRes, CharSequence description, Runnable action) {
         int size = dim(c, R.dimen.gzh_icon_button);
         ImageView button = new ImageView(c);
@@ -278,13 +284,10 @@ final class UiKit {
         int pad = dp(c, 11);
         button.setPadding(pad, pad, pad, pad);
         button.setContentDescription(description);
-        GradientDrawable bg = new GradientDrawable(
-            GradientDrawable.Orientation.TL_BR,
-            new int[] { color(c, R.color.gzh_glass_fill_high),
-                        color(c, R.color.gzh_glass_surface_high) });
-        bg.setShape(GradientDrawable.OVAL);
-        bg.setStroke(Math.max(1, dp(c, 1)), color(c, R.color.gzh_glass_stroke));
-        button.setBackground(bg);
+        // GeneralsX @feature Android port tactical-command-ui 20/10/2026
+        // Was a round glass disc; now a squared plate with a khaki edge.
+        button.setBackground(panelDrawable(c, dim(c, R.dimen.gzh_radius_row),
+            R.color.gzh_surface_container_high));
         button.setClickable(true);
         button.setFocusable(true);
         button.setOnClickListener(v -> action.run());
@@ -297,28 +300,42 @@ final class UiKit {
     // ----------------------------------------------------------------- cards
 
     /**
-     * A rounded surface-container card appended to {@code parent}. Returns the
-     * card's inner vertical content holder — callers just add views to it.
+     * A squared surface-container panel appended to {@code parent}. Returns
+     * the panel's inner vertical content holder — callers just add views
+     * to it.
      */
     static LinearLayout card(LinearLayout parent) {
         Context c = parent.getContext();
         MaterialCardView card = new MaterialCardView(c);
         card.setRadius(dim(c, R.dimen.gzh_radius_card));
-        // Glass card: translucent navy fill so the page gradient glows
-        // through, a hairline glass stroke, and a soft elevation so the
-        // card floats over the backdrop instead of sitting flat on it.
-        card.setCardElevation(dp(c, 6));
+        // GeneralsX @feature Android port tactical-command-ui 20/10/2026
+        // Tactical panel: flat near-opaque olive fill, a 1dp khaki
+        // hairline stroke, sharp 4dp corners (gzh_radius_card) and NO
+        // elevation — panels bolt onto the backdrop, they do not float
+        // over it like the old glass cards did.
+        card.setCardElevation(0);
         card.setCardBackgroundColor(color(c, R.color.gzh_glass_surface));
         card.setStrokeColor(color(c, R.color.gzh_glass_stroke));
         card.setStrokeWidth(Math.max(1, dp(c, 1)));
         card.setUseCompatPadding(false);
         card.setPreventCornerOverlap(false);
 
+        // A muted-khaki accent stripe runs the panel's full height at its
+        // start edge, outside the padded body.
+        LinearLayout shell = new LinearLayout(c);
+        shell.setOrientation(LinearLayout.HORIZONTAL);
+        View stripe = new View(c);
+        stripe.setBackgroundColor(color(c, R.color.gzh_outline));
+        shell.addView(stripe, new LinearLayout.LayoutParams(dp(c, 3),
+            ViewGroup.LayoutParams.MATCH_PARENT));
+
         LinearLayout body = new LinearLayout(c);
         body.setOrientation(LinearLayout.VERTICAL);
         int pad = dim(c, R.dimen.gzh_card_padding);
         body.setPadding(pad, pad, pad, pad);
-        card.addView(body, new ViewGroup.LayoutParams(
+        shell.addView(body, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        card.addView(shell, new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -329,9 +346,85 @@ final class UiKit {
     }
 
     /**
-     * Card header: an accent icon, the section name, and (optionally) a value
-     * pinned to the end edge in the accent colour. Returns that value view, or
-     * null when {@code withValue} is false.
+     * GeneralsX @feature Android port tactical-command-ui 20/10/2026
+     * The hero plate (Setup Home): @drawable/gzh_hero_background — a flat
+     * dark-olive panel with amber corner ticks — instead of a card. Same
+     * contract as {@link #card}: returns the padded inner vertical holder
+     * callers add views to.
+     */
+    static LinearLayout heroPanel(LinearLayout parent) {
+        Context c = parent.getContext();
+        LinearLayout panel = new LinearLayout(c);
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setBackground(ContextCompat.getDrawable(c, R.drawable.gzh_hero_background));
+
+        LinearLayout body = new LinearLayout(c);
+        body.setOrientation(LinearLayout.VERTICAL);
+        int pad = dim(c, R.dimen.gzh_card_padding);
+        body.setPadding(pad, pad, pad, pad);
+        panel.addView(body, new ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = dim(c, R.dimen.gzh_card_gap);
+        parent.addView(panel, lp);
+        return body;
+    }
+
+    /**
+     * GeneralsX @feature Android port tactical-command-ui 20/10/2026
+     * A horizontal strip of squared status readouts (see {@link #readout}),
+     * appended to {@code parent} — the hero's instrument row.
+     */
+    static LinearLayout readoutStrip(LinearLayout parent) {
+        Context c = parent.getContext();
+        LinearLayout strip = new LinearLayout(c);
+        strip.setOrientation(LinearLayout.HORIZONTAL);
+        strip.setBaselineAligned(false);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = dim(c, R.dimen.gzh_item_gap);
+        parent.addView(strip, lp);
+        return strip;
+    }
+
+    /**
+     * GeneralsX @feature Android port tactical-command-ui 20/10/2026
+     * One squared "readout" chip in a {@link #readoutStrip}: dark plate,
+     * khaki hairline, caps label in the given colour. Returns the view so
+     * a caller can keep one readout live (the hero's folder verdict is
+     * rewritten by SetupActivity.refreshStatus()).
+     */
+    static TextView readout(LinearLayout strip, CharSequence text, int textColorRes) {
+        Context c = strip.getContext();
+        TextView view = new TextView(c);
+        view.setText(text);
+        view.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_caption));
+        view.setTextColor(color(c, textColorRes));
+        view.setTypeface(fontSemibold(c));
+        view.setAllCaps(true);
+        view.setLetterSpacing(0.04f);
+        view.setGravity(Gravity.CENTER_VERTICAL);
+        view.setPadding(dp(c, 10), dp(c, 6), dp(c, 10), dp(c, 6));
+        view.setMaxLines(1);
+        view.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        view.setBackground(panelDrawable(c, dp(c, 2), R.color.gzh_surface));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        if (strip.getChildCount() > 0) {
+            lp.setMarginStart(dim(c, R.dimen.gzh_item_gap_tight));
+        }
+        strip.addView(view, lp);
+        return view;
+    }
+
+    /**
+     * Card header as a Tactical Command "command label": a leading amber
+     * tick block, the section name in the display face (caps, letter-
+     * spaced), an optional value pinned to the end edge in the accent
+     * colour, and a hairline rule under the whole label. Returns that
+     * value view, or null when {@code withValue} is false.
      */
     static TextView sectionHeader(LinearLayout body, int iconRes, CharSequence title, boolean withValue) {
         Context c = body.getContext();
@@ -340,10 +433,19 @@ final class UiKit {
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setBaselineAligned(false);
 
+        // GeneralsX @feature Android port tactical-command-ui 20/10/2026
+        // The amber tick: every settings group announces itself with the
+        // same signal block before its name.
+        View tick = new View(c);
+        tick.setBackgroundColor(color(c, R.color.gzh_primary));
+        LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(dp(c, 5), dp(c, 20));
+        tlp.setMarginEnd(dp(c, 10));
+        row.addView(tick, tlp);
+
         if (iconRes != 0) {
             ImageView icon = new ImageView(c);
             icon.setImageDrawable(ContextCompat.getDrawable(c, iconRes));
-            icon.setImageTintList(tint(c, R.color.gzh_primary));
+            icon.setImageTintList(tint(c, R.color.gzh_secondary));
             int s = dim(c, R.dimen.gzh_icon);
             LinearLayout.LayoutParams ilp = new LinearLayout.LayoutParams(s, s);
             ilp.setMarginEnd(dp(c, 10));
@@ -354,7 +456,9 @@ final class UiKit {
         titleView.setText(title);
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_title));
         titleView.setTextColor(color(c, R.color.gzh_on_surface));
-        titleView.setTypeface(fontSemibold(c));
+        titleView.setTypeface(fontDisplay(c));
+        titleView.setAllCaps(true);
+        titleView.setLetterSpacing(0.05f);
         row.addView(titleView, new LinearLayout.LayoutParams(0,
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
@@ -371,10 +475,17 @@ final class UiKit {
             row.addView(value, vlp);
         }
 
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.bottomMargin = dim(c, R.dimen.gzh_item_gap);
-        body.addView(row, lp);
+        body.addView(row, new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        // The hairline rule the label stands on, extending the full width.
+        View rule = new View(c);
+        rule.setBackgroundColor(color(c, R.color.gzh_outline_variant));
+        LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, Math.max(1, dp(c, 1)));
+        rlp.topMargin = dp(c, 6);
+        rlp.bottomMargin = dim(c, R.dimen.gzh_item_gap);
+        body.addView(rule, rlp);
         return value;
     }
 
@@ -429,7 +540,7 @@ final class UiKit {
     static View divider(LinearLayout parent) {
         Context c = parent.getContext();
         View line = new View(c);
-        line.setBackgroundColor(color(c, R.color.gzh_glass_stroke));
+        line.setBackgroundColor(color(c, R.color.gzh_outline_variant));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, Math.max(1, dp(c, 1)));
         lp.topMargin = dim(c, R.dimen.gzh_item_gap);
@@ -457,7 +568,9 @@ final class UiKit {
         b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
         b.setTypeface(fontSemibold(c));
         b.setLetterSpacing(0f);
-        b.setCornerRadius(dp(c, 28));
+        // GeneralsX @feature Android port tactical-command-ui 20/10/2026
+        // Squared corners (was a 28dp glass pill radius).
+        b.setCornerRadius(dim(c, R.dimen.gzh_radius_row));
         b.setInsetTop(0);
         b.setInsetBottom(0);
         b.setMinHeight(dim(c, R.dimen.gzh_button_height));
@@ -513,6 +626,23 @@ final class UiKit {
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.topMargin = dim(c, R.dimen.gzh_item_gap_tight);
         parent.addView(b, lp);
+        return b;
+    }
+
+    /**
+     * GeneralsX @feature Android port tactical-command-ui 20/10/2026
+     * The hero action: a BTN_PRIMARY block grown to dominate its screen —
+     * the full-width signal-amber launch slab on Setup Home (taller,
+     * display face, larger label). Same click contract as {@link #button}.
+     */
+    static MaterialButton heroButton(LinearLayout parent, int iconRes,
+                                     CharSequence label, Runnable onClick) {
+        MaterialButton b = button(parent, BTN_PRIMARY, iconRes, label, onClick);
+        Context c = parent.getContext();
+        b.setMinHeight(dim(c, R.dimen.gzh_button_height_hero));
+        b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19f);
+        b.setTypeface(fontDisplay(c));
+        b.setLetterSpacing(0.03f);
         return b;
     }
 
@@ -582,7 +712,10 @@ final class UiKit {
             b.setTypeface(fontSemibold(c));
             b.setMaxLines(1);
             b.setEllipsize(android.text.TextUtils.TruncateAt.END);
-            b.setCornerRadius(dp(c, 24));
+            // GeneralsX @feature Android port tactical-command-ui
+            // 20/10/2026 Squared segments (was a 24dp pill radius); the
+            // checked segment is the solid amber block below.
+            b.setCornerRadius(dim(c, R.dimen.gzh_radius_row));
             b.setInsetTop(0);
             b.setInsetBottom(0);
             b.setMinWidth(0);
@@ -697,8 +830,17 @@ final class UiKit {
         int padV = dp(c, 14);
         row.setPadding(padH, padV, padH, padV);
 
-        row.setBackground(glassDrawable(c, dim(c, R.dimen.gzh_radius_row),
-            R.color.gzh_glass_fill));
+        // GeneralsX @feature Android port tactical-command-ui 20/10/2026
+        // Flat squared panel (was a translucent rounded glass row).
+        row.setBackground(panelDrawable(c, dim(c, R.dimen.gzh_radius_row),
+            R.color.gzh_surface_container));
+        // Khaki accent stripe at the row's start edge.
+        View stripe = new View(c);
+        stripe.setBackgroundColor(color(c, R.color.gzh_khaki));
+        LinearLayout.LayoutParams stripeLp = new LinearLayout.LayoutParams(dp(c, 3),
+            ViewGroup.LayoutParams.MATCH_PARENT);
+        stripeLp.setMarginEnd(dim(c, R.dimen.gzh_item_gap));
+        row.addView(stripe, stripeLp);
         if (onClick != null) {
             row.setClickable(true);
             row.setFocusable(true);
@@ -717,7 +859,7 @@ final class UiKit {
         if (iconRes != 0) {
             ImageView icon = new ImageView(c);
             icon.setImageDrawable(ContextCompat.getDrawable(c, iconRes));
-            icon.setImageTintList(tint(c, R.color.gzh_primary));
+            icon.setImageTintList(tint(c, R.color.gzh_secondary));
             int s = dim(c, R.dimen.gzh_icon);
             LinearLayout.LayoutParams ilp = new LinearLayout.LayoutParams(s, s);
             ilp.setMarginEnd(dim(c, R.dimen.gzh_item_gap));
@@ -765,7 +907,7 @@ final class UiKit {
     }
 
     /**
-     * A compact "chip": a rounded, tinted, non-interactive label. Used for the
+     * A compact "chip": a squared, tinted, non-interactive label. Used for the
      * one-word verdicts (GPU name, active driver) that used to be full
      * sentences of body text.
      */
@@ -777,8 +919,12 @@ final class UiKit {
         chip.setTextSize(TypedValue.COMPLEX_UNIT_PX, dim(c, R.dimen.gzh_text_caption));
         chip.setTextColor(color(c, textColorRes));
         chip.setTypeface(fontSemibold(c));
+        // GeneralsX @feature Android port tactical-command-ui 20/10/2026
+        // Caps + tracking: chips read as instrument readouts now.
+        chip.setAllCaps(true);
+        chip.setLetterSpacing(0.04f);
         chip.setGravity(Gravity.CENTER_VERTICAL);
-        chip.setPadding(dp(c, 12), dp(c, 7), dp(c, 12), dp(c, 7));
+        chip.setPadding(dp(c, 10), dp(c, 6), dp(c, 10), dp(c, 6));
         chip.setMaxLines(2);
         chip.setEllipsize(android.text.TextUtils.TruncateAt.END);
         if (iconRes != 0) {
@@ -793,7 +939,9 @@ final class UiKit {
         }
         GradientDrawable bg = new GradientDrawable();
         bg.setShape(GradientDrawable.RECTANGLE);
-        bg.setCornerRadius(dp(c, 999));
+        // GeneralsX @feature Android port tactical-command-ui 20/10/2026
+        // Squared chip (was a 999dp pill).
+        bg.setCornerRadius(dp(c, 2));
         bg.setColor(color(c, backgroundColorRes));
         bg.setStroke(Math.max(1, dp(c, 1)), color(c, R.color.gzh_glass_stroke));
         chip.setBackground(bg);

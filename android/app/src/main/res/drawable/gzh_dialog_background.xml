@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- GeneralsX @feature Android port material3-glass-ui 20/10/2026 Glass
-     panel behind the plain android.app.AlertDialogs the launcher still
-     uses (language picker, render-backend picker, clear-logs confirm):
-     translucent navy glass fill, hairline glass stroke, 28dp corners. -->
+<!-- GeneralsX @feature Android port tactical-command-ui 20/10/2026 Panel
+     behind the plain android.app.AlertDialogs the launcher still uses
+     (language picker, render-backend picker, clear-logs confirm): a flat
+     dark-olive tactical fill, a 1dp khaki hairline stroke and sharp 4dp
+     corners — the old translucent navy glass is gone. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <gradient
-        android:type="linear"
-        android:angle="270"
-        android:startColor="#E61B2C4A"
-        android:endColor="#E60D1830" />
+    <solid android:color="@color/gzh_surface_container_high" />
     <stroke
         android:width="1dp"
         android:color="@color/gzh_glass_stroke" />
-    <corners android:radius="28dp" />
+    <corners android:radius="4dp" />
 </shape>

@@ -95,9 +95,15 @@ public class SetupActivity extends Activity {
     static final int SIM_HZ_RETAIL = 30;
     static final int SIM_HZ_CROSSPLAY = 60;
 
+    // GeneralsX @tweak Android port 20/10/2026 The out-of-box default is now
+    // 60 Hz: the APK ships both engines (CI builds libmain60.so alongside
+    // libmain.so), and players asked for the smoother rate without having to
+    // find this setting first. A player who stored a choice keeps it --
+    // SIM_HZ_RETAIL below only applies when nothing was ever saved. 30 Hz
+    // remains selectable for proven Android-to-Android play.
     static int getSimHz(android.content.Context ctx) {
         int hz = ctx.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-            .getInt(PREF_SIM_HZ, SIM_HZ_RETAIL);
+            .getInt(PREF_SIM_HZ, SIM_HZ_CROSSPLAY);
         return hz == SIM_HZ_CROSSPLAY ? SIM_HZ_CROSSPLAY : SIM_HZ_RETAIL;
     }
 
@@ -305,20 +311,30 @@ public class SetupActivity extends Activity {
         nav.setLayoutDirection(android.view.View.LAYOUT_DIRECTION_LTR);
         nav.setTextDirection(android.view.View.TEXT_DIRECTION_LOCALE);
 
-        // Glass nav: translucent navy sheet + top glass hairline (UiKit).
+        // GeneralsX @feature Android port tactical-command-ui 20/10/2026
+        // Command bar: solid near-black slab with a 2dp amber top rule
+        // (UiKit), no glass sheet and no floating pill. The active item
+        // sits in a solid signal-amber BLOCK (squared shape appearance),
+        // its icon knocked out dark against the amber, its label amber;
+        // inactive items stay faint khaki.
         UiKit.applyGlassNavBackground(nav);
         nav.setElevation(UiKit.dp(this, 8));
         nav.setLabelVisibilityMode(NavigationBarView.LABEL_VISIBILITY_LABELED);
         nav.setItemIconSize(UiKit.dp(this, 22));
-        // Checked/unchecked pair: the selected item is the one sitting in the
-        // active-indicator pill, so it takes the on-container colour.
-        android.content.res.ColorStateList itemTint = new android.content.res.ColorStateList(
+        android.content.res.ColorStateList iconTint = new android.content.res.ColorStateList(
             new int[][] { new int[] { android.R.attr.state_checked }, new int[0] },
-            new int[] { UiKit.color(this, R.color.gzh_on_primary_container),
+            new int[] { UiKit.color(this, R.color.gzh_on_primary),
                         UiKit.color(this, R.color.gzh_on_surface_faint) });
-        nav.setItemIconTintList(itemTint);
-        nav.setItemTextColor(itemTint);
-        nav.setItemActiveIndicatorColor(UiKit.tint(this, R.color.gzh_primary_container));
+        nav.setItemIconTintList(iconTint);
+        android.content.res.ColorStateList textTint = new android.content.res.ColorStateList(
+            new int[][] { new int[] { android.R.attr.state_checked }, new int[0] },
+            new int[] { UiKit.color(this, R.color.gzh_primary),
+                        UiKit.color(this, R.color.gzh_on_surface_faint) });
+        nav.setItemTextColor(textTint);
+        nav.setItemActiveIndicatorColor(UiKit.tint(this, R.color.gzh_primary));
+        nav.setItemActiveIndicatorShapeAppearance(
+            new com.google.android.material.shape.ShapeAppearanceModel.Builder()
+                .setAllCornerSizes(UiKit.dp(this, 2)).build());
         nav.setItemRippleColor(UiKit.tint(this, R.color.gzh_ripple_primary));
 
         Menu menu = nav.getMenu();
@@ -411,6 +427,7 @@ public class SetupActivity extends Activity {
 
     /** Forgets every page-scoped view so a stale one is never written to. */
     private void clearPageReferences() {
+        heroFolderChip = null;
         statusText = null;
         onlineStatusView = null;
         updatesStatusView = null;
@@ -429,9 +446,84 @@ public class SetupActivity extends Activity {
 
     // ------------------------------------------------------------ Home page
 
+    // GeneralsX @feature Android port tactical-command-ui 20/10/2026 The
+    // hero's folder-verdict readout, kept live by refreshStatus() (which
+    // already computes the verdict for the folder card's status line).
+    // Page-scoped like every other refresh* view: nulled in
+    // clearPageReferences().
+    private TextView heroFolderChip;
+
+    /**
+     * GeneralsX @feature Android port tactical-command-ui 20/10/2026
+     * The Tactical Command hero at the top of Home: the amber-ticked
+     * plate carrying the "ZERO HOUR" wordmark (app_name, display face,
+     * caps) over the full game title, and a status strip of squared
+     * readouts — folder verdict (live, see refreshStatus()), render
+     * backend, sim rate and build version. Pure presentation: every
+     * value comes from the same getters the rest of the page already
+     * uses, and nothing here is clickable.
+     */
+    private void buildHero(LinearLayout page) {
+        LinearLayout hero = UiKit.heroPanel(page);
+
+        TextView over = new TextView(this);
+        over.setText(getString(R.string.setup_title));
+        over.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+            UiKit.dim(this, R.dimen.gzh_text_overline));
+        over.setTextColor(UiKit.color(this, R.color.gzh_primary));
+        over.setTypeface(UiKit.fontMedium(this));
+        over.setAllCaps(true);
+        over.setLetterSpacing(0.09f);
+        over.setMaxLines(1);
+        over.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        hero.addView(over);
+
+        TextView wordmark = new TextView(this);
+        wordmark.setText(getString(R.string.app_name));
+        wordmark.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+            UiKit.dim(this, R.dimen.gzh_text_wordmark));
+        wordmark.setTextColor(UiKit.color(this, R.color.gzh_on_surface));
+        wordmark.setTypeface(UiKit.fontDisplay(this));
+        wordmark.setAllCaps(true);
+        wordmark.setLineSpacing(0f, 1.0f);
+        LinearLayout.LayoutParams wlp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        wlp.topMargin = UiKit.dp(this, 2);
+        hero.addView(wordmark, wlp);
+
+        TextView tagline = new TextView(this);
+        tagline.setText(getString(R.string.setup_subtitle));
+        tagline.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+            UiKit.dim(this, R.dimen.gzh_text_body));
+        tagline.setTextColor(UiKit.color(this, R.color.gzh_on_surface_variant));
+        tagline.setTypeface(UiKit.fontBody(this));
+        LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        tlp.topMargin = UiKit.dim(this, R.dimen.gzh_item_gap_tight);
+        hero.addView(tagline, tlp);
+
+        LinearLayout strip = UiKit.readoutStrip(hero);
+        heroFolderChip = UiKit.readout(strip,
+            getString(R.string.setup_hero_folder_missing), R.color.gzh_status_warn);
+        UiKit.readout(strip, shortRenderBackendLabel(getRenderBackendChoice()),
+            R.color.gzh_on_surface_variant);
+        UiKit.readout(strip, getString(getSimHz(this) == SIM_HZ_CROSSPLAY
+            ? R.string.setup_sim_rate_60_short : R.string.setup_sim_rate_30_short),
+            R.color.gzh_on_surface_variant);
+        String version = versionLabel();
+        if (!version.isEmpty()) {
+            UiKit.readout(strip, "v" + version, R.color.gzh_on_surface_faint);
+        }
+    }
+
     private void buildHomeSection(LinearLayout page) {
-        // The one thing this app exists to do, as the first thing on it.
-        UiKit.button(page, UiKit.BTN_PRIMARY, R.drawable.ic_gzh_play,
+        // GeneralsX @feature Android port tactical-command-ui 20/10/2026
+        // Hero first (wordmark + status strip), then the launch action.
+        buildHero(page);
+
+        // The one thing this app exists to do, as the first thing on it:
+        // a huge full-width signal-amber block, visually dominant.
+        UiKit.heroButton(page, R.drawable.ic_gzh_play,
             getString(R.string.setup_button_launch_game), this::onLaunchGame);
 
         LinearLayout folder = UiKit.card(page);
@@ -2239,6 +2331,11 @@ public class SetupActivity extends Activity {
             return;  // the current page has no status line (see showTab())
         }
         String path = getSavedGamePath();
+        // GeneralsX @feature Android port tactical-command-ui 20/10/2026
+        // The hero strip's folder readout mirrors this same verdict in
+        // short form; defaults cover the not-set case.
+        int chipTextRes = R.string.setup_hero_folder_missing;
+        int chipColorRes = R.color.gzh_status_warn;
         SpannableStringBuilder sb = new SpannableStringBuilder();
         if (path == null) {
             sb.append(getString(R.string.setup_status_folder_not_set));
@@ -2251,14 +2348,20 @@ public class SetupActivity extends Activity {
             if (!valid) {
                 sb.append(getString(R.string.setup_status_folder_invalid));
                 statusColorRes = R.color.gzh_status_error;
+                chipTextRes = R.string.setup_hero_folder_check;
+                chipColorRes = R.color.gzh_status_error;
             } else {
                 java.util.List<String> issues = findGameFolderIntegrityIssues(dir);
                 if (issues.isEmpty()) {
                     sb.append(getString(R.string.setup_status_folder_valid));
                     statusColorRes = R.color.gzh_status_ok;
+                    chipTextRes = R.string.setup_hero_folder_ready;
+                    chipColorRes = R.color.gzh_status_ok;
                 } else {
                     sb.append(getString(R.string.setup_status_folder_incomplete, joinLines(issues)));
                     statusColorRes = R.color.gzh_status_error;
+                    chipTextRes = R.string.setup_hero_folder_check;
+                    chipColorRes = R.color.gzh_status_error;
                 }
             }
             int statusEnd = sb.length();
@@ -2284,6 +2387,13 @@ public class SetupActivity extends Activity {
             end--;
         }
         statusText.setText(sb.subSequence(0, end));
+        // GeneralsX @feature Android port tactical-command-ui 20/10/2026
+        // Keep the hero readout on the same verdict (Home page only; the
+        // chip is null everywhere else).
+        if (heroFolderChip != null) {
+            heroFolderChip.setText(chipTextRes);
+            heroFolderChip.setTextColor(UiKit.color(this, chipColorRes));
+        }
         updateGameLanguageStatusView();
     }
 
