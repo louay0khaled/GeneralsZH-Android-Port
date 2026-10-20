@@ -664,8 +664,20 @@ jobs:
           set -euo pipefail
           declare -A latest_run
 
+          # GeneralsX @bugfix Android CI 20/10/2026 Scope this sweep to THIS
+          # workflow's own runs, and never touch the current run's artifacts.
+          # The repo-wide version compared artifact run ids across every
+          # workflow: Build Android run #45 deleted its own just-uploaded APK
+          # because a GeneralsX CI run triggered by the same push had a
+          # higher run id on the same branch and already had log artifacts,
+          # so it counted as the branch's "latest" run.
+          OWN_RUNS="$(mktemp)"
+          gh api "repos/${{ github.repository }}/actions/workflows/build-android.yml/runs" --paginate \
+            --jq '.workflow_runs[].id' > "$OWN_RUNS" || true
+
           while IFS=$'\t' read -r branch run_id; do
             [ -z "${branch}" ] && continue
+            grep -qx "${run_id}" "$OWN_RUNS" || continue
             if [ -z "${latest_run[$branch]:-}" ] || [ "${run_id}" -gt "${latest_run[$branch]}" ]; then
               latest_run[$branch]="${run_id}"
             fi
@@ -676,6 +688,8 @@ jobs:
             --jq '.artifacts[] | [(.workflow_run.head_branch // ""), .workflow_run.id, .id] | @tsv' \
           | while IFS=$'\t' read -r branch run_id artifact_id; do
               [ -z "${branch}" ] && continue
+              [ "${run_id}" = "${{ github.run_id }}" ] && continue
+              grep -qx "${run_id}" "$OWN_RUNS" || continue
               if [ "${run_id}" != "${latest_run[$branch]:-}" ]; then
                 echo "Deleting old artifact ${artifact_id} (branch ${branch}, run ${run_id}, latest for that branch is ${latest_run[$branch]})"
                 gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/${artifact_id}" || true
