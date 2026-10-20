@@ -805,3 +805,5 @@ final class UiKit {
         return chip;
     }
 }
+
+// Rebuild trigger 2026-10-20: fresh CI run after a throttled runner; no functional change.
