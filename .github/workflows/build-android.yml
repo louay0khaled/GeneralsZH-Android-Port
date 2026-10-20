@@ -498,7 +498,12 @@ jobs:
           # engine stashed by pass 1 as libmain60.so, next to libmain.so.
           GX_SECOND_GAME_LIB: ${{ github.workspace }}/build/libmain60.so
         run: |
-          ./scripts/build/android/package-android-zh.sh
+          # GeneralsX @bugfix Android CI 20/10/2026 Invoke via bash explicitly:
+          # this script's git mode is 100644 (a connector push stripped its
+          # execute bit), and run #43 died at this step with exit code 126
+          # ("command cannot execute") for exactly that reason. Calling bash
+          # makes the step independent of the stored file mode.
+          bash scripts/build/android/package-android-zh.sh
 
       - name: Locate APK
         id: locate
