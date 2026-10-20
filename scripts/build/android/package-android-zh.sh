@@ -9,7 +9,7 @@
 #      in-tree SDL3 source, so Java and native SDL always match versions.
 #   3. Stage small runtime assets bundled into the APK and extracted on first
 #      launch: fonts/ (Liberation, renamed), dxvk.conf, DefaultOptions.ini.
-#   4. gradle assembleDebug -> app-debug.apk, ready for adb install.
+#   4. gradle assembleRelease -> app-release.apk, ready for adb install.
 #
 # Game .big archives are NOT packaged: the user copies their own game data to
 # /storage/emulated/0/Android/data/com.generalsx.zerohour/files/ (see
@@ -340,10 +340,10 @@ if [[ -n "${GX_ANDROID_VERSION_NAME:-}" ]]; then
     GRADLE_VERSION_ARG="${GRADLE_VERSION_ARG} -PandroidVersionName=${GX_ANDROID_VERSION_NAME}"
 fi
 
-echo "==> ${GRADLE_CMD} assembleDebug ${GRADLE_VERSION_ARG}"
-"${GRADLE_CMD}" assembleDebug ${GRADLE_VERSION_ARG}
+echo "==> ${GRADLE_CMD} assembleRelease ${GRADLE_VERSION_ARG}"
+"${GRADLE_CMD}" assembleRelease ${GRADLE_VERSION_ARG}
 
-APK="${ANDROID_DIR}/app/build/outputs/apk/debug/app-debug.apk"
+APK="${ANDROID_DIR}/app/build/outputs/apk/release/app-release.apk"
 if [[ ! -f "${APK}" ]]; then
     echo "ERROR: expected APK not found at ${APK}"
     exit 1
