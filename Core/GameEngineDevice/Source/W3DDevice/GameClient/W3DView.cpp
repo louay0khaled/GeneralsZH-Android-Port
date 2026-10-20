@@ -190,6 +190,7 @@ W3DView::W3DView()
 
 	m_cameraAreaConstraints.zero();
 	m_recalcCamera = false;
+	m_startMaxHeightAboveGround = 0.0f;
 
 }
 
@@ -806,7 +807,9 @@ void W3DView::updateCameraClipPlanes(const Matrix3D &transform)
 		const Real projectedRadiusToEdge = fabs(dx * camDir.X) + fabs(dy * camDir.Y);
 
 		// Final far plane
-		farZ = projectedDistanceToCenter + projectedRadiusToEdge;
+		// GeneralsX @tweak Android port 21/10/2026 Matches upstream
+		// GeneralsGameCode main exactly (never negative).
+		farZ = std::max(projectedDistanceToCenter + projectedRadiusToEdge, 0.0f);
 	}
 	else
 	{
@@ -2273,6 +2276,14 @@ void W3DView::setCameraHeightAboveGroundLimitsToDefault(Real heightScale)
 	// so it cannot desync a lockstep match, and the raised ceiling stays
 	// well under the 1000 the engine itself allows a player to pick in
 	// Options.ini / the Extras menu slider.
+	// GeneralsX @tweak Android port 21/10/2026 Record the unraised ceiling
+	// first: device feedback was that the raised ceiling is also where
+	// every match STARTS (GameLogic calls setZoomToMax()), which made the
+	// far camera feel forced. setZoomToMax() now lands on this recorded
+	// value on Android; the x1.5 remains reachable headroom for pinch /
+	// wheel zoom, which clamps against m_maxHeightAboveGround itself
+	// (View::setHeightAboveGround).
+	m_startMaxHeightAboveGround = m_maxHeightAboveGround;
 	m_maxHeightAboveGround *= 1.5f;
 #endif
 	m_minHeightAboveGround = TheGlobalData->m_minCameraHeight * aspectRatioScale;
@@ -2291,6 +2302,12 @@ void W3DView::setDefaultView(Real pitch, Real angle, Real maxHeight)
 	m_maxHeightAboveGround = TheGlobalData->m_maxCameraHeight*maxHeight;
 	if (m_minHeightAboveGround > m_maxHeightAboveGround)
 		m_maxHeightAboveGround = m_minHeightAboveGround;
+#if defined(__ANDROID__)
+	// GeneralsX @tweak Android port 21/10/2026 A script-defined view is its
+	// own start height: keep the recorded start max in sync so a later
+	// setZoomToMax() cannot resurrect the pre-script ceiling.
+	m_startMaxHeightAboveGround = m_maxHeightAboveGround;
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2328,6 +2345,23 @@ void W3DView::setZoomToMax()
 {
 	// default zoom has to be max, otherwise players will just zoom to max always
 	m_heightAboveGround = m_maxHeightAboveGround;
+#if defined(__ANDROID__)
+	// GeneralsX @tweak Android port 21/10/2026 On Android "max" for an
+	// automatic zoom (match start in GameLogic, the Options menu action)
+	// is the ORIGINAL ceiling recorded in
+	// setCameraHeightAboveGroundLimitsToDefault, not the x1.5 zoom-out
+	// bonus: the bonus is headroom the player reaches by pinching /
+	// wheeling out (View::setHeightAboveGround clamps to the raised
+	// m_maxHeightAboveGround), never a start position imposed on him.
+	if (m_startMaxHeightAboveGround > 0.0f)
+	{
+		m_heightAboveGround = m_startMaxHeightAboveGround;
+		if (m_heightAboveGround < m_minHeightAboveGround)
+			m_heightAboveGround = m_minHeightAboveGround;
+		if (m_heightAboveGround > m_maxHeightAboveGround)
+			m_heightAboveGround = m_maxHeightAboveGround;
+	}
+#endif
 	m_zoom = getMaxZoom(m_pos.x, m_pos.y);
 
 	m_cameraAreaConstraintsValid = false; // recalc it.
@@ -3777,38 +3811,209 @@ void W3DView::Add_Camera_Shake (const Coord3D & position,float radius,float dura
 	CameraShakerSystem.Add_Camera_Shake(vpos,radius,duration,power);
 }
 
+/**
+//=============================================================================
+// Returns a terrain draw size based on the camera's visible ground footprint.
+// Also outputs a draw center in World coordinates that HeightMap uses instead
+// of scanning the heightmap. Returns false for degenerate views, in which
+// case the caller should not change the terrain draw state; the output
+// dimensions then span the entire map, and drawCenter is origin.
+//=============================================================================
+
+GeneralsX @feature Android port 21/10/2026 Ported from TheSuperHackers
+GeneralsGameCode PR #2785 (open upstream; already shipped in a
+GeneralsOnline-related client fork): the fixed 129/257-vertex draw window
+stopped covering the visible ground at high zoom, so valid in-map terrain
+fell outside the window and the screen showed the black clear color (most
+visible with this port's x1.5 Android zoom-out). The window is now sized
+to the frustum's ground footprint and hard-capped at the map extent -- a
+DRAW-window cap only; camera height/zoom itself is never limited.
+Adaptations for this tree (constant names, non-const map accessors) are
+listed in the round-5 implementation notes; the sizing math is upstream's.
+*/
+bool W3DView::getDesiredTerrainDrawSize(ICoord2D &dimensions, Vector2 &drawCenter) const
+{
+	WorldHeightMap *map = TheTerrainRenderObject->getMap();
+	if (map == nullptr)
+	{
+		return false;
+	}
+
+	Int drawSizeX;
+	Int drawSizeY;
+
+	if (TheTerrainLogic->getDrawEntireTerrain())
+	{
+		drawSizeX = map->getXExtent();
+		drawSizeY = map->getYExtent();
+	}
+	else
+	{
+		const Vector3 &cameraPosition = m_3DCamera->Get_Position();
+		const Real cameraHeightAboveTerrainMin = cameraPosition.Z - TheTerrainRenderObject->getMinHeight();
+		// Clamp the evaluated terrain height so the projected footprint cannot expand indefinitely when
+		// the camera rises above the maximum terrain height.
+		const Real maxTerrainHeight = std::min(TheTerrainRenderObject->getMaxHeight(), cameraPosition.Z);
+
+		Vector3 minCameraSpaceCorner(REAL_MAX, REAL_MAX, REAL_MAX);
+		Vector3 maxCameraSpaceCorner(-REAL_MAX, -REAL_MAX, -REAL_MAX);
+		Bool hasValidCorner = false;
+
+		// Evaluate both plausible ground heights because the frustum's deepest intersection depends on terrain elevation.
+		const Real groundHeights[2] = {
+			TheTerrainRenderObject->getMinHeight(),
+			maxTerrainHeight
+		};
+
+		for (Int groundHeightIndex = 0; groundHeightIndex < 2; ++groundHeightIndex)
+		{
+			const Real groundHeight = groundHeights[groundHeightIndex];
+			const Real groundRelativeCameraHeight = cameraPosition.Z - groundHeight;
+
+			if (groundRelativeCameraHeight <= 0.0f)
+			{
+				continue;
+			}
+
+			// Reconstruct the terrain plane in camera space so the projected footprint stays stable while yaw changes.
+			// The terrain plane passes through the point directly below the camera at the evaluated ground height.
+			const Vector3 groundPointWorld(cameraPosition.X, cameraPosition.Y, groundHeight);
+			const Vector3 groundPointCameraSpace = Matrix3D::Transform_Vector(m_3DCamera->Get_View_Matrix(), groundPointWorld);
+			const Vector3 groundPlaneNormalCameraSpace = Matrix3D::Transform_Vector(m_3DCamera->Get_View_Matrix(), Vector3(0.0f, 0.0f, 1.0f));
+
+			Vector2 viewPlaneMin;
+			Vector2 viewPlaneMax;
+			m_3DCamera->Get_View_Plane(viewPlaneMin, viewPlaneMax);
+
+			const Matrix3D &cameraTransform = m_3DCamera->Get_Transform();
+			const Vector4 &cameraRight = cameraTransform[0];
+			const Vector4 &cameraUp = cameraTransform[1];
+			const Real tanHalfHorizontalFov = -viewPlaneMax.X;
+			const Real tanHalfVerticalFov = -viewPlaneMax.Y;
+			// Derive the camera forward axes from the frustum tangents because the projected footprint
+			// should not change size from yaw alone.
+			const Real horizontalForwardComponent = std::sqrt(1.0f + SQUARE(tanHalfHorizontalFov));
+			const Real verticalForwardComponent = std::sqrt(1.0f + SQUARE(tanHalfVerticalFov));
+			const Real horizontalCorrection = 1.0f / horizontalForwardComponent;
+			const Real verticalCorrection = 1.0f / verticalForwardComponent;
+			const Vector3 cameraRightHorizontal(cameraRight.X * horizontalCorrection, cameraRight.Y * horizontalCorrection, 0.0f);
+			const Vector3 cameraUpVertical(cameraUp.X * verticalCorrection, cameraUp.Y * verticalCorrection, 0.0f);
+			const Real groundNormalZ = std::fabs(cameraTransform[2].Z);
+
+			for (Int cornerIndex = 0; cornerIndex < 4; ++cornerIndex)
+			{
+				const Real horizontal = (cornerIndex & 1) ? 1.0f : -1.0f;
+				const Real vertical = (cornerIndex & 2) ? 1.0f : -1.0f;
+				const Vector3 rayDirection(horizontal * tanHalfHorizontalFov, vertical * tanHalfVerticalFov, -1.0f);
+
+				const Real rayPlaneDenominator = Vector3::Dot_Product(rayDirection, groundPlaneNormalCameraSpace);
+				if (rayPlaneDenominator >= 0.0f)
+				{
+					continue;
+				}
+
+				const Real rayDistance = groundRelativeCameraHeight / -rayPlaneDenominator;
+				// A negative ray distance means the frustum corner faces away from the terrain and does not
+				// contribute to the visible ground footprint.
+				if (rayDistance < 0.0f || !std::isfinite(rayDistance))
+				{
+					continue;
+				}
+
+				const Vector3 intersectionCameraSpace = groundPointCameraSpace + rayDirection * rayDistance;
+				if (!intersectionCameraSpace.Is_Valid())
+				{
+					continue;
+				}
+				// Ignore frustum corners projecting beyond the far plane because they do not contribute to the visible terrain.
+				if (-intersectionCameraSpace.Z > m_farZ)
+				{
+					continue;
+				}
+
+				// Convert the camera-space intersection into horizontal camera axes so the footprint diameter is
+				// independent of the camera's yaw.
+				// The camera basis vectors are orthonormal, so dividing by the forward-axis Z component scales the footprint.
+				const Vector3 horizontalProjection = cameraRightHorizontal * (horizontal * rayDistance * tanHalfHorizontalFov / groundNormalZ);
+				const Vector3 verticalProjection = cameraUpVertical * (vertical * rayDistance * tanHalfVerticalFov / groundNormalZ);
+
+				minCameraSpaceCorner.Update_Min(horizontalProjection + verticalProjection);
+				maxCameraSpaceCorner.Update_Max(horizontalProjection + verticalProjection);
+				hasValidCorner = true;
+			}
+		}
+
+		if (!hasValidCorner)
+		{
+			// Keep the previous draw size and fall back in HeightMap, where visibility culling is more tolerant.
+			dimensions.x = map->getXExtent();
+			dimensions.y = map->getYExtent();
+			drawCenter.Set(0.0f, 0.0f);
+			return false;
+		}
+
+		const Vector3 footprintSize = maxCameraSpaceCorner - minCameraSpaceCorner;
+		const Real diameterSquared = SQUARE(footprintSize.X) + SQUARE(footprintSize.Y);
+		if (!std::isfinite(diameterSquared) || diameterSquared < 0.0f)
+		{
+			dimensions.x = map->getXExtent();
+			dimensions.y = map->getYExtent();
+			drawCenter.Set(0.0f, 0.0f);
+			return false;
+		}
+
+		const Int footprintTiles = static_cast<Int>(std::ceil(std::sqrt(diameterSquared) / MAP_XY_FACTOR)) + 5;
+		// Snap upward to the renderer's vertex buffer so the draw window stays buffer-aligned.
+		const Int drawTiles = std::max(footprintTiles - 1, 0);
+		const Int drawBlocks = (drawTiles + VERTEX_BUFFER_TILE_LENGTH - 1) / VERTEX_BUFFER_TILE_LENGTH;
+		Int drawSize = 1 + drawBlocks * VERTEX_BUFFER_TILE_LENGTH;
+
+		// Use the legacy terrain draw sizes as the minimum so close-up views do not regress in quality or draw less than before.
+		// (This tree names them NORMAL_DRAW_WIDTH / LOW_ANGLE_DRAW_WIDTH; WIDTH == HEIGHT == 129 / 257 here.)
+		Int minimumDrawSize = WorldHeightMap::NORMAL_DRAW_WIDTH;
+		if (m_isUserControlled && (m_3DCamera->Get_Transform()[2].Length() <= 0.0f || std::asin(std::fabs(m_3DCamera->Get_Transform()[2].Z)) <= ViewDefaultLowPitchRadians))
+		{
+			// Preserve the legacy behavior where non-default low-pitch cameras used the low-angle draw distance.
+			minimumDrawSize = WorldHeightMap::LOW_ANGLE_DRAW_WIDTH;
+		}
+		drawSize = std::max(drawSize, minimumDrawSize);
+
+		const Real terrainScale = TheGlobalData->m_terrainDrawDistanceScale;
+		if (terrainScale != 1.0f)
+		{
+			drawSize = static_cast<Int>(drawSize * terrainScale);
+		}
+
+		drawSizeX = std::min(map->getXExtent(), drawSize);
+		drawSizeY = std::min(map->getYExtent(), drawSize);
+	}
+
+	// TheSuperHackers @performance sailro 06/09/2026 Reuse the view position instead of requiring HeightMap to project
+	// the frustum again just to determine the draw center.
+	// (Adapted: this tree's View::getPosition() returns const Coord3D& instead of filling a Vector3*.)
+	const Coord3D &viewPosition = getPosition();
+	drawCenter.Set(viewPosition.x, viewPosition.y);
+	dimensions.x = drawSizeX;
+	dimensions.y = drawSizeY;
+	return true;
+}
+
 void W3DView::updateTerrain()
 {
 	DEBUG_ASSERTCRASH(TheTerrainRenderObject != nullptr, ("TheTerrainRenderObject is null"));
 
+	ICoord2D drawSize;
+	Vector2 drawCenter;
+	const bool hasDrawCenter = getDesiredTerrainDrawSize(drawSize, drawCenter);
+	if (hasDrawCenter)
+	{
+		TheTerrainRenderObject->setTerrainDrawSize(drawSize.x, drawSize.y);
+	}
+
 	RefRenderObjListIterator *it = W3DDisplay::m_3DScene->createLightsIterator();
+
 	const Vector3 cameraPivot(m_pos.x, m_pos.y, m_pos.z);
-	const Real cameraPitch = asin(fabs(m_3DCamera->Get_Forward_Dir().Z));
-	Int drawWidth;
-	Int drawHeight;
-
-	if (cameraPitch > ViewDefaultLowPitchRadians)
-	{
-		drawWidth = WorldHeightMap::NORMAL_DRAW_WIDTH;
-		drawHeight = WorldHeightMap::NORMAL_DRAW_HEIGHT;
-	}
-	else
-	{
-		// TheSuperHackers @tweak xezon 31/12/2025 Increases visible terrain area when lowering the camera pitch.
-		// Note: The default camera pitch in Generals was 37.5, which we prefer to keep the normal draw size for.
-		drawWidth = WorldHeightMap::LOW_ANGLE_DRAW_WIDTH;
-		drawHeight = WorldHeightMap::LOW_ANGLE_DRAW_HEIGHT;
-	}
-
-	const Real terrainScale = TheGlobalData->m_terrainDrawDistanceScale;
-	if (terrainScale != 1.0f)
-	{
-		drawWidth = static_cast<Int>(drawWidth * terrainScale);
-		drawHeight = static_cast<Int>(drawHeight * terrainScale);
-	}
-
-	TheTerrainRenderObject->setTerrainDrawSize(drawWidth, drawHeight);
-	TheTerrainRenderObject->updateCenter(m_3DCamera, &cameraPivot, it);
+	TheTerrainRenderObject->updateCenter(m_3DCamera, &cameraPivot, it, hasDrawCenter ? &drawCenter : nullptr);
 
 	if (it)
 	{

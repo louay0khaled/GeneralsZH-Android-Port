@@ -67,6 +67,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -403,6 +404,7 @@ public class SetupActivity extends Activity {
                 buildLanguageSection(page);
                 buildUiScaleSection(page);
                 buildInterfaceScaleSection(page);
+                buildSelectPanelSection(page);
                 break;
             case TAB_HELP:
                 buildHelpSection(page);
@@ -1036,6 +1038,49 @@ public class SetupActivity extends Activity {
             prefs = new java.util.LinkedHashMap<>(readKeyValueFile(file));
         }
         prefs.put("GXUiScale", String.valueOf(percent));
+        writeKeyValueFile(file, prefs);
+    }
+
+    // GeneralsX @feature Android port 21/10/2026 Unit-category select panel
+    // (SelectPanel.wnd in the game): a column of buttons on the left edge,
+    // above the control-group buttons, that selects every on-screen unit of
+    // one kind. This is its show/hide switch, saved as GXSelectPanel in
+    // Options.ini and read by SDL3Main.cpp at startup (GX_SELECT_PANEL),
+    // the same pipeline as GXUiScale above. On by default: the key is only
+    // written when the user flips the switch, and the engine treats a
+    // missing key as "show".
+    private void buildSelectPanelSection(LinearLayout root) {
+        LinearLayout content = UiKit.card(root);
+        UiKit.sectionHeader(content, R.drawable.ic_gzh_chip,
+            getString(R.string.setup_card_select_panel), false);
+
+        MaterialSwitch toggle = UiKit.switchRow(content,
+            getString(R.string.setup_switch_select_panel),
+            getString(R.string.setup_switch_select_panel_desc));
+        toggle.setChecked(readSelectPanelEnabled());
+        toggle.setOnCheckedChangeListener((button, checked) -> {
+            writeSelectPanelEnabled(checked);
+            Toast.makeText(this, R.string.setup_toast_render_scale_saved, Toast.LENGTH_LONG).show();
+        });
+
+        UiKit.helpText(content, getString(R.string.setup_select_panel_help));
+    }
+
+    private boolean readSelectPanelEnabled() {
+        String val = readKeyValueFile(optionsIniFile()).get("GXSelectPanel");
+        return val == null || !"0".equals(val.trim());
+    }
+
+    private void writeSelectPanelEnabled(boolean enabled) {
+        File file = optionsIniFile();
+        // Seeded from DefaultOptions.ini when new, for the same reason as writeInterfaceScalePercent().
+        java.util.LinkedHashMap<String, String> prefs;
+        if (!file.isFile()) {
+            prefs = new java.util.LinkedHashMap<>(readKeyValueFile(defaultOptionsIniFile()));
+        } else {
+            prefs = new java.util.LinkedHashMap<>(readKeyValueFile(file));
+        }
+        prefs.put("GXSelectPanel", enabled ? "1" : "0");
         writeKeyValueFile(file, prefs);
     }
 

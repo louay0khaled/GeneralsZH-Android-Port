@@ -248,6 +248,10 @@
     <string name="setup_interface_scale_label">%1$d%%</string>
     <string name="setup_button_apply_interface_scale">Apply Interface Size</string>
     <string name="setup_interface_scale_help">Makes the in-game interface bigger, without touching the game\'s files: the control bar with the radar grows up from the bottom, and the generals\' powers bar, chat, event messages, player list, in-game menu with Save/Load and Options, and the main menu\'s buttons grow from where they sit. Nothing is pushed off the screen: each part grows only as far as it fits, so the control bar gets taller rather than wider on a wide phone, and the battlefield above it gets shorter. Works together with Menu Text Size. Takes effect the next time you launch the game.</string>
+    <string name="setup_card_select_panel">Unit Select Panel</string>
+    <string name="setup_switch_select_panel">Show unit select panel</string>
+    <string name="setup_switch_select_panel_desc">Infantry / Vehicles / Jets / Helicopters / All Army buttons on the left edge of the screen.</string>
+    <string name="setup_select_panel_help">The buttons sit above the control-group buttons and select every on-screen unit of one kind, replacing the current selection. Their labels follow the game\'s language. Takes effect the next time you launch the game.</string>
     <!-- GeneralsX @feature Android port tactical-command-ui 20/10/2026 Setup hero status-strip readouts. -->
     <string name="setup_hero_folder_ready">Game folder ready</string>
     <string name="setup_hero_folder_missing">Game folder not set</string>

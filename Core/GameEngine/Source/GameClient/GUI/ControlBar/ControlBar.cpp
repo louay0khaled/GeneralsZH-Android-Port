@@ -30,6 +30,8 @@
 // USER INCLUDES //////////////////////////////////////////////////////////////////////////////////
 
 #include "PreRTS.h"	// This must go first in EVERY cpp file in the GameEngine
+
+#include <cstdlib>	// getenv() for the GX_SELECT_PANEL toggle below
 #define DEFINE_GUI_COMMAND_NAMES
 #define DEFINE_COMMAND_OPTION_NAMES
 #define DEFINE_WEAPONSLOTTYPE_NAMES
@@ -961,6 +963,7 @@ ControlBar::ControlBar()
 	m_specialPowerLayout = nullptr;
 	m_groupPanelLayout = nullptr;
 	m_selectPanelLayout = nullptr;
+	m_selectPanelEnabled = TRUE;
 	m_scienceLayout = nullptr;
 	m_rightHUDWindow = nullptr;
 	m_rightHUDCameoWindow = nullptr;
@@ -1181,7 +1184,18 @@ void ControlBar::init()
 		// touch panel -- SelectPanel.wnd is a loose file next to
 		// GroupPanel.wnd, created and calibrated exactly the same way (and
 		// guarded the same way, in case it has not been extracted yet).
-		m_selectPanelLayout = TheWindowManager->winCreateLayout("SelectPanel.wnd");
+		// GeneralsX @feature Android port 21/10/2026 GXSelectPanel launcher
+		// toggle: SetupActivity writes GXSelectPanel to Options.ini and
+		// SDL3Main republishes it as the GX_SELECT_PANEL env var (the
+		// GXUiScale pipeline). Read once here; when off, the layout is
+		// never created and the panel never shows. A missing key -- and
+		// any value but 0 -- keeps the panel on, so existing installs see
+		// no change unless the user turns it off in the launcher.
+		const char *selectPanelEnv = getenv("GX_SELECT_PANEL");
+		m_selectPanelEnabled = !(selectPanelEnv && selectPanelEnv[0] == '0');
+		if (m_selectPanelEnabled) {
+			m_selectPanelLayout = TheWindowManager->winCreateLayout("SelectPanel.wnd");
+		}
 		if (m_selectPanelLayout) {
 			m_selectPanelLayout->hide(TRUE);
 
@@ -1561,7 +1575,7 @@ void ControlBar::update()
 		GameWindow *controlBarRoot = TheWindowManager->winGetWindowFromId(nullptr,
 			TheNameKeyGenerator->nameToKey("ControlBar.wnd:ControlBarParent"));
 		Bool barHidden = !controlBarRoot || controlBarRoot->winIsHidden();
-		Bool selectPanelVisible = gameplayActive && !barHidden;
+		Bool selectPanelVisible = gameplayActive && !barHidden && m_selectPanelEnabled;
 		m_selectPanelLayout->hide(!selectPanelVisible);
 
 		if (controlBarRoot) {
