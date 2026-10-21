@@ -325,6 +325,14 @@
             "environment": {
                 "PKG_CONFIG_PATH": ""
             }
+        },
+        {
+            "name": "android-vulkan-release",
+            "inherits": "android-vulkan",
+            "displayName": "Android Vulkan Release (-O3 trial)",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
         }
     ],
     "buildPresets": [
