@@ -66,6 +66,25 @@
 // constructed (a USER window with an IMAGE status behind plain buttons);
 // without Pro the authored flat fill stays. Nothing is copied out of the
 // .big -- the name is resolved against the live mapped-image collection.
+//
+// GeneralsX @feature Android port 21/10/2026 Round 7, from device feedback
+// on the round above: (1) the merge silently broke the "=" handle -- in
+// this engine a push button's click is delivered to its PARENT window's
+// system function (createGadget sets m_owner = parent), so the handle's
+// GBM_SELECTED now lands here in SelectPanelSystem instead of in
+// GroupPanelSystem; SelectPanelSystem forwards the group controls'
+// GBM_SELECTED / GBM_SELECTED_RIGHT messages to GroupPanelSystem, which
+// restores the exact pre-merge delivery (GroupPanel.cpp still untouched).
+// (2) The panel is re-anchored: instead of a calibrated offset to
+// ControlBarParent, the follow reads the LIVE rect of ControlBar.wnd:
+// LeftHUD (the minimap window, the same rect Radar draws from) every
+// frame and parks the merged stack flush on top of it -- bottom edge on
+// the minimap's top edge, left edges aligned, column sized to the
+// minimap's width with the five buttons centered inside it. (3) The
+// scheme refresh also puts the live scheme's button face on the buttons
+// themselves (see resolveSchemeFaceImage below): with a real face image
+// and the image draw function they render like the bar's own buttons
+// instead of flat fills.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PreRTS.h"
@@ -78,6 +97,7 @@
 #include "GameClient/Color.h"
 #include "GameClient/ControlBar.h"
 #include "GameClient/Display.h"
+#include "GameClient/GadgetPushButton.h"
 #include "GameClient/GameText.h"
 #include "GameClient/GameWindow.h"
 #include "GameClient/GameWindowManager.h"
@@ -95,6 +115,10 @@ static NameKeyType s_backgroundID = NAMEKEY_INVALID;
 static NameKeyType s_groupHandleID = NAMEKEY_INVALID;
 static NameKeyType s_groupRowID = NAMEKEY_INVALID;
 static NameKeyType s_buttonGroupID[10];
+// GeneralsX @feature Android port 21/10/2026 Round 7: the minimap window
+// the merged panel anchors to (the follow reads its live rect every
+// frame -- the same window Radar caches for the same reason).
+static NameKeyType s_leftHudID = NAMEKEY_INVALID;
 
 // Button order in SelectPanel.wnd -> InGameUI panel category.
 static const char *s_buttonNames[5] =
@@ -145,6 +169,7 @@ static void cacheWidgetIDs()
 		sprintf(buf, "GroupPanel.wnd:ButtonGroup%d", i);
 		s_buttonGroupID[i] = TheNameKeyGenerator->nameToKey(buf);
 	}
+	s_leftHudID = TheNameKeyGenerator->nameToKey("ControlBar.wnd:LeftHUD");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -156,6 +181,24 @@ static Int findSelectButtonIndex(Int controlID)
 		}
 	}
 	return -1;
+}
+
+//-------------------------------------------------------------------------------------------------
+// GeneralsX @feature Android port 21/10/2026 Round 7: the merged group
+// controls (the "=" handle and the ten digit buttons), whose click
+// messages SelectPanelSystem forwards to GroupPanelSystem (see the
+// GBM_SELECTED cases there for why the forward exists at all).
+static Bool isGroupControlID(Int controlID)
+{
+	if (controlID == s_groupHandleID) {
+		return TRUE;
+	}
+	for (Int i = 0; i < 10; ++i) {
+		if (controlID == s_buttonGroupID[i]) {
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -261,6 +304,75 @@ static void resolveTrayImageName(char *out)
 	}
 }
 
+// GeneralsX @feature Android port 21/10/2026 Round 7: face-art tracking --
+// the scheme button face currently applied to the panel's buttons
+// (nullptr = none applied / flat look). Image pointers in the mapped
+// collection are stable for the process lifetime, so the pointer itself
+// is the change key; SelectPanelInit clears it because a recreated
+// layout's buttons start over with the authored flat look and the plain
+// push-button draw function.
+static const Image *s_appliedFaceImage = nullptr;
+
+// The live scheme's button face. ControlBarScheme stores its
+// QueueButtonImage as an Image* that INI::parseMappedImage resolved from
+// the scheme text at load, and both the stock schemes and ControlBar Pro
+// put the name "SCBigButton" there. This tree exposes no accessor for
+// the scheme manager's current scheme (m_currentScheme is private and
+// nothing else reads scheme state except through ControlBar's cached
+// colors), so resolve the same name through the same collection: the
+// lookup returns the identical Image* the current scheme itself holds.
+// nullptr when the installed data has no such image -- the caller then
+// leaves (or restores) the authored flat fills, untouched.
+static const Image *resolveSchemeFaceImage()
+{
+	if (TheMappedImageCollection) {
+		return TheMappedImageCollection->findImageByName("SCBigButton");
+	}
+	return nullptr;
+}
+
+// Apply (or, with face == nullptr, remove) the scheme button face on one
+// push button. The face goes into slot 0 of EVERY state set the image
+// draw can pick from (W3DGadgetPushButtonImageDrawOne reads slot 0 for
+// enabled/disabled/hilite and slot 1 of the disabled/hilite sets for the
+// selected variants; no per-state variant names were guessed -- the one
+// scheme face serves all states, and the pressed/hover read comes from
+// the face art itself plus the text). Just as important is the draw
+// function: gogoGadgetPushButton assigns the image draw only to buttons
+// whose AUTHORED status carries IMAGE, which none of this panel's
+// buttons do -- they were created with the plain color draw, which never
+// looks at slot images at all. So applying a face also switches the draw
+// function to the manager's image draw (the same one Pro's own cameo
+// buttons run), and removing the face restores the plain draw. The
+// hold-to-clear clock wipe is PushButtonData-driven and renders under
+// both draws, so the group buttons keep it either way.
+static void setButtonFaceImage(GameWindow *button, const Image *face)
+{
+	if (!button || !TheWindowManager) {
+		return;
+	}
+	GadgetButtonSetEnabledImage(button, face);
+	GadgetButtonSetDisabledImage(button, face);
+	GadgetButtonSetHiliteImage(button, face);
+	GadgetButtonSetDisabledSelectedImage(button, face);
+	GadgetButtonSetHiliteSelectedImage(button, face);
+	button->winSetDrawFunc(face ? TheWindowManager->getPushButtonImageDrawFunc()
+															: TheWindowManager->getPushButtonDrawFunc());
+}
+
+// The face goes on every push button the merged panel owns: the five
+// select buttons, the "=" handle and the ten group buttons.
+static void applyFaceImageToPanel(const Image *face)
+{
+	for (Int i = 0; i < 5; ++i) {
+		setButtonFaceImage(TheWindowManager->winGetWindowFromId(nullptr, s_buttonID[i]), face);
+	}
+	setButtonFaceImage(TheWindowManager->winGetWindowFromId(nullptr, s_groupHandleID), face);
+	for (Int i = 0; i < 10; ++i) {
+		setButtonFaceImage(TheWindowManager->winGetWindowFromId(nullptr, s_buttonGroupID[i]), face);
+	}
+}
+
 // GeneralsX @feature Android port 21/10/2026 Round 6: this is now the
 // panel's whole scheme-ART refresh, not just its tint: the live scheme
 // border colors go on the column AND on the merged group windows, and the
@@ -268,6 +380,11 @@ static void resolveTrayImageName(char *out)
 // data provides one. Still fully change-driven -- once the colors are
 // applied and the tray name is settled, a call costs two color compares
 // and one string compare.
+// GeneralsX @feature Android port 21/10/2026 Round 7: the refresh also
+// owns the buttons' scheme FACE (see resolveSchemeFaceImage above). The
+// face is resolved before the change gate on purpose: it is one map
+// lookup, and its pointer joins the gate so a face appearing or
+// disappearing re-runs the application exactly once.
 static void refreshSchemeTint()
 {
 	if (!TheWindowManager || !TheControlBar) {
@@ -283,8 +400,9 @@ static void refreshSchemeTint()
 	}
 	char trayName[64];
 	resolveTrayImageName(trayName);
+	const Image *faceImage = resolveSchemeFaceImage();
 	if (borderColor == s_appliedBorderColor && actionColor == s_appliedActionColor
-		&& strcmp(trayName, s_lastTrayAttempt) == 0) {
+		&& strcmp(trayName, s_lastTrayAttempt) == 0 && faceImage == s_appliedFaceImage) {
 		return;
 	}
 
@@ -372,23 +490,41 @@ static void refreshSchemeTint()
 		}
 	}
 
+	// GeneralsX @feature Android port 21/10/2026 Round 7: button faces.
+	// When the scheme face changed (first application, a scheme/faction
+	// switch to a data set with a different face, or the face vanishing),
+	// (re)apply it to all sixteen panel buttons; a nullptr face restores
+	// the authored flat fills and the plain draw. Note the border tint
+	// above stays written on the buttons' draw data either way -- the
+	// image draw does not consume slot border colors, but the tint is
+	// what the buttons fall back to visually whenever no face is applied,
+	// and it still frames the row and group-row windows, which are USER
+	// windows and keep the default draw.
+	if (faceImage != s_appliedFaceImage) {
+		applyFaceImageToPanel(faceImage);
+		s_appliedFaceImage = faceImage;
+	}
+
 	s_appliedBorderColor = borderColor;
 	s_appliedActionColor = actionColor;
 }
 
-// GeneralsX @feature Android port 20/10/2026 Follow-the-bar pairing, same
-// calibrate-once design as GroupPanel's (see GroupPanel.cpp for the full
-// rationale): the offset between this panel's button column and the real
-// ControlBarParent is captured once in ControlBar::init(), while both are
-// still at their authored resting positions, and is then tracked every
-// frame so the panel slides with the bar. Only the column needs moving --
-// the five buttons are its children and move with it, and the layout's
-// parent window is an invisible no-input frame, same as GroupPanelParent.
-// GeneralsX @feature Android port 21/10/2026 Round 5: the column now sits
-// on the left edge like the group panel does, so the follow math gains
-// the same display-cutout inset GroupPanel applies
-// (GXSafeArea::leftPx() plus a little) -- the round-4 row was authored
-// mid-screen and deliberately had none.
+// GeneralsX @feature Android port 20/10/2026 Follow-the-bar pairing:
+// SelectPanelFollowControlBar is called from ControlBar::update() every
+// frame with the real bar's screen position and the panel's visibility
+// decision, and that contract stands through every restyle below.
+// GeneralsX @feature Android port 21/10/2026 Round 7: placement no
+// longer derives from the calibrated ControlBarParent offset this block
+// used to capture. The merged panel is anchored to the minimap instead:
+// ControlBar.wnd:LeftHUD is fetched by name (Radar caches the same
+// window for the same reason -- its authored rect differs between the
+// stock and scheme-override ControlBar.wnd files, so the LIVE rect is
+// the only reliable anchor) and the stack is parked flush on top of it
+// each frame. That absorbs scheme authoring resolutions, GXUiScale's
+// ControlBar.wnd scaling, the bar's slide animations and resolution
+// changes with no calibration at all. The calibrate entry point stays
+// (ControlBar::init still calls it) but its offsets no longer feed
+// placement.
 static Bool s_followOffsetCalibrated = FALSE;
 static Int s_followOffsetX = 0;
 static Int s_followOffsetY = 0;
@@ -409,59 +545,109 @@ void SelectPanelCalibrateFollowOffset(Int barScreenX, Int barScreenY)
 	s_followOffsetCalibrated = TRUE;
 }
 
+// Translate one of the merged panel's sibling windows by a screen-space
+// delta. Window positions are parent-relative and the shared parent
+// frame does not move, so translating the local position by the same
+// delta is exact; this moves the panel stack rigidly (the Round 6
+// arrangement).
+static void translateWindowBy(GameWindow *window, Int dx, Int dy)
+{
+	if (!window) {
+		return;
+	}
+	Int x, y;
+	window->winGetPosition(&x, &y);
+	window->winSetPosition(x + dx, y + dy);
+}
+
 void SelectPanelFollowControlBar(Int barScreenX, Int barScreenY, Bool visible)
 {
-	if (!visible || !s_followOffsetCalibrated) {
+	// Round 7: placement anchors on the minimap's live rect (below), so
+	// the bar position arguments are no longer used for placement; the
+	// signature stays because ControlBar::update calls it this way.
+	(void)barScreenX;
+	(void)barScreenY;
+	if (!visible) {
 		return;
 	}
 	if (!TheWindowManager) {
 		return;
 	}
 
-	// Round 5 (21/10/2026): first visible frame applies the localized
-	// captions and the live scheme tint; both are no-ops afterwards
-	// unless the scheme colors change (see the helpers above).
+	// First visible frame applies the localized captions, the live
+	// scheme tint/art and the button faces; all are change-driven
+	// no-ops afterwards (see the helpers above).
 	applyButtonTextOnce();
 	refreshSchemeTint();
 
+	GameWindow *leftHud = (s_leftHudID != NAMEKEY_INVALID)
+		? TheWindowManager->winGetWindowFromId(nullptr, s_leftHudID) : nullptr;
 	GameWindow *row = TheWindowManager->winGetWindowFromId(nullptr, s_buttonRowID);
-	if (!row) {
-		return;
-	}
-
-	Int targetX = barScreenX + s_followOffsetX + GXSafeArea::leftPx() + TheDisplay->getWidth() / 100;
-	Int targetY = barScreenY + s_followOffsetY;
-
-	Int curX, curY;
-	row->winGetScreenPosition(&curX, &curY);
-	Int dx = targetX - curX;
-	Int dy = targetY - curY;
-	if (dx == 0 && dy == 0) {
-		return;
-	}
-
-	Int rx, ry;
-	row->winGetPosition(&rx, &ry);
-	row->winSetPosition(rx + dx, ry + dy);
-
-	// GeneralsX @feature Android port 21/10/2026 Round 6: the merged group
-	// windows are the column's siblings under SelectPanelParent, so they
-	// do not inherit its motion the way the five buttons (its children)
-	// do -- translate them by the same delta, which is exactly what
-	// GroupPanelFollowControlBar used to do for its own layout. Their
-	// authored positions (and so their offset to the column) are fixed,
-	// so one delta keeps the whole merged panel rigid.
 	GameWindow *groupHandle = TheWindowManager->winGetWindowFromId(nullptr, s_groupHandleID);
-	if (groupHandle) {
-		Int hx, hy;
-		groupHandle->winGetPosition(&hx, &hy);
-		groupHandle->winSetPosition(hx + dx, hy + dy);
-	}
 	GameWindow *groupRow = TheWindowManager->winGetWindowFromId(nullptr, s_groupRowID);
-	if (groupRow) {
-		Int gx, gy;
-		groupRow->winGetPosition(&gx, &gy);
-		groupRow->winSetPosition(gx + dx, gy + dy);
+	if (!leftHud || !row || !groupHandle) {
+		// No anchor (or no panel) this frame -- keep the last placement
+		// exactly as it stands rather than jumping somewhere wrong.
+		return;
+	}
+
+	Int hudX, hudY, hudW, hudH;
+	leftHud->winGetScreenPosition(&hudX, &hudY);
+	leftHud->winGetSize(&hudW, &hudH);
+
+	// Width: the column and its tray background take the minimap's live
+	// width, and the five buttons center inside it -- a button's local x
+	// is parent-relative, so it is recomputed from its own live width
+	// against the row's new width. Sizes and positions are only written
+	// when they actually change, so a settled frame costs just reads.
+	Int rowW, rowH;
+	row->winGetSize(&rowW, &rowH);
+	if (rowW != hudW) {
+		row->winSetSize(hudW, rowH);
+	}
+	GameWindow *background = TheWindowManager->winGetWindowFromId(nullptr, s_backgroundID);
+	if (background) {
+		Int bgW, bgH;
+		background->winGetSize(&bgW, &bgH);
+		if (bgW != hudW) {
+			background->winSetSize(hudW, bgH);
+		}
+	}
+	for (Int i = 0; i < 5; ++i) {
+		GameWindow *button = TheWindowManager->winGetWindowFromId(nullptr, s_buttonID[i]);
+		if (!button) {
+			continue;
+		}
+		Int btnW, btnH;
+		button->winGetSize(&btnW, &btnH);
+		Int centeredX = (hudW - btnW) / 2;
+		if (centeredX < 0) {
+			centeredX = 0;
+		}
+		Int bx, by;
+		button->winGetPosition(&bx, &by);
+		if (bx != centeredX) {
+			button->winSetPosition(centeredX, by);
+		}
+	}
+
+	// Anchor: the merged stack keeps its authored relative arrangement
+	// (select column on top, group row under it, "=" handle at the
+	// bottom) and is translated rigidly so the handle -- the stack's
+	// lowest window, sharing the column's authored left edge -- lands
+	// with its bottom edge flush on the minimap's top edge and the
+	// stack's left edge aligned with the minimap's left edge. The group
+	// row keeps its authored width and still expands rightward from the
+	// handle over the map.
+	Int hx, hy, hw, hh;
+	groupHandle->winGetScreenPosition(&hx, &hy);
+	groupHandle->winGetSize(&hw, &hh);
+	Int dx = hudX - hx;
+	Int dy = hudY - (hy + hh);
+	if (dx != 0 || dy != 0) {
+		translateWindowBy(row, dx, dy);
+		translateWindowBy(groupHandle, dx, dy);
+		translateWindowBy(groupRow, dx, dy);
 	}
 }
 
@@ -478,6 +664,7 @@ void SelectPanelInit(WindowLayout *layout, void *userData)
 	s_appliedActionColor = GAME_COLOR_UNDEFINED;
 	s_lastTrayAttempt[0] = '\0';
 	s_trayArtApplied = FALSE;
+	s_appliedFaceImage = nullptr;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -533,6 +720,36 @@ WindowMsgHandledType SelectPanelSystem(GameWindow *window, UnsignedInt msg,
 			if (index >= 0) {
 				handleSelectButton(index);
 				return MSG_HANDLED;
+			}
+
+			// GeneralsX @bugfix Android port 21/10/2026 Round 7: a push
+			// button delivers its clicks to its PARENT window's system
+			// function (createGadget sets the button's owner to its
+			// parent), and since the Round 6 merge the "=" handle's
+			// parent is SelectPanelParent -- this function -- instead of
+			// GroupPanelParent, so its clicks landed here and were
+			// silently dropped. Forward the group controls' messages to
+			// GroupPanelSystem with the original arguments: exactly the
+			// delivery they had before the merge. The digit buttons'
+			// parent (GroupRow) kept GroupPanelSystem, so they do not
+			// arrive here; they are covered anyway in case that changes.
+			if (isGroupControlID(controlID)) {
+				return GroupPanelSystem(window, msg, mData1, mData2);
+			}
+			break;
+		}
+
+		case GBM_SELECTED_RIGHT:
+		{
+			// Same forward for right / two-finger clicks: before the
+			// merge these reached GroupPanelSystem through the handle's
+			// parent as well. GroupPanelSystem force-assigns on the
+			// digits here and ignores the handle, exactly as it did then.
+			GameWindow *control = (GameWindow *)mData1;
+			Int controlID = control->winGetWindowId();
+
+			if (isGroupControlID(controlID)) {
+				return GroupPanelSystem(window, msg, mData1, mData2);
 			}
 			break;
 		}

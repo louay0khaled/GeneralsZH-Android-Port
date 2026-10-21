@@ -5665,8 +5665,17 @@ static Bool panelCategoryUnitSelection( Drawable *test, void *userData )
 		}
 
 		// only select objects if not already selected
+		// GeneralsX @tweak Android port 21/10/2026 Round 7: the panel's
+		// buttons are combat-selection buttons, so economy/builder units
+		// are excluded for every category (All Army included) -- the
+		// supply Chinook out of Helicopters, the GLA Worker (gatherer and
+		// builder in one) out of Infantry, dozers and supply trucks out
+		// of Vehicles. The flags are role markers: no combat unit carries
+		// either of them.
 		if( object && isKindOfMatch
 					&& !object->isKindOf(KINDOF_IGNORES_SELECT_ALL)
+					&& !object->isKindOf(KINDOF_HARVESTER)
+					&& !object->isKindOf(KINDOF_DOZER)
 					&& object->isLocallyControlled()
 					&& !object->isContained()
 					&& !object->getDrawable()->isSelected()
