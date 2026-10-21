@@ -34,6 +34,7 @@
 
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////////////////////////
 #include <stdlib.h>
+#include <float.h>
 #include <windows.h>
 
 // USER INCLUDES //////////////////////////////////////////////////////////////////////////////////
@@ -3842,7 +3843,7 @@ bool W3DView::getDesiredTerrainDrawSize(ICoord2D &dimensions, Vector2 &drawCente
 	Int drawSizeX;
 	Int drawSizeY;
 
-	if (TheTerrainLogic->getDrawEntireTerrain())
+	if (TheGlobalData->m_drawEntireTerrain)
 	{
 		drawSizeX = map->getXExtent();
 		drawSizeY = map->getYExtent();
@@ -3850,13 +3851,16 @@ bool W3DView::getDesiredTerrainDrawSize(ICoord2D &dimensions, Vector2 &drawCente
 	else
 	{
 		const Vector3 &cameraPosition = m_3DCamera->Get_Position();
+		// This tree's W3DView keeps no far-plane member (upstream's m_farZ): the current far clip
+		// plane lives in the camera, set by updateCameraClipPlanes() on the same one-frame cadence.
+		const Real farClipPlane = m_3DCamera->Get_Depth();
 		const Real cameraHeightAboveTerrainMin = cameraPosition.Z - TheTerrainRenderObject->getMinHeight();
 		// Clamp the evaluated terrain height so the projected footprint cannot expand indefinitely when
 		// the camera rises above the maximum terrain height.
 		const Real maxTerrainHeight = std::min(TheTerrainRenderObject->getMaxHeight(), cameraPosition.Z);
 
-		Vector3 minCameraSpaceCorner(REAL_MAX, REAL_MAX, REAL_MAX);
-		Vector3 maxCameraSpaceCorner(-REAL_MAX, -REAL_MAX, -REAL_MAX);
+		Vector3 minCameraSpaceCorner(FLT_MAX, FLT_MAX, FLT_MAX);
+		Vector3 maxCameraSpaceCorner(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 		Bool hasValidCorner = false;
 
 		// Evaluate both plausible ground heights because the frustum's deepest intersection depends on terrain elevation.
@@ -3878,8 +3882,12 @@ bool W3DView::getDesiredTerrainDrawSize(ICoord2D &dimensions, Vector2 &drawCente
 			// Reconstruct the terrain plane in camera space so the projected footprint stays stable while yaw changes.
 			// The terrain plane passes through the point directly below the camera at the evaluated ground height.
 			const Vector3 groundPointWorld(cameraPosition.X, cameraPosition.Y, groundHeight);
-			const Vector3 groundPointCameraSpace = Matrix3D::Transform_Vector(m_3DCamera->Get_View_Matrix(), groundPointWorld);
-			const Vector3 groundPlaneNormalCameraSpace = Matrix3D::Transform_Vector(m_3DCamera->Get_View_Matrix(), Vector3(0.0f, 0.0f, 1.0f));
+			// (Adapted to this tree: Transform_Vector is the out-parameter form and includes
+			// translation -- right for the point; the plane normal is a direction, so Rotate_Vector.)
+			Vector3 groundPointCameraSpace;
+			Matrix3D::Transform_Vector(m_3DCamera->Get_View_Matrix(), groundPointWorld, &groundPointCameraSpace);
+			Vector3 groundPlaneNormalCameraSpace;
+			Matrix3D::Rotate_Vector(m_3DCamera->Get_View_Matrix(), Vector3(0.0f, 0.0f, 1.0f), &groundPlaneNormalCameraSpace);
 
 			Vector2 viewPlaneMin;
 			Vector2 viewPlaneMax;
@@ -3892,8 +3900,8 @@ bool W3DView::getDesiredTerrainDrawSize(ICoord2D &dimensions, Vector2 &drawCente
 			const Real tanHalfVerticalFov = -viewPlaneMax.Y;
 			// Derive the camera forward axes from the frustum tangents because the projected footprint
 			// should not change size from yaw alone.
-			const Real horizontalForwardComponent = std::sqrt(1.0f + SQUARE(tanHalfHorizontalFov));
-			const Real verticalForwardComponent = std::sqrt(1.0f + SQUARE(tanHalfVerticalFov));
+			const Real horizontalForwardComponent = std::sqrt(1.0f + tanHalfHorizontalFov * tanHalfHorizontalFov);
+			const Real verticalForwardComponent = std::sqrt(1.0f + tanHalfVerticalFov * tanHalfVerticalFov);
 			const Real horizontalCorrection = 1.0f / horizontalForwardComponent;
 			const Real verticalCorrection = 1.0f / verticalForwardComponent;
 			const Vector3 cameraRightHorizontal(cameraRight.X * horizontalCorrection, cameraRight.Y * horizontalCorrection, 0.0f);
@@ -3926,7 +3934,7 @@ bool W3DView::getDesiredTerrainDrawSize(ICoord2D &dimensions, Vector2 &drawCente
 					continue;
 				}
 				// Ignore frustum corners projecting beyond the far plane because they do not contribute to the visible terrain.
-				if (-intersectionCameraSpace.Z > m_farZ)
+				if (-intersectionCameraSpace.Z > farClipPlane)
 				{
 					continue;
 				}
@@ -3953,7 +3961,7 @@ bool W3DView::getDesiredTerrainDrawSize(ICoord2D &dimensions, Vector2 &drawCente
 		}
 
 		const Vector3 footprintSize = maxCameraSpaceCorner - minCameraSpaceCorner;
-		const Real diameterSquared = SQUARE(footprintSize.X) + SQUARE(footprintSize.Y);
+		const Real diameterSquared = footprintSize.X * footprintSize.X + footprintSize.Y * footprintSize.Y;
 		if (!std::isfinite(diameterSquared) || diameterSquared < 0.0f)
 		{
 			dimensions.x = map->getXExtent();
