@@ -1860,7 +1860,12 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, const Vector3 *c
 			// It is much more efficient to update a couple of columns one frame, and then
 			// a couple of rows.  So if we aren't "jumping" to a new view, and have done X
 			// recently, return.
-			if (!drawCenter && abs(deltaX) < BIG_JUMP && !m_doXNextTime) {
+			// GeneralsX @tweak Android port 21/10/2026 Round 6: upstream PR #2785 gated
+			// this stagger on !drawCenter, but this port supplies a drawCenter on every
+			// recenter, which disabled the stagger entirely and doubled the peak
+			// per-frame band-update work while panning. The stock stagger applies
+			// with a drawCenter too.
+			if (abs(deltaX) < BIG_JUMP && !m_doXNextTime) {
 				m_updating = false;
 				m_doXNextTime = true;
 				return;	// Only do the y this frame.  Do x next frame.  jba.

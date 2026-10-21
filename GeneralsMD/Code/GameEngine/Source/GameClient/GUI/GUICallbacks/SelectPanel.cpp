@@ -51,12 +51,30 @@
 // bundled languages/<lang>/generals.str packs), set by this file itself:
 // the layout's custom system callback drops the GGM_SET_LABEL that would
 // otherwise deliver the fetched string (see applyButtonTextOnce below).
+//
+// GeneralsX @feature Android port 21/10/2026 Round 6, from device feedback
+// on the round above: (1) the group panel is MERGED into this layout --
+// SelectPanel.wnd now also contains GroupPanel.wnd's ButtonHandle,
+// GroupRow and ButtonGroup0..9 (window names and the GroupPanelSystem
+// callback byte-identical, so GroupPanel.cpp's logic is untouched); this
+// file drives the merged windows' follow translation, scheme tint and
+// per-frame update (GroupPanelUpdate is forwarded from SelectPanelUpdate).
+// (2) The scheme refresh also applies ControlBar Pro's tray art: a
+// background window behind the column gets the live faction's
+// "<Side>ProTraySmall" mapped image when the installed game data provides
+// it (ControlBarPro.big does), exactly how Pro's own shortcut bar is
+// constructed (a USER window with an IMAGE status behind plain buttons);
+// without Pro the authored flat fill stays. Nothing is copied out of the
+// .big -- the name is resolved against the live mapped-image collection.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PreRTS.h"
 
 #include "Common/GXSafeArea.h"
 #include "Common/NameKeyGenerator.h"
+#include "Common/Player.h"
+#include "Common/PlayerList.h"
+#include "Common/PlayerTemplate.h"
 #include "GameClient/Color.h"
 #include "GameClient/ControlBar.h"
 #include "GameClient/Display.h"
@@ -64,11 +82,19 @@
 #include "GameClient/GameWindow.h"
 #include "GameClient/GameWindowManager.h"
 #include "GameClient/GUICallbacks.h"
+#include "GameClient/Image.h"
 #include "GameClient/InGameUI.h"
 #include "GameClient/WindowLayout.h"
 
 static NameKeyType s_buttonRowID = NAMEKEY_INVALID;
 static NameKeyType s_buttonID[5];
+static NameKeyType s_backgroundID = NAMEKEY_INVALID;
+// GeneralsX @feature Android port 21/10/2026 Round 6: the merged group
+// windows, cached here as well (GroupPanel.cpp keeps its own copies for
+// its logic) because this file now moves and tints them with the column.
+static NameKeyType s_groupHandleID = NAMEKEY_INVALID;
+static NameKeyType s_groupRowID = NAMEKEY_INVALID;
+static NameKeyType s_buttonGroupID[10];
 
 // Button order in SelectPanel.wnd -> InGameUI panel category.
 static const char *s_buttonNames[5] =
@@ -110,6 +136,14 @@ static void cacheWidgetIDs()
 	s_buttonRowID = TheNameKeyGenerator->nameToKey("SelectPanel.wnd:ButtonRow");
 	for (Int i = 0; i < 5; ++i) {
 		s_buttonID[i] = TheNameKeyGenerator->nameToKey(s_buttonNames[i]);
+	}
+	s_backgroundID = TheNameKeyGenerator->nameToKey("SelectPanel.wnd:PanelBackground");
+	s_groupHandleID = TheNameKeyGenerator->nameToKey("GroupPanel.wnd:ButtonHandle");
+	s_groupRowID = TheNameKeyGenerator->nameToKey("GroupPanel.wnd:GroupRow");
+	char buf[40];
+	for (Int i = 0; i < 10; ++i) {
+		sprintf(buf, "GroupPanel.wnd:ButtonGroup%d", i);
+		s_buttonGroupID[i] = TheNameKeyGenerator->nameToKey(buf);
 	}
 }
 
@@ -180,6 +214,60 @@ static void applyButtonTextOnce()
 static Color s_appliedBorderColor = GAME_COLOR_UNDEFINED;
 static Color s_appliedActionColor = GAME_COLOR_UNDEFINED;
 
+// GeneralsX @feature Android port 21/10/2026 Round 6: tray-art tracking --
+// the last "<Side>ProTraySmall" name we tried to resolve for this layout
+// ("" = none tried yet), and whether it was found and set. Keyed on the
+// NAME, not on success, so an install without ControlBar Pro pays the
+// lookup once per faction instead of per frame; SelectPanelInit clears it
+// because a recreated layout's background window starts imageless again.
+static char s_lastTrayAttempt[64] = "";
+static Bool s_trayArtApplied = FALSE;
+
+// The live local player's scheme side ("America", "ChinaTankGeneral", ...),
+// or "" when no local player/template is around yet (shell, observer) --
+// the same source the ControlBar's own scheme matching reads.
+static AsciiString currentLocalPlayerSide()
+{
+	if (ThePlayerList) {
+		if (Player *player = ThePlayerList->getLocalPlayer()) {
+			if (const PlayerTemplate *pt = player->getPlayerTemplate()) {
+				return pt->getSide();
+			}
+		}
+	}
+	return AsciiString();
+}
+
+// ControlBar Pro's per-faction tray image name, prefix-matched from the
+// live scheme side so sub-general sides resolve to their parent faction's
+// art: "America*"/"China*"/"GLA*" -> "AmericaProTraySmall" /
+// "ChinaProTraySmall" / "GlaProTraySmall" (the exact MappedImage names from
+// <Faction>PowersPro.ini in the Pro archive). Any other side yields "" --
+// no tray art applies and the authored flat fill stays.
+static void resolveTrayImageName(char *out)
+{
+	out[0] = '\0';
+	AsciiString side = currentLocalPlayerSide();
+	const char *prefix = nullptr;
+	if (strncmp(side.str(), "America", 7) == 0) {
+		prefix = "America";
+	} else if (strncmp(side.str(), "China", 5) == 0) {
+		prefix = "China";
+	} else if (strncmp(side.str(), "GLA", 3) == 0) {
+		prefix = "Gla";
+	}
+	if (prefix) {
+		sprintf(out, "%sProTraySmall", prefix);
+	}
+}
+
+// GeneralsX @feature Android port 21/10/2026 Round 6: this is now the
+// panel's whole scheme-ART refresh, not just its tint: the live scheme
+// border colors go on the column AND on the merged group windows, and the
+// background window gets the live faction's Pro tray image when the game
+// data provides one. Still fully change-driven -- once the colors are
+// applied and the tray name is settled, a call costs two color compares
+// and one string compare.
 static void refreshSchemeTint()
 {
 	if (!TheWindowManager || !TheControlBar) {
@@ -193,7 +281,10 @@ static void refreshSchemeTint()
 	if (actionColor == GAME_COLOR_UNDEFINED) {
 		actionColor = borderColor;
 	}
-	if (borderColor == s_appliedBorderColor && actionColor == s_appliedActionColor) {
+	char trayName[64];
+	resolveTrayImageName(trayName);
+	if (borderColor == s_appliedBorderColor && actionColor == s_appliedActionColor
+		&& strcmp(trayName, s_lastTrayAttempt) == 0) {
 		return;
 	}
 
@@ -218,6 +309,66 @@ static void refreshSchemeTint()
 			button->winSetEnabledBorderColor(slot, borderColor);
 			button->winSetDisabledBorderColor(slot, borderColor);
 			button->winSetHiliteBorderColor(slot, actionColor);
+		}
+	}
+
+	// GeneralsX @feature Android port 21/10/2026 Round 6: the merged group
+	// windows take the same live tint -- the group row like the button row
+	// (faction trim on every border), the handle and group buttons like
+	// the select buttons (trim normally, action color on hilite). Their
+	// authored colors stay as the fallback, exactly as before the merge.
+	GameWindow *groupRow = TheWindowManager->winGetWindowFromId(nullptr, s_groupRowID);
+	if (groupRow) {
+		for (Int slot = 0; slot < 9; ++slot) {
+			groupRow->winSetEnabledBorderColor(slot, borderColor);
+			groupRow->winSetDisabledBorderColor(slot, borderColor);
+			groupRow->winSetHiliteBorderColor(slot, borderColor);
+		}
+	}
+	GameWindow *groupHandle = TheWindowManager->winGetWindowFromId(nullptr, s_groupHandleID);
+	if (groupHandle) {
+		for (Int slot = 0; slot < 9; ++slot) {
+			groupHandle->winSetEnabledBorderColor(slot, borderColor);
+			groupHandle->winSetDisabledBorderColor(slot, borderColor);
+			groupHandle->winSetHiliteBorderColor(slot, actionColor);
+		}
+	}
+	for (Int i = 0; i < 10; ++i) {
+		GameWindow *groupButton = TheWindowManager->winGetWindowFromId(nullptr, s_buttonGroupID[i]);
+		if (!groupButton) {
+			continue;
+		}
+		for (Int slot = 0; slot < 9; ++slot) {
+			groupButton->winSetEnabledBorderColor(slot, borderColor);
+			groupButton->winSetDisabledBorderColor(slot, borderColor);
+			groupButton->winSetHiliteBorderColor(slot, actionColor);
+		}
+	}
+
+	// GeneralsX @feature Android port 21/10/2026 Round 6: tray art. Resolve
+	// the live faction's ProTraySmall against the mapped-image collection
+	// (the .big archives mounted at startup provide it when ControlBar Pro
+	// is installed) and set it as the background window's slot-0 enabled
+	// image -- the same construction as Pro's own GenPowersShortcutBar
+	// parent. Not found (no Pro, or a side with no tray): the authored
+	// NoImage + flat fill stays, and if a previous faction's tray is still
+	// set it is cleared back to that. The attempt is recorded either way
+	// (see s_lastTrayAttempt above), so this runs once per faction.
+	if (strcmp(trayName, s_lastTrayAttempt) != 0) {
+		GameWindow *background = TheWindowManager->winGetWindowFromId(nullptr, s_backgroundID);
+		if (background) {
+			const Image *tray = nullptr;
+			if (trayName[0] != '\0' && TheMappedImageCollection) {
+				tray = TheMappedImageCollection->findImageByName(trayName);
+			}
+			if (tray) {
+				background->winSetEnabledImage(0, tray);
+				s_trayArtApplied = TRUE;
+			} else if (s_trayArtApplied) {
+				background->winSetEnabledImage(0, nullptr);
+				s_trayArtApplied = FALSE;
+			}
+			strcpy(s_lastTrayAttempt, trayName);
 		}
 	}
 
@@ -292,6 +443,26 @@ void SelectPanelFollowControlBar(Int barScreenX, Int barScreenY, Bool visible)
 	Int rx, ry;
 	row->winGetPosition(&rx, &ry);
 	row->winSetPosition(rx + dx, ry + dy);
+
+	// GeneralsX @feature Android port 21/10/2026 Round 6: the merged group
+	// windows are the column's siblings under SelectPanelParent, so they
+	// do not inherit its motion the way the five buttons (its children)
+	// do -- translate them by the same delta, which is exactly what
+	// GroupPanelFollowControlBar used to do for its own layout. Their
+	// authored positions (and so their offset to the column) are fixed,
+	// so one delta keeps the whole merged panel rigid.
+	GameWindow *groupHandle = TheWindowManager->winGetWindowFromId(nullptr, s_groupHandleID);
+	if (groupHandle) {
+		Int hx, hy;
+		groupHandle->winGetPosition(&hx, &hy);
+		groupHandle->winSetPosition(hx + dx, hy + dy);
+	}
+	GameWindow *groupRow = TheWindowManager->winGetWindowFromId(nullptr, s_groupRowID);
+	if (groupRow) {
+		Int gx, gy;
+		groupRow->winGetPosition(&gx, &gy);
+		groupRow->winSetPosition(gx + dx, gy + dy);
+	}
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -300,21 +471,26 @@ void SelectPanelInit(WindowLayout *layout, void *userData)
 	(void)layout;
 	(void)userData;
 	// The layout is recreated for every match in the same process, so the
-	// one-shot caption/tint state starts over with it (the follow
-	// function re-applies both on the first visible frame).
+	// one-shot caption/tint/tray state starts over with it (the follow
+	// function re-applies all of it on the first visible frame).
 	s_buttonTextApplied = FALSE;
 	s_appliedBorderColor = GAME_COLOR_UNDEFINED;
 	s_appliedActionColor = GAME_COLOR_UNDEFINED;
+	s_lastTrayAttempt[0] = '\0';
+	s_trayArtApplied = FALSE;
 }
 
 //-------------------------------------------------------------------------------------------------
 void SelectPanelUpdate(WindowLayout *layout, void *userData)
 {
-	(void)layout;
-	(void)userData;
-	// Nothing per-frame: the buttons are plain GBM_SELECTED push buttons,
-	// handled in SelectPanelSystem below. The update callback exists
-	// because the layout names one (and ControlBar::update() runs it).
+	// The select buttons themselves need nothing per-frame (plain
+	// GBM_SELECTED push buttons, handled in SelectPanelSystem below).
+	// GeneralsX @feature Android port 21/10/2026 Round 6: the merged
+	// layout also carries the group windows, whose hold-gesture visuals
+	// (radial clock wipe while a press is being held) live in
+	// GroupPanelUpdate() and used to run off the separate GroupPanel
+	// layout's runUpdate() -- forward to it so they keep running.
+	GroupPanelUpdate(layout, userData);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -45,6 +45,7 @@
 
 // FORWARD REFERENCES /////////////////////////////////////////////////////////////////////////////
 class Drawable;
+class WorldHeightMap;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum {MAX_WAYPOINTS=25};
@@ -296,6 +297,9 @@ private:
 	Bool m_recalcCameraConstraintsAfterScrolling; ///< Recalculates the camera area constraints after the user has moved the camera
 	Bool m_recalcCamera; ///< Recalculates the camera transform in the next render update
 	Real m_startMaxHeightAboveGround; ///< GeneralsX Android port 21/10/2026: the max camera height WITHOUT the Android x1.5 zoom-out bonus (recorded in setCameraHeightAboveGroundLimitsToDefault before m_maxHeightAboveGround is raised); setZoomToMax() starts matches here on Android while pinch/wheel zoom still clamps to the raised max. 0 = not recorded yet.
+	ICoord2D m_appliedTerrainDrawSize; ///< GeneralsX Android port 21/10/2026 Round 6: the terrain draw size most recently passed to setTerrainDrawSize() by updateTerrain() (draw-size hysteresis in updateTerrain). (0,0) = nothing applied for the current map yet.
+	Int m_terrainDrawShrinkDwell; ///< GeneralsX Android port 21/10/2026 Round 6: consecutive updateTerrain() calls that requested a smaller-than-applied draw size; a shrink is applied only once this reaches 60, so relief-driven size wobble cannot flap the vertex buffers.
+	WorldHeightMap *m_terrainDrawSizeMap; ///< GeneralsX Android port 21/10/2026 Round 6: the map m_appliedTerrainDrawSize belongs to; when TheTerrainRenderObject's map changes (new match/map), the tracked size and dwell reset so a stale oversized window is never carried onto a smaller map.
 
 	Real getHeightAroundPos(Real x, Real y, Real terrainSampleSize = TERRAIN_SAMPLE_SIZE) const;
 	Real getCameraOffsetZ() const;

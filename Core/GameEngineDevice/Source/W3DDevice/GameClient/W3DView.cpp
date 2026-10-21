@@ -192,6 +192,10 @@ W3DView::W3DView()
 	m_cameraAreaConstraints.zero();
 	m_recalcCamera = false;
 	m_startMaxHeightAboveGround = 0.0f;
+	m_appliedTerrainDrawSize.x = 0;
+	m_appliedTerrainDrawSize.y = 0;
+	m_terrainDrawShrinkDwell = 0;
+	m_terrainDrawSizeMap = nullptr;
 
 }
 
@@ -3976,6 +3980,13 @@ bool W3DView::getDesiredTerrainDrawSize(ICoord2D &dimensions, Vector2 &drawCente
 		const Int drawBlocks = (drawTiles + VERTEX_BUFFER_TILE_LENGTH - 1) / VERTEX_BUFFER_TILE_LENGTH;
 		Int drawSize = 1 + drawBlocks * VERTEX_BUFFER_TILE_LENGTH;
 
+		// GeneralsX @tweak Android port 21/10/2026 Round 6: draw-window safety cap
+		// (321 = 1 + 10 vertex-buffer blocks). This bounds the terrain DRAW window
+		// only -- camera height/zoom itself is never limited. The footprint sizes
+		// on 16:9 / 20:9 phones (257 / 289) pass under it untouched; it binds only
+		// on wider-than-20:9 displays (foldables, tablets, DeX).
+		drawSize = std::min(drawSize, 321);
+
 		// Use the legacy terrain draw sizes as the minimum so close-up views do not regress in quality or draw less than before.
 		// (This tree names them NORMAL_DRAW_WIDTH / LOW_ANGLE_DRAW_WIDTH; WIDTH == HEIGHT == 129 / 257 here.)
 		Int minimumDrawSize = WorldHeightMap::NORMAL_DRAW_WIDTH;
@@ -4015,7 +4026,42 @@ void W3DView::updateTerrain()
 	const bool hasDrawCenter = getDesiredTerrainDrawSize(drawSize, drawCenter);
 	if (hasDrawCenter)
 	{
-		TheTerrainRenderObject->setTerrainDrawSize(drawSize.x, drawSize.y);
+		// GeneralsX @tweak Android port 21/10/2026 Round 6: draw-size hysteresis.
+		// setTerrainDrawSize() reallocates every vertex-buffer tile and forces a
+		// full-window rebuild whenever the size changes, and the footprint size
+		// wobbles across 32-tile block boundaries while panning over relief --
+		// applying every request verbatim made pans hitch on full rebuilds.
+		// Grow to a larger requested size immediately (a too-small window shows
+		// black edges at the screen corners); apply a smaller size only after it
+		// has been requested for 60 consecutive calls. A stale-large window is
+		// visually harmless.
+		WorldHeightMap *map = TheTerrainRenderObject->getMap();
+		if (map != m_terrainDrawSizeMap)
+		{
+			// New match/map: never carry a stale oversized window onto it.
+			m_terrainDrawSizeMap = map;
+			m_appliedTerrainDrawSize.x = 0;
+			m_appliedTerrainDrawSize.y = 0;
+			m_terrainDrawShrinkDwell = 0;
+		}
+
+		const Bool smallerOnEitherAxis = drawSize.x < m_appliedTerrainDrawSize.x
+			|| drawSize.y < m_appliedTerrainDrawSize.y;
+		if (!smallerOnEitherAxis)
+		{
+			if (drawSize.x != m_appliedTerrainDrawSize.x || drawSize.y != m_appliedTerrainDrawSize.y)
+			{
+				TheTerrainRenderObject->setTerrainDrawSize(drawSize.x, drawSize.y);
+				m_appliedTerrainDrawSize = drawSize;
+			}
+			m_terrainDrawShrinkDwell = 0;
+		}
+		else if (++m_terrainDrawShrinkDwell >= 60)
+		{
+			TheTerrainRenderObject->setTerrainDrawSize(drawSize.x, drawSize.y);
+			m_appliedTerrainDrawSize = drawSize;
+			m_terrainDrawShrinkDwell = 0;
+		}
 	}
 
 	RefRenderObjListIterator *it = W3DDisplay::m_3DScene->createLightsIterator();

@@ -943,14 +943,14 @@ protected:
 
 	GameWindow *m_communicatorButton;             ///< button for the communicator
 
-	// GeneralsX @feature Android port 02/08/2026 Native in-engine unit-group
-	// touch panel (GroupPanel.wnd, GroupPanel.cpp) -- hidden outside of real,
-	// already-started gameplay, same as the Android-overlay version this
-	// replaces was gated (see update()'s use of this).
-	WindowLayout *m_groupPanelLayout;
 	// GeneralsX @feature Android port 20/10/2026 Unit-category selection
-	// touch panel (SelectPanel.wnd, SelectPanel.cpp) -- docked next to the
-	// group panel and shown/hidden under exactly the same conditions.
+	// touch panel (SelectPanel.wnd, SelectPanel.cpp) -- shown/hidden outside
+	// of real, already-started gameplay only.
+	// GeneralsX @feature Android port 21/10/2026 Round 6: the unit-group
+	// windows (GroupPanel.wnd's ButtonHandle/GroupRow/ButtonGroup0..9) were
+	// merged INTO SelectPanel.wnd, so this one layout now carries the whole
+	// combined panel; the separate GroupPanel layout that used to live here
+	// is gone.
 	WindowLayout *m_selectPanelLayout;
 	// GeneralsX @feature Android port 21/10/2026 GXSelectPanel launcher
 	// toggle, read once in init() from the GX_SELECT_PANEL env var

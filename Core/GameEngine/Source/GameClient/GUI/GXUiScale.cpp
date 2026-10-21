@@ -90,10 +90,13 @@ namespace
 	{
 		// In game.
 		{ "ControlBar.wnd",                 1.0f, 0.40f, FALSE, { nullptr } },
-		// This port's control group row (Window\\GroupPanel.wnd) rides on the control bar.
-		{ "GroupPanel.wnd",                 1.0f, 1.0f, FALSE, { nullptr }, "ControlBar.wnd" },
-		// GeneralsX @feature Android port 20/10/2026 Same for the unit-category
-		// selection row (Window\\SelectPanel.wnd) docked next to it.
+		// GeneralsX @feature Android port 20/10/2026 The unit-category
+		// selection row (Window\\SelectPanel.wnd) docked on the control bar.
+		// GeneralsX @feature Android port 21/10/2026 Round 6: SelectPanel.wnd
+		// now also contains the control-group windows that used to live in
+		// Window\\GroupPanel.wnd (whose identical row used to sit here), so
+		// this one row scales the whole merged panel; GroupPanel.wnd is no
+		// longer loaded by anything.
 		{ "SelectPanel.wnd",                1.0f, 1.0f, FALSE, { nullptr }, "ControlBar.wnd" },
 		{ "ControlBarPopupDescription.wnd", 1.0f, 1.0f, TRUE, { nullptr } },
 		// The generals' power buttons stack up from just above the control bar; scaled around their
