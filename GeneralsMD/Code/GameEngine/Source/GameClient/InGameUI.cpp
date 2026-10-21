@@ -5624,10 +5624,12 @@ Bool InGameUI::canSelectedObjectsEffectivelyUseWeapon( const CommandButton *comm
 // GeneralsX @feature Android port 20/10/2026 Select-panel category selection
 // (SelectPanel.wnd, driven from GUICallbacks/SelectPanel.cpp). The existing
 // selectAllUnitsByType family cannot express two of the panel's categories:
-// there is no KINDOF_HELICOPTER, and the engine's own jet/helicopter split is
-// "has a JetAIUpdate" (jets need runways and parking; helicopters make do
-// with a plain AI update -- the Chinook even has its own), which no KindOf
-// mask can say. So the panel gets its own filter + accumulate pass here,
+// there is no KINDOF_HELICOPTER, and the jet/helicopter split cannot be a
+// KindOf mask either -- it keys on how the engine itself tells its aircraft
+// apart (see the split in panelCategoryUnitSelection below: a helicopter is
+// a helipad-produced aircraft or an assault transport; a jet is a
+// JetAIUpdate aircraft that is not a helicopter). So the panel gets its own
+// filter + accumulate pass here,
 // mirroring kindOfUnitSelection and selectAllUnitsByTypeAcrossRegion
 // guarantee for guarantee, plus one of its own: units flagged
 // KINDOF_IGNORES_SELECT_ALL opt out, which the older filter never checked.
@@ -5654,14 +5656,32 @@ static Bool panelCategoryUnitSelection( Drawable *test, void *userData )
 
 		Bool isKindOfMatch = object->isKindOfMulti(data->m_mustbeSet, data->m_mustbeClear);
 
-		// The jet/helicopter split, the same one the engine itself uses:
-		// only jets carry a JetAIUpdate.
+		// The jet/helicopter split. There is no helicopter AI class in
+		// this engine: JetAIUpdate flies the Comanche too and tells its
+		// helipad aircraft from its runway jets by
+		// KINDOF_PRODUCED_AT_HELIPAD (KindOf.h: "hacky fix for comanche";
+		// AIGroup.cpp comments the same test "//helicopter"). So a jet is
+		// a JetAIUpdate aircraft that is NOT a helicopter; a helicopter
+		// is a helipad-produced aircraft, or an assault transport (the
+		// Combat Chinook -- user ruling 21/10/2026: it counts as a
+		// helicopter). Aircraft with neither marker (drones) land in
+		// neither air category; All Army still reaches them.
 		if (isKindOfMatch && data->m_airMode != 0)
 		{
 			const AIUpdateInterface *ai = object->getAIUpdateInterface();
 			Bool isJet = (ai != nullptr && ai->getJetAIUpdate() != nullptr);
-			if ((data->m_airMode == 1) != isJet)
-				isKindOfMatch = FALSE;
+			Bool isHelicopter = object->isKindOf(KINDOF_PRODUCED_AT_HELIPAD)
+				|| (ai != nullptr && ai->getAssaultTransportAIInterface() != nullptr);
+			if (data->m_airMode == 1)
+			{
+				if (!isJet || isHelicopter)
+					isKindOfMatch = FALSE;
+			}
+			else // data->m_airMode == 2
+			{
+				if (!isHelicopter)
+					isKindOfMatch = FALSE;
+			}
 		}
 
 		// only select objects if not already selected

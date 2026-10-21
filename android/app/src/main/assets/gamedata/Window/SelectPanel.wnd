@@ -6,7 +6,7 @@ STARTLAYOUTBLOCK
 ENDLAYOUTBLOCK
 WINDOW
   WINDOWTYPE = USER;
-  SCREENRECT = UPPERLEFT: 0 168, BOTTOMRIGHT: 366 446, CREATIONRESOLUTION: 800 600;
+  SCREENRECT = UPPERLEFT: 0 0, BOTTOMRIGHT: 366 294, CREATIONRESOLUTION: 800 600;
   NAME = "SelectPanel.wnd:SelectPanelParent";
   STATUS = ENABLED+NOFOCUS+NOINPUT;
   STYLE = USER;
@@ -18,8 +18,8 @@ WINDOW
   HEADERTEMPLATE = "[NONE]";
   TOOLTIPDELAY = -1;
   TEXTCOLOR = ENABLED: 255 255 255 255, ENABLEDBORDER: 255 255 255 255,
-              DISABLED: 255 255 255 255, DISABLEDBORDER: 255 255 255 255,
-              HILITE: 255 255 255 255, HILITEBORDER: 255 255 255 255;
+            DISABLED: 255 255 255 255, DISABLEDBORDER: 255 255 255 255,
+            HILITE: 255 255 255 255, HILITEBORDER: 255 255 255 255;
   ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
@@ -30,27 +30,115 @@ WINDOW
                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
   DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
   HILITEDRAWDATA = IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                    IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+                   IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                   IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                   IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                   IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                   IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                   IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                   IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                   IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
   CHILD
   WINDOW
     WINDOWTYPE = USER;
-    SCREENRECT = UPPERLEFT: 2 170, BOTTOMRIGHT: 82 360, CREATIONRESOLUTION: 800 600;
+    SCREENRECT = UPPERLEFT: 0 0, BOTTOMRIGHT: 120 24, CREATIONRESOLUTION: 800 600;
+    NAME = "SelectPanel.wnd:HeaderPlate";
+    STATUS = ENABLED+IMAGE+NOFOCUS+NOINPUT;
+    STYLE = USER;
+    SYSTEMCALLBACK = "SelectPanelSystem";
+    INPUTCALLBACK = "[None]";
+    TOOLTIPCALLBACK = "[None]";
+    DRAWCALLBACK = "[None]";
+    FONT = NAME: "Arial", SIZE: 10, BOLD: 0;
+    HEADERTEMPLATE = "[NONE]";
+    TOOLTIPDELAY = -1;
+    TEXTCOLOR = ENABLED: 255 255 255 255, ENABLEDBORDER: 255 255 255 255,
+              DISABLED: 255 255 255 255, DISABLEDBORDER: 255 255 255 255,
+              HILITE: 255 255 255 255, HILITEBORDER: 255 255 255 255;
+    ENABLEDDRAWDATA = IMAGE: GXPlateHeaderUSA, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    DISABLEDDRAWDATA = IMAGE: GXPlateHeaderUSA, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    HILITEDRAWDATA = IMAGE: GXPlateHeaderUSA, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+  END
+  WINDOW
+    WINDOWTYPE = USER;
+    SCREENRECT = UPPERLEFT: 0 24, BOTTOMRIGHT: 120 252, CREATIONRESOLUTION: 800 600;
+    NAME = "SelectPanel.wnd:ColumnPlate";
+    STATUS = ENABLED+IMAGE+NOFOCUS+NOINPUT;
+    STYLE = USER;
+    SYSTEMCALLBACK = "SelectPanelSystem";
+    INPUTCALLBACK = "[None]";
+    TOOLTIPCALLBACK = "[None]";
+    DRAWCALLBACK = "[None]";
+    FONT = NAME: "Arial", SIZE: 10, BOLD: 0;
+    HEADERTEMPLATE = "[NONE]";
+    TOOLTIPDELAY = -1;
+    TEXTCOLOR = ENABLED: 255 255 255 255, ENABLEDBORDER: 255 255 255 255,
+              DISABLED: 255 255 255 255, DISABLEDBORDER: 255 255 255 255,
+              HILITE: 255 255 255 255, HILITEBORDER: 255 255 255 255;
+    ENABLEDDRAWDATA = IMAGE: GXPlateColumnUSA, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    DISABLEDDRAWDATA = IMAGE: GXPlateColumnUSA, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    HILITEDRAWDATA = IMAGE: GXPlateColumnUSA, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+  END
+  WINDOW
+    WINDOWTYPE = USER;
+    SCREENRECT = UPPERLEFT: 0 24, BOTTOMRIGHT: 120 214, CREATIONRESOLUTION: 800 600;
     NAME = "SelectPanel.wnd:ButtonRow";
     STATUS = ENABLED+NOFOCUS+NOINPUT;
     STYLE = USER;
@@ -62,312 +150,312 @@ WINDOW
     HEADERTEMPLATE = "[NONE]";
     TOOLTIPDELAY = -1;
     TEXTCOLOR = ENABLED: 255 255 255 255, ENABLEDBORDER: 255 255 255 255,
-                DISABLED: 255 255 255 255, DISABLEDBORDER: 255 255 255 255,
-                HILITE: 255 255 255 255, HILITEBORDER: 255 255 255 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 195 165 90 255;
+              DISABLED: 255 255 255 255, DISABLEDBORDER: 255 255 255 255,
+              HILITE: 255 255 255 255, HILITEBORDER: 255 255 255 255;
+    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
     CHILD
-  WINDOW
-    WINDOWTYPE = USER;
-    SCREENRECT = UPPERLEFT: 2 170, BOTTOMRIGHT: 82 360, CREATIONRESOLUTION: 800 600;
-    NAME = "SelectPanel.wnd:PanelBackground";
-    STATUS = ENABLED+IMAGE+NOFOCUS+NOINPUT;
-    STYLE = USER;
-    SYSTEMCALLBACK = "SelectPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 10, BOLD: 0;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXTCOLOR = ENABLED: 255 255 255 255, ENABLEDBORDER: 255 255 255 255,
-                DISABLED: 255 255 255 255, DISABLEDBORDER: 255 255 255 255,
-                HILITE: 255 255 255 255, HILITEBORDER: 255 255 255 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 10 12 16 120, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
-                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 4 172, BOTTOMRIGHT: 80 206, CREATIONRESOLUTION: 800 600;
-    NAME = "SelectPanel.wnd:ButtonInfantry";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "SelectPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 10, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "GX:SelectInfantry";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 4 24, BOTTOMRIGHT: 116 58, CREATIONRESOLUTION: 800 600;
+      NAME = "SelectPanel.wnd:ButtonInfantry";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "SelectPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 10, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "GX:SelectInfantry";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 4 210, BOTTOMRIGHT: 80 244, CREATIONRESOLUTION: 800 600;
-    NAME = "SelectPanel.wnd:ButtonGround";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "SelectPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 10, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "GX:SelectVehicles";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXBtnInfantryUSA, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXBtnInfantryUSAD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXBtnInfantryUSAD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXBtnInfantryUSAH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXBtnInfantryUSAP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 4 62, BOTTOMRIGHT: 116 96, CREATIONRESOLUTION: 800 600;
+      NAME = "SelectPanel.wnd:ButtonGround";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "SelectPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 10, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "GX:SelectVehicles";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 4 248, BOTTOMRIGHT: 80 282, CREATIONRESOLUTION: 800 600;
-    NAME = "SelectPanel.wnd:ButtonJets";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "SelectPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 10, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "GX:SelectJets";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXBtnVehiclesUSA, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXBtnVehiclesUSAD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXBtnVehiclesUSAD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXBtnVehiclesUSAH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXBtnVehiclesUSAP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 4 100, BOTTOMRIGHT: 116 134, CREATIONRESOLUTION: 800 600;
+      NAME = "SelectPanel.wnd:ButtonJets";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "SelectPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 10, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "GX:SelectJets";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 4 286, BOTTOMRIGHT: 80 320, CREATIONRESOLUTION: 800 600;
-    NAME = "SelectPanel.wnd:ButtonHelicopters";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "SelectPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 10, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "GX:SelectHelicopters";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXBtnJetsUSA, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXBtnJetsUSAD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXBtnJetsUSAD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXBtnJetsUSAH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXBtnJetsUSAP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 4 138, BOTTOMRIGHT: 116 172, CREATIONRESOLUTION: 800 600;
+      NAME = "SelectPanel.wnd:ButtonHelicopters";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "SelectPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 10, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "GX:SelectHelicopters";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 4 324, BOTTOMRIGHT: 80 358, CREATIONRESOLUTION: 800 600;
-    NAME = "SelectPanel.wnd:ButtonAllArmy";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "SelectPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 10, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "GX:SelectAllArmy";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXBtnHelicoptersUSA, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXBtnHelicoptersUSAD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXBtnHelicoptersUSAD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXBtnHelicoptersUSAH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXBtnHelicoptersUSAP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 4 176, BOTTOMRIGHT: 116 210, CREATIONRESOLUTION: 800 600;
+      NAME = "SelectPanel.wnd:ButtonAllArmy";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "SelectPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 10, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "GX:SelectAllArmy";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 12 14 18 160, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
+      ENABLEDDRAWDATA = IMAGE: GXBtnAllArmyUSA, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXBtnAllArmyUSAD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXBtnAllArmyUSAD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXBtnAllArmyUSAH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXBtnAllArmyUSAP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
     ENDALLCHILDREN
   END
   WINDOW
     WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 2 408, BOTTOMRIGHT: 36 442, CREATIONRESOLUTION: 800 600;
+    SCREENRECT = UPPERLEFT: 76 2, BOTTOMRIGHT: 120 22, CREATIONRESOLUTION: 800 600;
+    NAME = "SelectPanel.wnd:ButtonCollapse";
+    STATUS = ENABLED+IMAGE+MOUSETRACK;
+    STYLE = PUSHBUTTON+MOUSETRACK;
+    SYSTEMCALLBACK = "SelectPanelSystem";
+    INPUTCALLBACK = "[None]";
+    TOOLTIPCALLBACK = "[None]";
+    DRAWCALLBACK = "[None]";
+    FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
+    HEADERTEMPLATE = "[NONE]";
+    TOOLTIPDELAY = -1;
+    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+              DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
+              HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
+    ENABLEDDRAWDATA = IMAGE: GXArrowUp, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    DISABLEDDRAWDATA = IMAGE: GXArrowUpD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXArrowUpD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    HILITEDRAWDATA = IMAGE: GXArrowUpH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: GXArrowUpP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+  END
+  WINDOW
+    WINDOWTYPE = PUSHBUTTON;
+    SCREENRECT = UPPERLEFT: 2 256, BOTTOMRIGHT: 36 290, CREATIONRESOLUTION: 800 600;
     NAME = "GroupPanel.wnd:ButtonHandle";
-    STATUS = ENABLED+MOUSETRACK;
+    STATUS = ENABLED+IMAGE+MOUSETRACK;
     STYLE = PUSHBUTTON+MOUSETRACK;
     SYSTEMCALLBACK = "GroupPanelSystem";
     INPUTCALLBACK = "[None]";
@@ -378,39 +466,39 @@ WINDOW
     TOOLTIPDELAY = -1;
     TEXT = "=";
     TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
-                DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
-                HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 200, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
+              DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
+              HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
+    ENABLEDDRAWDATA = IMAGE: GXHandle, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                      IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    DISABLEDDRAWDATA = IMAGE: GXHandleD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXHandleD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    HILITEDRAWDATA = IMAGE: GXHandleH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: GXHandleP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                     IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
   END
   WINDOW
     WINDOWTYPE = USER;
-    SCREENRECT = UPPERLEFT: 2 366, BOTTOMRIGHT: 362 404, CREATIONRESOLUTION: 800 600;
+    SCREENRECT = UPPERLEFT: 2 216, BOTTOMRIGHT: 362 250, CREATIONRESOLUTION: 800 600;
     NAME = "GroupPanel.wnd:GroupRow";
     STATUS = ENABLED+NOFOCUS+NOINPUT;
     STYLE = USER;
@@ -422,8 +510,8 @@ WINDOW
     HEADERTEMPLATE = "[NONE]";
     TOOLTIPDELAY = -1;
     TEXTCOLOR = ENABLED: 255 255 255 255, ENABLEDBORDER: 255 255 255 255,
-                DISABLED: 255 255 255 255, DISABLEDBORDER: 255 255 255 255,
-                HILITE: 255 255 255 255, HILITEBORDER: 255 255 255 255;
+              DISABLED: 255 255 255 255, DISABLEDBORDER: 255 255 255 255,
+              HILITE: 255 255 255 255, HILITEBORDER: 255 255 255 255;
     ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 18 24 32 95, BORDERCOLOR: 195 165 90 255,
                       IMAGE: NoImage, COLOR: 18 24 32 95, BORDERCOLOR: 195 165 90 255,
                       IMAGE: NoImage, COLOR: 18 24 32 95, BORDERCOLOR: 195 165 90 255,
@@ -452,456 +540,456 @@ WINDOW
                      IMAGE: NoImage, COLOR: 18 24 32 95, BORDERCOLOR: 195 165 90 255,
                      IMAGE: NoImage, COLOR: 18 24 32 95, BORDERCOLOR: 195 165 90 255;
     CHILD
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 4 368, BOTTOMRIGHT: 36 402, CREATIONRESOLUTION: 800 600;
-    NAME = "GroupPanel.wnd:ButtonGroup0";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "GroupPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "0";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 4 216, BOTTOMRIGHT: 36 250, CREATIONRESOLUTION: 800 600;
+      NAME = "GroupPanel.wnd:ButtonGroup0";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "GroupPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "0";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 39 368, BOTTOMRIGHT: 71 402, CREATIONRESOLUTION: 800 600;
-    NAME = "GroupPanel.wnd:ButtonGroup1";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "GroupPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "1";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXDigit, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXDigitH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXDigitP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 39 216, BOTTOMRIGHT: 71 250, CREATIONRESOLUTION: 800 600;
+      NAME = "GroupPanel.wnd:ButtonGroup1";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "GroupPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "1";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 74 368, BOTTOMRIGHT: 106 402, CREATIONRESOLUTION: 800 600;
-    NAME = "GroupPanel.wnd:ButtonGroup2";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "GroupPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "2";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXDigit, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXDigitH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXDigitP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 74 216, BOTTOMRIGHT: 106 250, CREATIONRESOLUTION: 800 600;
+      NAME = "GroupPanel.wnd:ButtonGroup2";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "GroupPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "2";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 109 368, BOTTOMRIGHT: 141 402, CREATIONRESOLUTION: 800 600;
-    NAME = "GroupPanel.wnd:ButtonGroup3";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "GroupPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "3";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXDigit, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXDigitH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXDigitP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 109 216, BOTTOMRIGHT: 141 250, CREATIONRESOLUTION: 800 600;
+      NAME = "GroupPanel.wnd:ButtonGroup3";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "GroupPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "3";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 144 368, BOTTOMRIGHT: 176 402, CREATIONRESOLUTION: 800 600;
-    NAME = "GroupPanel.wnd:ButtonGroup4";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "GroupPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "4";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXDigit, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXDigitH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXDigitP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 144 216, BOTTOMRIGHT: 176 250, CREATIONRESOLUTION: 800 600;
+      NAME = "GroupPanel.wnd:ButtonGroup4";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "GroupPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "4";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 179 368, BOTTOMRIGHT: 211 402, CREATIONRESOLUTION: 800 600;
-    NAME = "GroupPanel.wnd:ButtonGroup5";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "GroupPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "5";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXDigit, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXDigitH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXDigitP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 179 216, BOTTOMRIGHT: 211 250, CREATIONRESOLUTION: 800 600;
+      NAME = "GroupPanel.wnd:ButtonGroup5";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "GroupPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "5";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 214 368, BOTTOMRIGHT: 246 402, CREATIONRESOLUTION: 800 600;
-    NAME = "GroupPanel.wnd:ButtonGroup6";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "GroupPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "6";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXDigit, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXDigitH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXDigitP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 214 216, BOTTOMRIGHT: 246 250, CREATIONRESOLUTION: 800 600;
+      NAME = "GroupPanel.wnd:ButtonGroup6";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "GroupPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "6";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 249 368, BOTTOMRIGHT: 281 402, CREATIONRESOLUTION: 800 600;
-    NAME = "GroupPanel.wnd:ButtonGroup7";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "GroupPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "7";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXDigit, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXDigitH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXDigitP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 249 216, BOTTOMRIGHT: 281 250, CREATIONRESOLUTION: 800 600;
+      NAME = "GroupPanel.wnd:ButtonGroup7";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "GroupPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "7";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 284 368, BOTTOMRIGHT: 316 402, CREATIONRESOLUTION: 800 600;
-    NAME = "GroupPanel.wnd:ButtonGroup8";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "GroupPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "8";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXDigit, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXDigitH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXDigitP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 284 216, BOTTOMRIGHT: 316 250, CREATIONRESOLUTION: 800 600;
+      NAME = "GroupPanel.wnd:ButtonGroup8";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "GroupPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "8";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
-  WINDOW
-    WINDOWTYPE = PUSHBUTTON;
-    SCREENRECT = UPPERLEFT: 319 368, BOTTOMRIGHT: 351 402, CREATIONRESOLUTION: 800 600;
-    NAME = "GroupPanel.wnd:ButtonGroup9";
-    STATUS = ENABLED+MOUSETRACK;
-    STYLE = PUSHBUTTON+MOUSETRACK;
-    SYSTEMCALLBACK = "GroupPanelSystem";
-    INPUTCALLBACK = "[None]";
-    TOOLTIPCALLBACK = "[None]";
-    DRAWCALLBACK = "[None]";
-    FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
-    HEADERTEMPLATE = "[NONE]";
-    TOOLTIPDELAY = -1;
-    TEXT = "9";
-    TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
+      ENABLEDDRAWDATA = IMAGE: GXDigit, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXDigitH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXDigitP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
+    WINDOW
+      WINDOWTYPE = PUSHBUTTON;
+      SCREENRECT = UPPERLEFT: 319 216, BOTTOMRIGHT: 351 250, CREATIONRESOLUTION: 800 600;
+      NAME = "GroupPanel.wnd:ButtonGroup9";
+      STATUS = ENABLED+IMAGE+MOUSETRACK;
+      STYLE = PUSHBUTTON+MOUSETRACK;
+      SYSTEMCALLBACK = "GroupPanelSystem";
+      INPUTCALLBACK = "[None]";
+      TOOLTIPCALLBACK = "[None]";
+      DRAWCALLBACK = "[None]";
+      FONT = NAME: "Arial", SIZE: 12, BOLD: 1;
+      HEADERTEMPLATE = "[NONE]";
+      TOOLTIPDELAY = -1;
+      TEXT = "9";
+      TEXTCOLOR = ENABLED: 235 220 190 255, ENABLEDBORDER: 0 0 0 255,
                 DISABLED: 150 150 150 255, DISABLEDBORDER: 0 0 0 255,
                 HILITE: 255 255 255 255, HILITEBORDER: 0 0 0 255;
-    ENABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                      IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    DISABLEDDRAWDATA = IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255,
-                       IMAGE: NoImage, COLOR: 24 34 46 165, BORDERCOLOR: 195 165 90 255;
-    HILITEDRAWDATA = IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255,
-                     IMAGE: NoImage, COLOR: 46 64 82 255, BORDERCOLOR: 195 165 90 255;
-  END
+      ENABLEDDRAWDATA = IMAGE: GXDigit, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                        IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      DISABLEDDRAWDATA = IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: GXDigitD, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                         IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+      HILITEDRAWDATA = IMAGE: GXDigitH, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: GXDigitP, COLOR: 255 255 255 255, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0,
+                       IMAGE: NoImage, COLOR: 0 0 0 0, BORDERCOLOR: 0 0 0 0;
+    END
     ENDALLCHILDREN
   END
   ENDALLCHILDREN

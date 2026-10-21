@@ -520,6 +520,29 @@ public class GeneralsZHActivity extends SDLActivity {
     // normal "leave it alone if it already exists" behavior.
     private static final String ALWAYS_OVERWRITE_PREFIX = "Window/";
 
+    // GeneralsX @feature Android port 21/10/2026 Round 10: the select
+    // panel's own art (Data/INI/MappedImages/HandCreated/GXSelectPanel.ini
+    // + its three faction atlases under Data/Textures/) is ours the same
+    // way the Window/ screens are -- a stale copy left by the rule above
+    // would silently freeze the panel's look at whatever shipped first.
+    // Exact files only: the rest of Data/ keeps the normal behavior, so
+    // game data and user edits elsewhere are never clobbered.
+    private static final String[] ALWAYS_OVERWRITE_FILES = {
+        "Data/INI/MappedImages/HandCreated/GXSelectPanel.ini",
+        "Data/Textures/GXSelectPanelUSA_512.tga",
+        "Data/Textures/GXSelectPanelChina_512.tga",
+        "Data/Textures/GXSelectPanelGLA_512.tga",
+    };
+
+    private static boolean isAlwaysOverwriteFile(String rel) {
+        for (String file : ALWAYS_OVERWRITE_FILES) {
+            if (file.equals(rel)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void copyAssetTree(String assetPath, File destRoot) {
         AssetManager assets = getAssets();
         try {
@@ -530,7 +553,8 @@ public class GeneralsZHActivity extends SDLActivity {
                 if (rel.startsWith("/")) rel = rel.substring(1);
                 if (rel.isEmpty()) return;
                 File dest = new File(destRoot, rel);
-                boolean alwaysOverwrite = rel.startsWith(ALWAYS_OVERWRITE_PREFIX);
+                boolean alwaysOverwrite = rel.startsWith(ALWAYS_OVERWRITE_PREFIX)
+                        || isAlwaysOverwriteFile(rel);
                 if (dest.exists() && !alwaysOverwrite) return;
                 File parent = dest.getParentFile();
                 if (parent != null && !parent.exists() && !parent.mkdirs()) {
