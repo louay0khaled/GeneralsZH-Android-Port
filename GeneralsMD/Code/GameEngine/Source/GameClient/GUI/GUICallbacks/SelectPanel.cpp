@@ -81,10 +81,24 @@
 // frame and parks the merged stack flush on top of it -- bottom edge on
 // the minimap's top edge, left edges aligned, column sized to the
 // minimap's width with the five buttons centered inside it. (3) The
-// scheme refresh also puts the live scheme's button face on the buttons
-// themselves (see resolveSchemeFaceImage below): with a real face image
-// and the image draw function they render like the bar's own buttons
-// instead of flat fills.
+// scheme refresh also put the live scheme's button face on the buttons
+// themselves -- REMOVED in Round 9, see below.
+//
+// GeneralsX @feature Android port 21/10/2026 Round 9, from the device
+// verdict on the round above: item (3) never rendered on a real
+// install. The face name it resolved ("SCBigButton", the scheme's
+// QueueButtonImage value) provably resolves to nothing in the mapped-
+// image collection of a real install -- the name exists only as scheme
+// text; no MappedImage by that name is loaded -- so the face path was
+// dead code, and no wide labeled-button face art exists in stock or
+// ControlBar Pro data anyway (Pro's faced buttons are small icon
+// buttons with dedicated art; SCBigButton itself is the build queue's
+// 60x48 disabled placeholder). Round 9 removes the face path entirely:
+// the buttons keep the plain draw with the live scheme border/action
+// colors the refresh writes, and the follow widens them to fill the
+// column (a small proportional inset) so the Pro tray behind them
+// reads as a frame around the buttons instead of leaking its striped
+// interior around narrower centered boxes.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PreRTS.h"
@@ -97,7 +111,6 @@
 #include "GameClient/Color.h"
 #include "GameClient/ControlBar.h"
 #include "GameClient/Display.h"
-#include "GameClient/GadgetPushButton.h"
 #include "GameClient/GameText.h"
 #include "GameClient/GameWindow.h"
 #include "GameClient/GameWindowManager.h"
@@ -304,75 +317,6 @@ static void resolveTrayImageName(char *out)
 	}
 }
 
-// GeneralsX @feature Android port 21/10/2026 Round 7: face-art tracking --
-// the scheme button face currently applied to the panel's buttons
-// (nullptr = none applied / flat look). Image pointers in the mapped
-// collection are stable for the process lifetime, so the pointer itself
-// is the change key; SelectPanelInit clears it because a recreated
-// layout's buttons start over with the authored flat look and the plain
-// push-button draw function.
-static const Image *s_appliedFaceImage = nullptr;
-
-// The live scheme's button face. ControlBarScheme stores its
-// QueueButtonImage as an Image* that INI::parseMappedImage resolved from
-// the scheme text at load, and both the stock schemes and ControlBar Pro
-// put the name "SCBigButton" there. This tree exposes no accessor for
-// the scheme manager's current scheme (m_currentScheme is private and
-// nothing else reads scheme state except through ControlBar's cached
-// colors), so resolve the same name through the same collection: the
-// lookup returns the identical Image* the current scheme itself holds.
-// nullptr when the installed data has no such image -- the caller then
-// leaves (or restores) the authored flat fills, untouched.
-static const Image *resolveSchemeFaceImage()
-{
-	if (TheMappedImageCollection) {
-		return TheMappedImageCollection->findImageByName("SCBigButton");
-	}
-	return nullptr;
-}
-
-// Apply (or, with face == nullptr, remove) the scheme button face on one
-// push button. The face goes into slot 0 of EVERY state set the image
-// draw can pick from (W3DGadgetPushButtonImageDrawOne reads slot 0 for
-// enabled/disabled/hilite and slot 1 of the disabled/hilite sets for the
-// selected variants; no per-state variant names were guessed -- the one
-// scheme face serves all states, and the pressed/hover read comes from
-// the face art itself plus the text). Just as important is the draw
-// function: gogoGadgetPushButton assigns the image draw only to buttons
-// whose AUTHORED status carries IMAGE, which none of this panel's
-// buttons do -- they were created with the plain color draw, which never
-// looks at slot images at all. So applying a face also switches the draw
-// function to the manager's image draw (the same one Pro's own cameo
-// buttons run), and removing the face restores the plain draw. The
-// hold-to-clear clock wipe is PushButtonData-driven and renders under
-// both draws, so the group buttons keep it either way.
-static void setButtonFaceImage(GameWindow *button, const Image *face)
-{
-	if (!button || !TheWindowManager) {
-		return;
-	}
-	GadgetButtonSetEnabledImage(button, face);
-	GadgetButtonSetDisabledImage(button, face);
-	GadgetButtonSetHiliteImage(button, face);
-	GadgetButtonSetDisabledSelectedImage(button, face);
-	GadgetButtonSetHiliteSelectedImage(button, face);
-	button->winSetDrawFunc(face ? TheWindowManager->getPushButtonImageDrawFunc()
-															: TheWindowManager->getPushButtonDrawFunc());
-}
-
-// The face goes on every push button the merged panel owns: the five
-// select buttons, the "=" handle and the ten group buttons.
-static void applyFaceImageToPanel(const Image *face)
-{
-	for (Int i = 0; i < 5; ++i) {
-		setButtonFaceImage(TheWindowManager->winGetWindowFromId(nullptr, s_buttonID[i]), face);
-	}
-	setButtonFaceImage(TheWindowManager->winGetWindowFromId(nullptr, s_groupHandleID), face);
-	for (Int i = 0; i < 10; ++i) {
-		setButtonFaceImage(TheWindowManager->winGetWindowFromId(nullptr, s_buttonGroupID[i]), face);
-	}
-}
-
 // GeneralsX @feature Android port 21/10/2026 Round 6: this is now the
 // panel's whole scheme-ART refresh, not just its tint: the live scheme
 // border colors go on the column AND on the merged group windows, and the
@@ -380,11 +324,11 @@ static void applyFaceImageToPanel(const Image *face)
 // data provides one. Still fully change-driven -- once the colors are
 // applied and the tray name is settled, a call costs two color compares
 // and one string compare.
-// GeneralsX @feature Android port 21/10/2026 Round 7: the refresh also
-// owns the buttons' scheme FACE (see resolveSchemeFaceImage above). The
-// face is resolved before the change gate on purpose: it is one map
-// lookup, and its pointer joins the gate so a face appearing or
-// disappearing re-runs the application exactly once.
+// GeneralsX @feature Android port 21/10/2026 Round 9: Round 7 also had
+// this refresh apply a scheme button FACE to the buttons; that path is
+// removed (see the Round 9 note in the file header) -- it never resolved
+// on a real install, so the buttons simply keep the plain draw with the
+// border/action colors written here.
 static void refreshSchemeTint()
 {
 	if (!TheWindowManager || !TheControlBar) {
@@ -400,9 +344,8 @@ static void refreshSchemeTint()
 	}
 	char trayName[64];
 	resolveTrayImageName(trayName);
-	const Image *faceImage = resolveSchemeFaceImage();
 	if (borderColor == s_appliedBorderColor && actionColor == s_appliedActionColor
-		&& strcmp(trayName, s_lastTrayAttempt) == 0 && faceImage == s_appliedFaceImage) {
+		&& strcmp(trayName, s_lastTrayAttempt) == 0) {
 		return;
 	}
 
@@ -490,21 +433,6 @@ static void refreshSchemeTint()
 		}
 	}
 
-	// GeneralsX @feature Android port 21/10/2026 Round 7: button faces.
-	// When the scheme face changed (first application, a scheme/faction
-	// switch to a data set with a different face, or the face vanishing),
-	// (re)apply it to all sixteen panel buttons; a nullptr face restores
-	// the authored flat fills and the plain draw. Note the border tint
-	// above stays written on the buttons' draw data either way -- the
-	// image draw does not consume slot border colors, but the tint is
-	// what the buttons fall back to visually whenever no face is applied,
-	// and it still frames the row and group-row windows, which are USER
-	// windows and keep the default draw.
-	if (faceImage != s_appliedFaceImage) {
-		applyFaceImageToPanel(faceImage);
-		s_appliedFaceImage = faceImage;
-	}
-
 	s_appliedBorderColor = borderColor;
 	s_appliedActionColor = actionColor;
 }
@@ -574,9 +502,9 @@ void SelectPanelFollowControlBar(Int barScreenX, Int barScreenY, Bool visible)
 		return;
 	}
 
-	// First visible frame applies the localized captions, the live
-	// scheme tint/art and the button faces; all are change-driven
-	// no-ops afterwards (see the helpers above).
+	// First visible frame applies the localized captions and the live
+	// scheme tint/art; both are change-driven no-ops afterwards (see
+	// the helpers above).
 	applyButtonTextOnce();
 	refreshSchemeTint();
 
@@ -596,10 +524,13 @@ void SelectPanelFollowControlBar(Int barScreenX, Int barScreenY, Bool visible)
 	leftHud->winGetSize(&hudW, &hudH);
 
 	// Width: the column and its tray background take the minimap's live
-	// width, and the five buttons center inside it -- a button's local x
-	// is parent-relative, so it is recomputed from its own live width
-	// against the row's new width. Sizes and positions are only written
-	// when they actually change, so a settled frame costs just reads.
+	// width, and the five buttons fill it edge to edge (Round 9, see the
+	// header note): each button is widened to the row's width minus a
+	// small inset kept proportional to the authored 2 px at the authored
+	// 80 px row width, so the buttons cover the tray's striped interior
+	// and the tray reads as a frame around them. A button's local x is
+	// parent-relative. Sizes and positions are only written when they
+	// actually change, so a settled frame costs just reads.
 	Int rowW, rowH;
 	row->winGetSize(&rowW, &rowH);
 	if (rowW != hudW) {
@@ -613,6 +544,14 @@ void SelectPanelFollowControlBar(Int barScreenX, Int barScreenY, Bool visible)
 			background->winSetSize(hudW, bgH);
 		}
 	}
+	Int btnInset = hudW * 2 / 80;
+	if (btnInset < 0) {
+		btnInset = 0;
+	}
+	Int targetBtnW = hudW - 2 * btnInset;
+	if (targetBtnW < 1) {
+		targetBtnW = 1;
+	}
 	for (Int i = 0; i < 5; ++i) {
 		GameWindow *button = TheWindowManager->winGetWindowFromId(nullptr, s_buttonID[i]);
 		if (!button) {
@@ -620,14 +559,13 @@ void SelectPanelFollowControlBar(Int barScreenX, Int barScreenY, Bool visible)
 		}
 		Int btnW, btnH;
 		button->winGetSize(&btnW, &btnH);
-		Int centeredX = (hudW - btnW) / 2;
-		if (centeredX < 0) {
-			centeredX = 0;
+		if (btnW != targetBtnW) {
+			button->winSetSize(targetBtnW, btnH);
 		}
 		Int bx, by;
 		button->winGetPosition(&bx, &by);
-		if (bx != centeredX) {
-			button->winSetPosition(centeredX, by);
+		if (bx != btnInset) {
+			button->winSetPosition(btnInset, by);
 		}
 	}
 
@@ -664,7 +602,6 @@ void SelectPanelInit(WindowLayout *layout, void *userData)
 	s_appliedActionColor = GAME_COLOR_UNDEFINED;
 	s_lastTrayAttempt[0] = '\0';
 	s_trayArtApplied = FALSE;
-	s_appliedFaceImage = nullptr;
 	// GeneralsX @bugfix Android port 21/10/2026 Round 7 addendum: the
 	// merged layout declares only this init, so GroupPanelInit is never
 	// called anymore -- call it from here so the group panel's per-match
