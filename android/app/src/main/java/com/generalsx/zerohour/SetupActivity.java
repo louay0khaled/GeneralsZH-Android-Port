@@ -3106,6 +3106,7 @@ public class SetupActivity extends Activity {
         copyFileIfMissing(new File(bundledRoot, "DefaultOptions.ini"), new File(gameFolderPath, "DefaultOptions.ini"));
         copyDirIfMissing(new File(bundledRoot, "fonts"), new File(gameFolderPath, "fonts"));
         syncEngineWindowOverrides(bundledRoot, gameFolderPath);
+        syncSelectPanelArt(bundledRoot, gameFolderPath);
         removeRetiredPortStringFiles(new File(gameFolderPath, "data"));
         removeRetiredPortStringFiles(new File(bundledRoot, "data"));
     }
@@ -3159,6 +3160,38 @@ public class SetupActivity extends Activity {
             if (child.isFile()) {
                 copyFileOverwrite(child, new File(destDir, child.getName()));
             }
+        }
+    }
+
+    // GeneralsX @bugfix Android port 21/10/2026 Round 10.1: the select
+    // panel's GX art (GeneralsZHActivity.ALWAYS_OVERWRITE_FILES) reached
+    // only the external-files dir via stage 1 -- but the engine runs
+    // with CWD = the user-picked game folder and never opens that tree,
+    // so the panel's art probe found none of its 38 images and fell back
+    // to the flat look. Bridge the same files here, next to the Window/
+    // overrides: ours, never user-edited, so always overwrite (a stale
+    // copy would silently freeze the panel art again). The destination
+    // of each file comes from GeneralsZHActivity.toGameFolderRel -- the
+    // atlases land in Art/Textures/, NOT under the Data/Textures/ path
+    // they stage at. Failure style matches copyFileOverwrite's: nothing
+    // here may throw, the bridge's other payloads and the launch itself
+    // must survive a missing or uncopyable art file.
+    private static void syncSelectPanelArt(File bundledRoot, String gameFolderPath) {
+        for (String bundledRel : GeneralsZHActivity.ALWAYS_OVERWRITE_FILES) {
+            File src = new File(bundledRoot, bundledRel);
+            if (!src.isFile()) {
+                // Stage 1 has not written it (yet), or an older APK did
+                // not bundle it: the panel keeps its fallback look for
+                // this launch and the next one retries.
+                continue;
+            }
+            File dest = new File(gameFolderPath,
+                    GeneralsZHActivity.toGameFolderRel(bundledRel));
+            File parent = dest.getParentFile();
+            if (parent != null && !parent.isDirectory() && !parent.mkdirs()) {
+                continue;
+            }
+            copyFileOverwrite(src, dest);
         }
     }
 

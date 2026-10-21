@@ -121,6 +121,16 @@
 // runtime the panel degrades to a flat tier (plain draw, opaque scheme
 // fills) instead of rendering broken. The helicopter classification
 // fix that ships alongside lives in InGameUI.cpp.
+//
+// GeneralsX @feature Android port 21/10/2026 Round 10.1, from the
+// device verdict on Round 10: the arrow in the header's corner read
+// as a detached tab, so the toggle moved to the column's FOOT -- a
+// drawer-style tab in the root's bottom band, right-aligned to the
+// column, directly above the minimap (user decision 21/10/2026). The
+// header plate now hides with the column; collapsed, the arrow tab is
+// the block's only remnant. Its meaning flips with the dock: expanded
+// shows DOWN (a tap folds the column down onto the tab), collapsed
+// shows UP (a tap raises the column again).
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PreRTS.h"
@@ -146,7 +156,8 @@ static NameKeyType s_buttonRowID = NAMEKEY_INVALID;
 static NameKeyType s_buttonID[5];
 // GeneralsX @feature Android port 21/10/2026 Round 10: the layout root
 // (the follow anchors IT now, never the children), the two backplate
-// windows that replaced the Pro tray, and the header's collapse toggle.
+// windows that replaced the Pro tray, and the collapse toggle (in the
+// header at Round 10; docked at the column's foot since Round 10.1).
 static NameKeyType s_parentID = NAMEKEY_INVALID;
 static NameKeyType s_headerPlateID = NAMEKEY_INVALID;
 static NameKeyType s_columnPlateID = NAMEKEY_INVALID;
@@ -233,9 +244,9 @@ static const Image *s_buttonFace[5][4];
 static const Image *s_plateFace[2];	// 0 = header, 1 = column
 static const Image *s_digitFace[4];
 static const Image *s_handleFace[4];
-static const Image *s_arrowFace[2][5];	// 0 = Up (expanded), 1 = Down (collapsed)
+static const Image *s_arrowFace[2][5];	// 0 = Up (shown while collapsed), 1 = Down (shown while expanded)
 
-// Collapse state for the header arrow toggle (SelectPanelSystem flips
+// Collapse state for the foot arrow toggle (SelectPanelSystem flips
 // it, the follow consumes it). Per-match: reset by SelectPanelInit and
 // by the follow's layout-generation check. Not persisted.
 static Bool s_columnCollapsed = FALSE;
@@ -570,11 +581,14 @@ static void applyButtonFaces(GameWindow *button, const Image *faces[4])
 	GadgetButtonSetDisabledSelectedImage(button, faces[3]);
 }
 
-// The collapse arrow's face for the current collapse state. Tier B:
-// the Up set while expanded, the Down set while collapsed (authored in
-// the .wnd as Up; this swap is the only runtime image change the panel
-// ever makes outside a tier/family application). Tier Flat: a text
-// glyph of the same meaning ("^" expanded, "v" collapsed).
+// The collapse arrow's face for the current collapse state. The
+// arrow docks at the column's foot (Round 10.1), so its meaning
+// follows the bottom-dock convention: Tier B shows the Down set while
+// expanded (a tap folds the column down onto the tab) and the Up set
+// while collapsed (a tap raises it again) -- authored in the .wnd as
+// Down; this swap is the only runtime image change the panel ever
+// makes outside a tier/family application. Tier Flat: a text glyph of
+// the same meaning ("v" expanded, "^" collapsed).
 static void applyArrowFace()
 {
 	if (!TheWindowManager) {
@@ -586,14 +600,14 @@ static void applyArrowFace()
 	}
 	if (s_artTier == 2) {
 		UnicodeString glyph;
-		glyph.translate(AsciiString(s_columnCollapsed ? "v" : "^"));
+		glyph.translate(AsciiString(s_columnCollapsed ? "^" : "v"));
 		collapse->winSetText(glyph);
 		return;
 	}
 	if (s_artTier != 1) {
 		return; // undecided yet -- ensurePanelArt calls this once it decides
 	}
-	const Image **faces = s_arrowFace[s_columnCollapsed ? 1 : 0];
+	const Image **faces = s_arrowFace[s_columnCollapsed ? 0 : 1];
 	GadgetButtonSetEnabledImage(collapse, faces[0]);
 	GadgetButtonSetHiliteImage(collapse, faces[1]);
 	GadgetButtonSetHiliteSelectedImage(collapse, faces[2]);
@@ -869,7 +883,8 @@ void SelectPanelFollowControlBar(Int barScreenX, Int barScreenY, Bool visible)
 	// their DrawOne faces are authored at an exact size and stretching
 	// them would distort the baked glyphs -- instead each is re-centered
 	// in the row whenever the width changes. The collapse arrow keeps
-	// its authored width and is re-pinned to the column's right edge.
+	// its authored size and is re-pinned to the column's right edge at
+	// the root's bottom band (the foot, Round 10.1).
 	// The group row and handle keep their authored geometry entirely
 	// (they ride the root). All writes are change-driven, as before.
 	Int rowW, rowH;
@@ -915,8 +930,19 @@ void SelectPanelFollowControlBar(Int barScreenX, Int barScreenY, Bool visible)
 		if (targetX < 0) {
 			targetX = 0;
 		}
-		if (cx != targetX) {
-			collapse->winSetPosition(targetX, cy);
+		// Round 10.1: the arrow's y is pinned too -- it docks in the
+		// root's bottom band, its top 42 layout px above the root's
+		// bottom edge (the .wnd authors the tab at y 252-272 of the
+		// 294-tall root: clear of GroupRow's y-250 bottom, beside the
+		// "=" handle's x range, 22 px short of the root's bottom).
+		// Derived from the live root height rather than restating 252,
+		// so the tab tracks the root's foot wherever the root stands.
+		Int targetY = rootH - 42;
+		if (targetY < 0) {
+			targetY = 0;
+		}
+		if (cx != targetX || cy != targetY) {
+			collapse->winSetPosition(targetX, targetY);
 		}
 	}
 
@@ -927,8 +953,12 @@ void SelectPanelFollowControlBar(Int barScreenX, Int barScreenY, Bool visible)
 	// it is itself hidden while collapsed, so GroupPanel's expanded
 	// state cannot change under us; the every-call force is belt and
 	// braces so no ordering of those writes can ever show the column
-	// while collapsed. The header plate and the arrow are never hidden
-	// here: collapsed, the block is just its cap sitting on the minimap.
+	// while collapsed. The arrow is the ONLY window never hidden here
+	// (Round 10.1: it docks at the foot, below everything it toggles);
+	// collapsed, it is the block's only remnant -- a tab sitting on the
+	// minimap. The header plate hides with the column and returns with
+	// it; both plates keep the tier guard, because Tier Flat hides them
+	// permanently and must never see them unhidden from here.
 	if (s_columnCollapsed) {
 		if (!s_collapseForceActive) {
 			s_groupRowHiddenBeforeCollapse = groupRow ? groupRow->winIsHidden() : TRUE;
@@ -936,6 +966,9 @@ void SelectPanelFollowControlBar(Int barScreenX, Int barScreenY, Bool visible)
 		}
 		if (columnPlate && s_artTier != 2) {
 			columnPlate->winHide(TRUE);
+		}
+		if (headerPlate && s_artTier != 2) {
+			headerPlate->winHide(TRUE);
 		}
 		row->winHide(TRUE);
 		if (groupRow) {
@@ -953,6 +986,9 @@ void SelectPanelFollowControlBar(Int barScreenX, Int barScreenY, Bool visible)
 		}
 		if (columnPlate && s_artTier != 2) {
 			columnPlate->winHide(FALSE);
+		}
+		if (headerPlate && s_artTier != 2) {
+			headerPlate->winHide(FALSE);
 		}
 		row->winHide(FALSE);
 		groupHandle->winHide(FALSE);
@@ -1047,8 +1083,9 @@ WindowMsgHandledType SelectPanelSystem(GameWindow *window, UnsignedInt msg,
 			Int controlID = control->winGetWindowId();
 
 			// GeneralsX @feature Android port 21/10/2026 Round 10: the
-			// header's collapse arrow. It is a direct child of the layout
-			// root, so its clicks are delivered to THIS system function
+			// collapse arrow (Round 10.1: docked at the column's foot).
+			// It is a direct child of the layout root, so its clicks are
+			// delivered to THIS system function
 			// (a push button reports to its parent window's system
 			// function -- the same createGadget owner rule behind the
 			// Round 7 forward below, no forwarding needed here). Flip
