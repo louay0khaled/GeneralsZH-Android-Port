@@ -52,6 +52,7 @@ on:
         description: "CMake preset for Android"
         options:
           - android-vulkan
+          - android-vulkan-release
         default: android-vulkan
       version_name:
         type: string
