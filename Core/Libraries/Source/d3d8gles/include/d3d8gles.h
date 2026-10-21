@@ -66,6 +66,13 @@ extern "C" int d3d8gles_SetVirtualBackbuffer(int w, int h, int renderW, int rend
 // resolution and the game's resolution is the window's; otherwise the whole frame is stretched at
 // present as before. Returns 1 when the split happened.
 extern "C" int d3d8gles_UpscaleSceneNow();
+// GeneralsX @feature Android port 21/10/2026 Round 8: arm (nonzero) or disarm (0) the adaptive
+// render-scale controller behind the launcher's "Dynamic" upscaler mode. While armed, the
+// translator's present path steps the same {100,77,67,59,50}% ladder the fixed modes use from
+// the measured frame cadence; disarmed, the cadence is not even measured. Called from
+// DX8Wrapper::Pillarbox_Setup when GX_UPSCALE is "auto". Arming resets the controller's state,
+// so a device reset (which re-runs Pillarbox_Setup) starts from a clean baseline.
+extern "C" void d3d8gles_SetDynamicUpscale(int enable);
 
 // GeneralsX @perf Android port 09/05/2026 Draw-call breakdown by subsystem.
 // Engine code tags the passes it can identify cheaply so the per-frame perf log

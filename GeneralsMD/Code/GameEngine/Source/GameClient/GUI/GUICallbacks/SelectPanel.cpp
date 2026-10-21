@@ -665,6 +665,15 @@ void SelectPanelInit(WindowLayout *layout, void *userData)
 	s_lastTrayAttempt[0] = '\0';
 	s_trayArtApplied = FALSE;
 	s_appliedFaceImage = nullptr;
+	// GeneralsX @bugfix Android port 21/10/2026 Round 7 addendum: the
+	// merged layout declares only this init, so GroupPanelInit is never
+	// called anymore -- call it from here so the group panel's per-match
+	// state (row-expanded flag, hold timers) resets with the layout too.
+	// Without this, a match that ended with the group row expanded left
+	// the flag set while ControlBar::init hid the row, and the next
+	// match's first "=" tap toggled it shut on the hidden row: a silent
+	// no-op that looks exactly like a dead button.
+	GroupPanelInit(layout, userData);
 }
 
 //-------------------------------------------------------------------------------------------------

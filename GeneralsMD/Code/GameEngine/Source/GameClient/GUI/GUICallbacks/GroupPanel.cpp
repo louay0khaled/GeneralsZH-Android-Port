@@ -325,6 +325,17 @@ void GroupPanelInit(WindowLayout *layout, void *userData)
 {
 	(void)layout;
 	(void)userData;
+	// GeneralsX @bugfix Android port 21/10/2026 Round 7 addendum: reset
+	// this panel's per-match state. Since the Round 6 merge the layout's
+	// STARTLAYOUTBLOCK no longer names this function, so it is invoked
+	// from SelectPanelInit instead (see there). ControlBar::init hides
+	// the group row for every new match; if s_groupRowExpanded stayed
+	// set from the previous match, the first "=" tap would toggle it
+	// shut on the already-hidden row and appear completely unresponsive.
+	s_groupRowExpanded = FALSE;
+	for (Int i = 0; i < 10; ++i) {
+		s_pressStartMs[i] = 0;
+	}
 }
 
 //-------------------------------------------------------------------------------------------------

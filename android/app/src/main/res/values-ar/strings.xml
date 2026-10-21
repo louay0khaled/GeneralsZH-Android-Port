@@ -235,7 +235,10 @@
     <string name="setup_upscale_performance">الأداء</string>
     <string name="setup_upscale_status_off">متوقف: العرض بالدقة الكاملة %1$d×%2$d</string>
     <string name="setup_upscale_status">%1$s: يُعرض الـ3D بدقة %2$d×%3$d ويُرفع إلى %4$d×%5$d</string>
-    <string name="setup_upscale_help">تُرسم ساحة المعركة بدقة أقل ثم تكبّرها Snapdragon GSR بوضوح إلى ملء الشاشة: إطارات أكثر وتبقى الواجهة واضحة. لـ GLES و ANGLE فقط. يسري عند التشغيل التالي.</string>
+    <string name="setup_upscale_help">تُرسم ساحة المعركة بدقة أقل ثم تكبّرها Snapdragon GSR بوضوح إلى ملء الشاشة: إطارات أكثر وتبقى الواجهة واضحة. لـ GLES و ANGLE فقط. يسري عند التشغيل التالي. الوضع الديناميكي يختار دقة العرض تلقائياً بين 100%% و50%% للحفاظ على معدل الإطارات؛ ينفع مع بطء الرسوميات (العرض البعيد الموسّع) لا مع بطء المعالج (جيوش ضخمة آخر اللعبة).</string>
+    <string name="setup_upscale_dynamic_short">ديناميكي</string>
+    <string name="setup_upscale_dynamic">ديناميكي</string>
+    <string name="setup_upscale_status_dynamic">ديناميكي: تُضبط دقة عرض الـ3D تلقائياً بين 100%% و50%% للحفاظ على معدل الإطارات، وتُرفع إلى %1$d×%2$d</string>
     <string name="setup_toast_render_scale_saved">تم الحفظ. يسري عند تشغيل اللعبة في المرة القادمة.</string>
     <string name="setup_card_interface_scale">حجم الواجهة</string>
     <string name="setup_interface_scale_label">%1$d%%</string>

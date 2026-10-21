@@ -2719,6 +2719,18 @@ extern "C" int d3d8gles_SetVirtualBackbuffer(int w, int h, int renderW, int rend
 	return WebGLPipeline::get()->setVirtualBackbuffer(w, h, renderW, renderH, gsr != 0) ? 1 : 0;
 }
 
+// GeneralsX @feature Android port 21/10/2026 Round 8: arm/disarm the adaptive render-scale
+// controller (the launcher's "Dynamic" upscaler mode). Arming resets the controller to the top
+// of the ladder so a device reset (Pillarbox_Setup re-runs) never inherits a stale position.
+extern "C" void d3d8gles_SetDynamicUpscale(int enable)
+{
+	if (!s_gxGlesReady)
+		return;
+	WebGLPipeline *p = WebGLPipeline::get();
+	if (p)
+		p->setDynamicUpscale(enable != 0);
+}
+
 // The present pass's shaders. One full-screen triangle from gl_VertexID (no vertex buffer), and
 // texture coordinates in the same orientation the scene was rendered in (an offscreen target's
 // v = 1 is D3D's top row, see Pillarbox_End()'s flipForGLTextureStorage). The SGSR fragment
@@ -2985,6 +2997,24 @@ bool WebGLPipeline::setVirtualBackbuffer(int w, int h, int renderW, int renderH,
 	fprintf(stderr, "[d3d8gles] virtual backbuffer %dx%d rendered at %dx%d (%d%%), stretched to the %dx%d window with %s\n",
 		w, h, renderW, renderH, (int)((int64_t)renderW * 100 / w), m_winW, m_winH, m_vbGsr ? "SGSR" : "bilinear filtering");
 	return true;
+}
+
+// GeneralsX @feature Android port 21/10/2026 Round 8: arm/disarm the adaptive render-scale
+// controller. Arming resets everything to the top of the ladder (100%) so a device reset or a
+// fresh launch always starts from the full-resolution baseline; the controller then steps down
+// only from measured cadence.
+void WebGLPipeline::setDynamicUpscale(bool armed)
+{
+	m_dynArmed = armed;
+	m_dynIndex = 0;
+	m_dynEmaMs = 0.0;
+	m_dynLastPresentMs = 0.0;
+	m_dynBadMs = 0.0;
+	m_dynGoodMs = 0.0;
+	m_dynLastStepMs = 0.0;
+	m_dynSkipUntilFrame = 0;
+	if (armed)
+		fprintf(stderr, "[d3d8gles] dynamic upscale controller armed: ladder 100/77/67/59/50%%\n");
 }
 
 // The virtual backbuffer over the whole window: by present() right before the swap, or by
@@ -4089,10 +4119,107 @@ void WebGLPipeline::debugSampleRenderTarget(WebGLTexture *tex, const char *tag)
 }
 
 
+// GeneralsX @feature Android port 21/10/2026 Round 8: the adaptive render-scale controller for
+// the launcher's "Dynamic" upscaler mode. Steps the same {100,77,67,59,50}% ladder the fixed
+// modes use from the present-to-present frame cadence: gxrt::present holds the game thread to
+// one frame in flight, so the cadence is the frame cost as the player feels it. Runs at the top
+// of present(), where m_vbSceneSeen still describes the frame being presented (it is reset at
+// the bottom). Anti-oscillation by construction: downshifts react fast (EMA > 17.5 ms sustained
+// ~1 s), upshifts return cautiously (EMA < 12.0 ms sustained ~8 s), with a 2.5 s minimum dwell
+// and 60 skipped frames after every step (the re-allocation frame is not representative).
+// Resizing reuses the existing setVirtualBackbuffer, which re-specs the same GL storage in
+// place and early-outs when nothing changed. Every step is logged in the layer's style.
+void WebGLPipeline::dynamicUpscaleStep()
+{
+	static const int kLadder[] = { 100, 77, 67, 59, 50 };
+	static const int kLadderSteps = 5;
+	static const double kEmaAlpha = 1.0 / 30.0; // ~30-frame exponential moving average
+	static const double kDownMs = 17.5;         // downshift when the average frame costs more
+	static const double kUpMs = 12.0;           // upshift only when it costs comfortably less
+	static const double kDownSustainS = 1.0;
+	static const double kUpSustainS = 8.0;
+	static const double kDwellS = 2.5;
+	static const unsigned kSkipFrames = 60;
+
+	if (!m_vbActive || m_vbW <= 0 || m_vbH <= 0)
+		return;
+	if (m_dynIndex < 0 || m_dynIndex >= kLadderSteps)
+		m_dynIndex = 0;
+
+	const double nowMs = std::chrono::duration<double, std::milli>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
+	if (m_dynLastPresentMs <= 0.0) {
+		m_dynLastPresentMs = nowMs;
+		return; // first call: seed the clock, nothing to measure yet
+	}
+	const double dtMs = nowMs - m_dynLastPresentMs;
+	m_dynLastPresentMs = nowMs;
+
+	// Scene frames only: menus, loading screens and videos never move the controller,
+	// mirroring the m_vbBypass scene detection. A step is a decision about 3D cost.
+	if (!m_vbSceneSeen)
+		return;
+	if (dtMs <= 0.0 || dtMs > 1000.0)
+		return; // clock jump or stall: don't feed the average
+
+	if (m_dynEmaMs <= 0.0)
+		m_dynEmaMs = dtMs;
+	else
+		m_dynEmaMs += (dtMs - m_dynEmaMs) * kEmaAlpha;
+
+	if (m_dynEmaMs > kDownMs) {
+		m_dynBadMs += dtMs / 1000.0;
+		m_dynGoodMs = 0.0;
+	} else if (m_dynEmaMs < kUpMs) {
+		m_dynGoodMs += dtMs / 1000.0;
+		m_dynBadMs = 0.0;
+	} else {
+		m_dynBadMs = 0.0;
+		m_dynGoodMs = 0.0;
+	}
+
+	if (m_frame < m_dynSkipUntilFrame)
+		return;
+	if ((nowMs - m_dynLastStepMs) / 1000.0 < kDwellS)
+		return;
+
+	int newIndex = m_dynIndex;
+	if (m_dynBadMs >= kDownSustainS && m_dynIndex < kLadderSteps - 1)
+		newIndex = m_dynIndex + 1; // one step down the ladder
+	else if (m_dynGoodMs >= kUpSustainS && m_dynIndex > 0)
+		newIndex = m_dynIndex - 1; // one step back up
+	else
+		return;
+
+	const int percent = kLadder[newIndex];
+	const int newRW = (m_vbW * percent / 100) & ~1;
+	const int newRH = (m_vbH * percent / 100) & ~1;
+	m_dynBadMs = 0.0;
+	m_dynGoodMs = 0.0;
+	m_dynLastStepMs = nowMs;
+	m_dynSkipUntilFrame = m_frame + kSkipFrames;
+	if (newRW == m_vbRW && newRH == m_vbRH) {
+		m_dynIndex = newIndex; // already there (rounding); keep the bookkeeping honest
+		return;
+	}
+	if (setVirtualBackbuffer(m_vbW, m_vbH, newRW, newRH, m_vbGsr)) {
+		fprintf(stderr, "[d3d8gles] dynamic upscale: %d%% -> %d%% (frame EMA %.1f ms)\n",
+			kLadder[m_dynIndex], percent, m_dynEmaMs);
+		m_dynIndex = newIndex;
+	} else {
+		fprintf(stderr, "[d3d8gles] dynamic upscale: step to %d%% rejected; staying at %d%%\n",
+			percent, kLadder[m_dynIndex]);
+	}
+}
+
 void WebGLPipeline::present()
 {
 	if (!m_ctxReady) return;
 	m_frame++;
+
+	// GeneralsX @feature Android port 21/10/2026 Round 8: the dynamic upscaler's controller.
+	if (m_dynArmed)
+		dynamicUpscaleStep();
 
 
 	// GeneralsX @performance Android port 27/09/2026 Asked once a second, not every frame: a

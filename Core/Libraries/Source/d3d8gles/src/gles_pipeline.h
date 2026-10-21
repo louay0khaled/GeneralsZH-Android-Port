@@ -240,6 +240,9 @@ public:
 	// d3d8gles_SetVirtualBackbuffer). w or h <= 0 turns it off.
 	bool setVirtualBackbuffer(int w, int h, int renderW, int renderH, bool gsr);
 	bool upscaleSceneNow();
+	// GeneralsX @feature Android port 21/10/2026 Round 8: arm/disarm the adaptive render-scale
+	// controller (the launcher's "Dynamic" upscaler mode). Arming resets the controller to 100%.
+	void setDynamicUpscale(bool armed);
 private:
 	void stretchVirtualBackbuffer();
 	// After upscaleSceneNow() "the backbuffer" is the window itself until the frame is presented.
@@ -263,6 +266,19 @@ private:
 	bool m_vbSceneSeen = false;
 	int m_vbW = 0, m_vbH = 0;   // what the engine sees (its backbuffer)
 	int m_vbRW = 0, m_vbRH = 0; // what is rendered: the texture stretched at present
+	// GeneralsX @feature Android port 21/10/2026 Round 8: the adaptive render-scale controller
+	// (the launcher's "Dynamic" upscaler mode). When armed, present() steps the same ladder
+	// the fixed modes use -- {100,77,67,59,50}% -- from the present-to-present frame cadence;
+	// disarmed, this costs one boolean check per present() and measures nothing.
+	bool m_dynArmed = false;
+	int m_dynIndex = 0;              // ladder position; 0 == 100%
+	double m_dynEmaMs = 0.0;         // present-cadence exponential moving average (ms)
+	double m_dynLastPresentMs = 0.0; // previous present() wall time (ms, steady clock)
+	double m_dynBadMs = 0.0;         // seconds the EMA has stayed above the downshift threshold
+	double m_dynGoodMs = 0.0;        // seconds the EMA has stayed below the upshift threshold
+	double m_dynLastStepMs = 0.0;    // wall time of the last ladder step (minimum dwell)
+	unsigned m_dynSkipUntilFrame = 0;// m_frame value before steps may resume (post-step skip)
+	void dynamicUpscaleStep();       // one controller evaluation, called from present()
 	int m_winW = 0, m_winH = 0;
 	GLuint m_vbFBO = 0, m_vbTex = 0, m_vbDepth = 0;
 	D3DVIEWPORT8 m_vbFullVp = {};

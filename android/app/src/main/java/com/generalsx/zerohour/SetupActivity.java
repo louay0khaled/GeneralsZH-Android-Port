@@ -1093,8 +1093,12 @@ public class SetupActivity extends Activity {
     // SDL3Main.cpp at startup and applied by the native GLES backend (DX8Wrapper::Pillarbox_Setup).
     // The first version was a percentage slider that lowered the game's Resolution itself -- the
     // same thing as picking a smaller resolution in the game's Options -- and is migrated here.
-    private static final String[] UPSCALE_MODES = { "off", "ultra", "quality", "balanced", "performance" };
-    private static final int[] UPSCALE_PERCENT = { 100, 77, 67, 59, 50 };
+    // GeneralsX @feature Android port 21/10/2026 Round 8: the "auto" entry is the dynamic mode --
+    // it steps the same {100,77,67,59,50} ladder automatically from the measured frame cadence
+    // (d3d8gles_SetDynamicUpscale in the GLES translator). Its percent slot is unused (the native
+    // side starts at 100% and the controller owns the steps); the status line has its own text.
+    private static final String[] UPSCALE_MODES = { "off", "auto", "ultra", "quality", "balanced", "performance" };
+    private static final int[] UPSCALE_PERCENT = { 100, 100, 77, 67, 59, 50 };
     private TextView upscaleStatus;
 
     private void buildRenderScaleSection(LinearLayout root) {
@@ -1104,6 +1108,7 @@ public class SetupActivity extends Activity {
         int current = readUpscaleMode();
         CharSequence[] labels = {
             getString(R.string.setup_upscale_off_short),
+            getString(R.string.setup_upscale_dynamic_short),
             getString(R.string.setup_upscale_ultra_short),
             getString(R.string.setup_upscale_quality_short),
             getString(R.string.setup_upscale_balanced_short),
@@ -1136,7 +1141,13 @@ public class SetupActivity extends Activity {
             upscaleStatus.setText(getString(R.string.setup_upscale_status_off, full[0], full[1]));
             return;
         }
-        int[] names = { 0, R.string.setup_upscale_ultra, R.string.setup_upscale_quality,
+        // GeneralsX @feature Android port 21/10/2026 Round 8: the dynamic mode's scale is chosen
+        // at runtime, so it gets its own status text instead of a fixed render resolution.
+        if (index == 1) {
+            upscaleStatus.setText(getString(R.string.setup_upscale_status_dynamic, full[0], full[1]));
+            return;
+        }
+        int[] names = { 0, 0, R.string.setup_upscale_ultra, R.string.setup_upscale_quality,
             R.string.setup_upscale_balanced, R.string.setup_upscale_performance };
         int percent = UPSCALE_PERCENT[index];
         upscaleStatus.setText(getString(R.string.setup_upscale_status, getString(names[index]),
