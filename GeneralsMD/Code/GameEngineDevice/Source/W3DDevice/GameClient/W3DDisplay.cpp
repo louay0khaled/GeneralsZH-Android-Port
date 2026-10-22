@@ -48,6 +48,9 @@ static void drawFramerateBar();
 #include <unistd.h> // access() for file existence checks
 #include <SDL3/SDL.h> // For SDL_ShowWindow() on Linux
 #endif
+#ifndef _WIN32
+#include "SDL3GameEngine.h" // For GXMobileRenderingSuspended()
+#endif
 #include <time.h>
 #include <vector>
 
@@ -2246,6 +2249,20 @@ static void gxTraceDisplayDrawPhase(double preRTTUs, double waterShadowRTTUs,
 //DECLARE_PERF_TIMER(W3DDisplay_draw)
 void W3DDisplay::draw()
 {
+#ifndef _WIN32
+	// GeneralsX @bugfix Android port 20/10/2026 While the app is backgrounded,
+	// do not submit ANY GPU work: no scene, no draw calls, no present, on
+	// either graphics backend (DXVK/Vulkan or d3d8gles/GLES). Android has
+	// torn the ANativeWindow down under the swapchain by now, and the GLES
+	// backend's render thread has handed its GL context back to the engine
+	// thread, so even ordinary draw submissions are unsafe in that state --
+	// skipping the whole frame here, before any of it is built, is what
+	// makes it safe. The rest of GameEngine::update() (simulation, message
+	// stream, network) is NOT gated and keeps running in the background;
+	// only the picture freezes, on the last completed presented frame.
+	if (GXMobileRenderingSuspended())
+		return;
+#endif
 	//USE_PERF_TIMER(W3DDisplay_draw)
 	const bool gxPerfTrace = GXTrace::isPerfEnabled();
 	std::chrono::steady_clock::time_point gxdT0, gxdT1, gxdT2, gxdT3, gxdT3b;

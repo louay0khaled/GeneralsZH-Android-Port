@@ -25731,6 +25731,26 @@ GX:ToolTipBuilderPageBack
 "بازگشت به فهرست ساختمان‌ها"
 END
 
+GX:SelectInfantry
+"پیاده‌نظام"
+END
+
+GX:SelectVehicles
+"وسایل نقلیه"
+END
+
+GX:SelectJets
+"جت‌ها"
+END
+
+GX:SelectHelicopters
+"بالگردها"
+END
+
+GX:SelectAllArmy
+"همه ارتش"
+END
+
 GUI:LoadReplayLong
 "بارگذاری بازپخش"
 END

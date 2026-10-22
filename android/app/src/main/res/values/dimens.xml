@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- GeneralsX @feature Android port launcher-ui-2026 08/09/2026 One
-         spacing/shape scale for every launcher screen, so a card, a row and
-         a button all agree about what "the edge" and "a gap" mean. Read
-         from UiKit.java rather than sprinkled as literals. -->
+    <!-- GeneralsX @feature Android port tactical-command-ui 20/10/2026 One
+         spacing/shape scale for every launcher screen, retuned for the
+         Tactical Command redesign: tighter gutters and — the sharpest
+         break with the old glass look — SHARP corners everywhere (card
+         4dp, row/field 3dp; nothing in the UI exceeds 6dp). All existing
+         names kept. Read from UiKit.java. -->
 
     <!-- Page gutter: distance from the screen edge to any card. -->
     <dimen name="gzh_gutter">16dp</dimen>
     <!-- Gap between two cards. -->
     <dimen name="gzh_card_gap">12dp</dimen>
     <!-- Padding inside a card. -->
-    <dimen name="gzh_card_padding">20dp</dimen>
+    <dimen name="gzh_card_padding">16dp</dimen>
     <!-- Gap between two items inside a card. -->
     <dimen name="gzh_item_gap">12dp</dimen>
     <dimen name="gzh_item_gap_tight">8dp</dimen>
 
-    <dimen name="gzh_radius_card">24dp</dimen>
-    <dimen name="gzh_radius_row">16dp</dimen>
-    <dimen name="gzh_radius_field">16dp</dimen>
+    <dimen name="gzh_radius_card">4dp</dimen>
+    <dimen name="gzh_radius_row">3dp</dimen>
+    <dimen name="gzh_radius_field">3dp</dimen>
 
     <dimen name="gzh_button_height">52dp</dimen>
     <dimen name="gzh_icon">22dp</dimen>
-    <dimen name="gzh_icon_button">44dp</dimen>
+    <dimen name="gzh_icon_button">48dp</dimen>
 
-    <dimen name="gzh_text_display">28sp</dimen>
+    <dimen name="gzh_text_display">34sp</dimen>
     <dimen name="gzh_text_title">17sp</dimen>
-    <dimen name="gzh_text_body">14sp</dimen>
+    <dimen name="gzh_text_body">15sp</dimen>
     <dimen name="gzh_text_caption">12sp</dimen>
-    <dimen name="gzh_text_overline">12sp</dimen>
+    <dimen name="gzh_text_overline">11sp</dimen>
+
+    <!-- Tactical Command additions: the Setup hero wordmark size and the
+         dominant launch block's height. -->
+    <dimen name="gzh_text_wordmark">44sp</dimen>
+    <dimen name="gzh_button_height_hero">64dp</dimen>
 </resources>

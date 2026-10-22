@@ -787,6 +787,15 @@ public:
 	Color getBorderColor(){return m_commandBarBorderColor;}
 	void updateBorderColor( Color color) {m_commandBarBorderColor = color;	}
 
+	// GeneralsX @feature Android port 21/10/2026 Read access to the live
+	// scheme's command-button border colors, for the select panel's
+	// runtime tint (SelectPanel.cpp) -- the values themselves stay
+	// private state, written by updateCommandBarBorderColors() below.
+	Color getCommandButtonBorderBuildColor() { return m_commandButtonBorderBuildColor; }
+	Color getCommandButtonBorderActionColor() { return m_commandButtonBorderActionColor; }
+	Color getCommandButtonBorderUpgradeColor() { return m_commandButtonBorderUpgradeColor; }
+	Color getCommandButtonBorderSystemColor() { return m_commandButtonBorderSystemColor; }
+
 	/// set the command data into the button
 	void setControlCommand( GameWindow *button, const CommandButton *commandButton );
 
@@ -934,11 +943,19 @@ protected:
 
 	GameWindow *m_communicatorButton;             ///< button for the communicator
 
-	// GeneralsX @feature Android port 02/08/2026 Native in-engine unit-group
-	// touch panel (GroupPanel.wnd, GroupPanel.cpp) -- hidden outside of real,
-	// already-started gameplay, same as the Android-overlay version this
-	// replaces was gated (see update()'s use of this).
-	WindowLayout *m_groupPanelLayout;
+	// GeneralsX @feature Android port 20/10/2026 Unit-category selection
+	// touch panel (SelectPanel.wnd, SelectPanel.cpp) -- shown/hidden outside
+	// of real, already-started gameplay only.
+	// GeneralsX @feature Android port 21/10/2026 Round 6: the unit-group
+	// windows (GroupPanel.wnd's ButtonHandle/GroupRow/ButtonGroup0..9) were
+	// merged INTO SelectPanel.wnd, so this one layout now carries the whole
+	// combined panel; the separate GroupPanel layout that used to live here
+	// is gone.
+	WindowLayout *m_selectPanelLayout;
+	// GeneralsX @feature Android port 21/10/2026 GXSelectPanel launcher
+	// toggle, read once in init() from the GX_SELECT_PANEL env var
+	// (Options.ini via SDL3Main); FALSE = the layout is never created.
+	Bool m_selectPanelEnabled;
 	WindowLayout *m_scienceLayout;								///< the Science window layout
 	GameWindow *m_sciencePurchaseWindowsRank1[ MAX_PURCHASE_SCIENCE_RANK_1 ];			///< command window controls for easy access
 	GameWindow *m_sciencePurchaseWindowsRank3[ MAX_PURCHASE_SCIENCE_RANK_3 ];			///< command window controls for easy access

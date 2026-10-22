@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The actual Zero Hour eagle emblem, extracted from GeneralsMD/Code/Main/
-     Generals.ico (the real game .exe icon) and upscaled to
-     mipmap-xxxhdpi/ic_launcher_foreground.png. minSdk 28 > 26, so this
-     anydpi-v26 entry is the only launcher icon needed. -->
+<!-- GeneralsX @feature Android port logo-renewal 20/10/2026 The user's
+     uploaded logo (blue shield, white wings, gold eagle, GENERALS ANDROID
+     wordmark) with its black background removed: the foreground PNG is
+     transparent and the background layer below is a fully transparent
+     colour, so the launcher's own backdrop shows around the artwork.
+     minSdk 28 > 26, so this anydpi-v26 entry serves every device; the
+     legacy density PNGs sit alongside for launchers that ask for them. -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@drawable/ic_launcher_background" />
     <foreground android:drawable="@mipmap/ic_launcher_foreground" />

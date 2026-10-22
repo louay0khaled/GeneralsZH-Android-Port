@@ -256,6 +256,14 @@ static const GXEnglishDefault s_gxEnglishDefaults[] =
 	// GeneralsOnline buttons the original menus do not have (score screen, player info).
 	{ "GX:ViewMatchOnline",    L"VIEW MATCH ONLINE" },
 	{ "GX:Logout",             L"LOGOUT" },
+	// GeneralsX @feature Android port 21/10/2026 Unit-category select panel
+	// captions (SelectPanel.wnd) -- category nouns, translated in the
+	// bundled languages/<lang>/generals.str packs.
+	{ "GX:SelectInfantry",     L"Infantry" },
+	{ "GX:SelectVehicles",     L"Vehicles" },
+	{ "GX:SelectJets",         L"Jets" },
+	{ "GX:SelectHelicopters",  L"Helicopters" },
+	{ "GX:SelectAllArmy",      L"All Army" },
 };
 
 

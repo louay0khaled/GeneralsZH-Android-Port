@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GeneralsZH</string>
+    <string name="app_name">Zero Hour</string>
+    <string name="setup_developer_credit">Louay Khaled</string>
+
     <string name="common_cancel">لغو</string>
 
     <!-- SetupActivity: title / fallback -->
@@ -13,7 +15,6 @@
     <string name="setup_card_game_folder">پوشه بازی</string>
     <string name="setup_button_select_game_folder">انتخاب پوشه بازی</string>
     <string name="setup_button_launch_game">اجرای بازی</string>
-    <string name="setup_button_view_logs">مشاهده گزارش‌ها</string>
     <string name="setup_button_clear_game_folder">بازنشانی پوشه بازی</string>
 
     <!-- SetupActivity: status text -->
@@ -27,7 +28,6 @@
     <string name="setup_folder_issue_bad_header">%1$s شبیه یک آرشیو معتبر بازی نیست</string>
     <string name="setup_folder_issue_missing_data">در %1$s داده‌های موردانتظار بازی کم است — احتمالاً یک نسخهٔ ناقص</string>
     <string name="setup_folder_issue_no_base_game">داده‌های بازی پایه Generals موجود نیست:%1$s\n\nیا پوشه‌ای را که از قبل آن‌ها را دارد مشخص کنید — دکمهٔ «پوشهٔ بازی پایه Generals…» در پایین (معمولاً ZH_Generals یا Command and Conquer Generals).</string>
-    <string name="setup_status_logs_note">گزارش‌های خرابی/موتور در حافظه خصوصی این برنامه ذخیره می‌شوند و فقط از طریق «مشاهده گزارش‌ها» در بالا قابل دسترسی هستند — اندروید عمداً آن‌ها را از مدیرهای فایل معمولی پنهان می‌کند (این رفتار استاندارد سندباکس اندروید است، نه ویژگی خاص این برنامه).</string>
 
     <!-- SetupActivity: Language card -->
     <string name="setup_card_language">زبان</string>
@@ -92,17 +92,7 @@
     <string name="setup_toast_driver_imported">درایور وارد شد: %1$s. در اجرای بعدی اعمال خواهد شد.</string>
 
     <!-- SetupActivity: Diagnostics card -->
-    <string name="setup_card_diagnostics">عیب‌یابی</string>
-    <string name="setup_diagnostics_help">این کلیدها گزارش‌گیری اضافی برای گزارش خطاها را فعال می‌کنند — در بازی عادی همه را خاموش نگه دارید، چون می‌توانند بازی را کند کنند یا گزارش‌های بسیار بزرگ ایجاد کنند. اگر گزارش‌دهنده یک مشکل از شما خواست یکی را روشن کنید، آن را فعال کنید، مشکل را دوباره ایجاد کنید، سپس نتیجه را با «مشاهده گزارش‌ها» در بالا ارسال کنید.</string>
     <string name="setup_diagnostics_no_folder">برای استفاده از این کلیدها ابتدا یک پوشه بازی (بالا) انتخاب کنید</string>
-    <string name="setup_switch_gx_trace">گزارش ردیابی مفصل</string>
-    <string name="setup_switch_gx_trace_desc">گزارش‌گیری داخلی بسیار مفصل (رابط کاربری، فونت‌ها، فایل‌های INI) برای ردیابی یک هنگ یا باگ خاص. ممکن است در یک نشست طولانی به ۵۰ تا ۱۰۰+ مگابایت برسد — اگر فقط به اعداد FPS نیاز دارید، به‌جای آن «خلاصه عملکرد» را فعال کنید. (gx_trace.txt)</string>
-    <string name="setup_switch_touch_debug">پوشش اشکال‌زدایی لمسی</string>
-    <string name="setup_switch_touch_debug_desc">وضعیت لایه لمسی را روی بازی می‌کشد: حرکت فعلی، جای انگشت شما، جایی که موتور بازی فکر می‌کند نشانگر است، و لنگر پیمایش دوربین. برای گزارش مشکلات کنترل این را روشن کنید — نقشه‌ای که خودش حرکت می‌کند، ساختمان شبح در جای اشتباه، توانایی که جایی را نشانه می‌رود که لمس نکرده‌اید. (gx_touch_debug.txt)</string>
-    <string name="setup_switch_gx_perf">خلاصه عملکرد</string>
-    <string name="setup_switch_gx_perf_desc">هر ثانیه یک خط کوتاه اضافه می‌کند که نشان می‌دهد زمان هر فریم صرف چه چیزی می‌شود (رادار، صدا، شبکه، منطق بازی، رندر). فعال نگه‌داشتن آن در کل نشست بازی بی‌خطر است — برای گزارش‌های FPS/کندی فعال کنید. (gx_perf.txt)</string>
-    <string name="setup_switch_gx_audio_trace">گزارش صدا</string>
-    <string name="setup_switch_gx_audio_trace_desc">ثبت می‌کند سامانهٔ صدا چه می‌کند: میزان پر بودن بافرهای موسیقی و گفتار، صدای ویدیوها، و هر منبعی که آغاز یا متوقف می‌شود. اگر پس از گزارش صدای ناموجود، بریده‌بریده یا خاموش از شما گزارش صدا خواستند، این را روشن کنید. ‎(gx_audio_trace.txt)</string>
     <string name="setup_button_download_langpack">دانلود بستهٔ زبان</string>
     <string name="setup_langpack_downloading">در حال دانلود بستهٔ زبان…</string>
     <string name="setup_langpack_done">بستهٔ زبان نصب شد. بازی در اجرای بعدی از آن استفاده می‌کند.</string>
@@ -121,12 +111,6 @@
     <string name="setup_game_text_status_default">متن بازی: انگلیسی — مگر آنکه یک ‎.big در پوشهٔ بازی جایگزینش کند</string>
     <string name="setup_game_text_none_found">هنوز بستهٔ زبانی در پوشهٔ بازی نیست. ابتدا یکی دانلود کنید.</string>
     <string name="setup_langpack_dialog_title">کدام زبان؟</string>
-    <string name="setup_switch_dxvk_hud">نمایش عملکرد روی صفحه</string>
-    <string name="setup_switch_dxvk_hud_desc">FPS، تعداد draw call، ارسال‌ها و تعداد پایپ‌لاین‌ها را مستقیماً روی صفحه و در گزارش نشان می‌دهد. برای گزارش‌های عملکرد GPU فعال کنید. (dxvk_hud.txt)</string>
-    <string name="setup_switch_dxvk_validation">لایه اعتبارسنجی Vulkan</string>
-    <string name="setup_switch_dxvk_validation_desc">صحت هر فراخوانی گرافیکی را بررسی می‌کند — باگ‌های واقعی رندر را پیدا می‌کند اما بازی را به‌طور محسوسی کند می‌کند. فقط زمانی فعال کنید که از شما خواسته شده یک کرش یا مشکل گرافیکی خاص را بازتولید کنید، نه برای بازی روزمره. (dxvk_validation.txt)</string>
-    <string name="setup_switch_dxvk_verbose_log">گزارش مفصل رندرر</string>
-    <string name="setup_switch_dxvk_verbose_log_desc">جزئیات اضافی هنگام راه‌اندازی درباره نحوه ارتباط بازی با درایور GPU شما اضافه می‌کند (قالب دقیق نمایش و تنظیمات مذاکره‌شده). زمانی فعال کنید که از شما خواسته شده یک مشکل گرافیکی مخصوص دستگاهتان را پیگیری کنید. (dxvk_verbose_log.txt)</string>
 
     <!-- SetupActivity: Online Multiplayer card -->
     <string name="setup_card_online">بازی چندنفره آنلاین</string>
@@ -135,8 +119,6 @@
     <string name="setup_online_signed_out">وارد نشده‌اید — برای بازی‌های آنلاین لازم است.</string>
 
     <!-- SetupActivity: How this works card -->
-    <string name="setup_card_how_it_works">این چگونه کار می‌کند</string>
-    <string name="setup_how_it_works_body">۱. «انتخاب پوشه بازی» یک مرورگر پوشه در حافظه گوشی شما باز می‌کند. به جایی که نصب خودتان از Command &amp; Conquer Generals Zero Hour را کپی کرده‌اید بروید (پوشه‌ای شامل INIZH.big، Data\\، ZH_Generals\\ و غیره) و روی «استفاده از این پوشه» ضربه بزنید.\n\n۲. اگر فهرست خالی به نظر می‌رسد، یعنی اندروید ابتدا مجوز «دسترسی برای مدیریت همه فایل‌ها» را درخواست می‌کند — آن را در صفحه‌ای که باز می‌شود اعطا کنید (این یک مجوز معمولی اندروید است و نیازی به روت ندارد).\n\n۳. «مشاهده گزارش‌ها» گزارش موتور را نشان می‌دهد و در صورت خراب شدن بازی، یک گزارش خرابی بومی را نیز نمایش می‌دهد — بدون نیاز به رایانه یا adb. از دکمه اشتراک‌گذاری آنجا برای ارسال گزارش به خودتان استفاده کنید.\n\n۴. «اجرای بازی» بازی را با پوشه‌ای که انتخاب کرده‌اید اجرا می‌کند.</string>
 
     <!-- SetupActivity: folder selection / misc toasts -->
     <string name="setup_toast_grant_all_files">مجوز «اجازه دسترسی برای مدیریت همه فایل‌ها» را در صفحه بعدی اعطا کنید، سپس بازگردید و دوباره روی انتخاب پوشه بازی ضربه بزنید.</string>
@@ -158,26 +140,6 @@
     <string name="folderpicker_toast_cant_read_legacy">خواندن این پوشه ممکن نیست. در Android 9–10 به برنامه اجازهٔ دسترسی به حافظه بدهید (تنظیمات ← برنامه‌ها ← GeneralsZH ← مجوزها ← حافظه) و دوباره تلاش کنید.</string>
 
     <!-- LogViewerActivity -->
-    <string name="logviewer_title">گزارش‌ها</string>
-    <string name="logviewer_button_clear">پاک کردن گزارش‌ها</string>
-    <string name="logviewer_button_copy">کپی</string>
-    <string name="logviewer_button_share">اشتراک‌گذاری</string>
-    <string name="logviewer_toast_copied">در کلیپ‌بورد کپی شد.</string>
-    <string name="logviewer_section_crash_log">=== crash.log (پردازشگر خرابی بومی، حافظه داخلی) ===\n</string>
-    <string name="logviewer_crash_log_absent">(وجود ندارد — از زمان نصب هیچ خرابی بومی ثبت نشده، یا برنامه هرگز فراتر از بارگذاری کتابخانه اجرا نشده است)</string>
-    <string name="logviewer_section_stderr_log">=== generals-stderr.log (گزارش موتور، حافظه خارجی) ===\n</string>
-    <string name="logviewer_stderr_log_absent">(وجود ندارد — تابع main() موتور هنوز شروع نشده، یا حافظه خارجی در دسترس نیست)</string>
-    <string name="logviewer_section_prev_log">=== generals-stderr-prev.log (نشست قبلی) ===\n</string>
-    <string name="logviewer_prev_log_absent">(وجود ندارد)</string>
-    <string name="logviewer_dialog_clear_title">پاک کردن گزارش‌ها</string>
-    <string name="logviewer_dialog_clear_message">فایل‌های گزارش خرابی و گزارش موتور حذف شوند؟ این کار قابل بازگشت نیست.</string>
-    <string name="logviewer_dialog_clear_confirm">پاک کردن</string>
-    <string name="logviewer_dialog_clear_cancel">لغو</string>
-    <string name="logviewer_toast_cleared">گزارش‌ها پاک شدند.</string>
-    <string name="logviewer_share_subject">گزارش GeneralsZH Android</string>
-    <string name="logviewer_share_chooser_title">اشتراک‌گذاری گزارش</string>
-    <string name="logviewer_toast_share_failed">آماده‌سازی فایل گزارش برای اشتراک‌گذاری ممکن نشد: %1$s</string>
-    <string name="logviewer_read_failed">(خواندن %1$s ممکن نشد: %2$s)</string>
 
     <!-- GeneralsOnlineActivity -->
     <string name="online_window_title">حساب GeneralsOnline</string>
@@ -204,10 +166,6 @@
     <string name="setup_toast_base_generals_cleared">پوشهٔ بازی پایه پاک شد</string>
     <string name="setup_base_generals_not_here">در %1$s آرشیو بازی پایه Generals وجود ندارد — پوشه‌ای را انتخاب کنید که Terrain.big و Textures.big و W3D.big در آن باشد.</string>
     <string name="setup_status_base_generals_line">Generals پایه: %1$s\n</string>
-    <string name="logviewer_crash_prev_log_absent">(موجود نیست)</string>
-    <string name="logviewer_elided_notice">\n...(%1$d نویسه در اینجا حذف شد؛ آغاز نشست در بالا و تازه‌ترین خروجی در پایین نگه داشته شده‌اند)...\n\n</string>
-    <string name="logviewer_section_crash_prev_log">=== crash-prev.log (مدیر خرابی بومی، نشست پیشین) ===\n</string>
-    <string name="logviewer_toast_share_none">هنوز پرونده گزارشی برای هم‌رسانی نیست.</string>
     <string name="setup_button_dxvk_config_reset">بازگردانی به پیش‌فرض</string>
     <string name="setup_button_dxvk_config_save">ذخیره</string>
     <string name="setup_card_dxvk_config">پیکربندی DXVK (dxvk.conf، پیشرفته)</string>
@@ -222,24 +180,10 @@
     <string name="nav_tab_home">خانه</string>
     <string name="nav_tab_graphics">گرافیک</string>
     <string name="nav_tab_interface">رابط</string>
-    <string name="nav_tab_tools">ابزارها</string>
     <string name="nav_tab_help">راهنما</string>
     <string name="setup_render_backend_gles_short">GLES</string>
     <string name="setup_render_backend_gles_angle_short">ANGLE</string>
     <string name="setup_render_backend_vulkan_short">Vulkan</string>
-    <string name="setup_switch_gx_net_trace">گزارش شبکهٔ آنلاین</string>
-    <string name="setup_switch_gx_net_trace_desc">هر درخواستی را که بازی به سرورهای GeneralsOnline می‌فرستد به همراه پاسخ آن ثبت می‌کند. اگر ورود، لابی یا همسان‌سازی داخل خود بازی شکست می‌خورد این را روشن کنید. درخواست‌های خودِ لانچر همیشه ثبت می‌شوند؛ این گزینه درخواست‌های بازی را اضافه می‌کند. همچنین تشخیص ناهمگامی در بازی میان‌سکویی را روشن می‌کند: مجموع‌های کنترلی شبیه‌سازی که در هر بازه مقایسه می‌شوند و در بازپخش، مجموع کنترلی هر شیء به‌تنهایی. (gx_net_trace.txt)</string>
-    <string name="netdiag_title">عیب‌یابی شبکه</string>
-    <string name="netdiag_row_note">بررسی اینکه آیا این دستگاه به سرورهای GeneralsOnline می‌رسد، و تهیهٔ گزارشی برای پیوست به گزارش خطا.</string>
-    <string name="netdiag_intro">به ترتیب بررسی می‌کند: آیا شبکه کار می‌کند، آیا نام سرورهای GeneralsOnline ترجمه می‌شود، آیا سرورها پاسخ می‌دهند، و دربارهٔ ورود چه می‌گویند.\n\nچیزی به جایی فرستاده نمی‌شود. برای شروع «اجرا» را بزنید.</string>
-    <string name="netdiag_running">در حال اجرا…</string>
-    <string name="netdiag_running_step">در حال اجرا… (%1$s)</string>
-    <string name="netdiag_button_run">اجرای عیب‌یابی</string>
-    <string name="netdiag_button_share">هم‌رسانی گزارش</string>
-    <string name="netdiag_button_copy">رونوشت</string>
-    <string name="netdiag_toast_copied">گزارش در کلیپ‌بورد رونوشت شد.</string>
-    <string name="netdiag_toast_share_failed">هم‌رسانی گزارش ممکن نشد: %1$s</string>
-    <string name="netdiag_share_subject">گزارش شبکهٔ GeneralsZH</string>
     <string name="online_status_banned">این حساب در GeneralsOnline مسدود شده است. می‌توانید در دیسکورد آن‌ها اعتراض کنید.</string>
     <string name="online_status_banned_reason">این حساب در GeneralsOnline مسدود شده است: %1$s</string>
     <string name="online_status_requesting_code">در حال درخواست کد ورود از سرور…</string>
@@ -278,55 +222,7 @@
     <string name="online_crossplay_patch_missing">وصله داده‌های انجمن نیست — «به‌روزرسانی» را بزنید</string>
     <string name="online_switch_crossplay">بازی با بازیکنان رایانه</string>
     <string name="online_switch_crossplay_desc">مجموع کنترلی EXE کلاینت ویندوز را گزارش می‌کند تا بازی‌هایش شما را بپذیرند. این مجموع ضدتقلب نیست: جلوی هم‌بازی شدن دستگاه‌هایی را می‌گیرد که بازی را متفاوت محاسبه می‌کنند، پس می‌تواند بازی را برای همهٔ افراد لابی خراب کند. برای رایانهٔ خودتان و فقط پس از کپی‌کردن داده‌های INI آن به این پوشهٔ بازی روشن کنید.</string>
-    <string name="replaycheck_title">بررسی بازپخش</string>
-    <string name="replaycheck_row_note">یک بازپخش رایانه را روی این نسخه بدون تماشا اجرا کنید یا به یک فریم بروید و ببینید مجموع‌های بررسی از کجا از هم جدا می‌شوند.</string>
-    <string name="replaycheck_refresh">تازه‌سازی</string>
-    <string name="replaycheck_last_result">آخرین نتیجه</string>
-    <string name="replaycheck_no_result">هنوز هیچ بررسی‌ای اجرا نشده است.</string>
-    <string name="replaycheck_result_match">%1$s: در همهٔ %2$s از %3$s نقطهٔ بررسی با ضبط یکسان است (%4$s فریم، %5$s ثانیه).</string>
-    <string name="replaycheck_result_mismatch">%1$s: اولین ناهمخوانی در فریم %2$s، آخرین همخوانی در %3$s. %4$s از %5$s نقطهٔ بررسی یکسان بود (%6$s فریم، %7$s ثانیه). گزارش‌ها را بفرستید.</string>
-    <string name="replaycheck_mode">حالت</string>
-    <string name="replaycheck_mode_run">اجرای کامل</string>
-    <string name="replaycheck_mode_watch">تماشا از فریم</string>
-    <string name="replaycheck_mode_help">اجرای کامل: بازپخش با بیشترین سرعتی که گوشی اجازه می‌دهد شبیه‌سازی می‌شود، کمی پس از اولین ناهمخوانی یا در پایان متوقف می‌شود و با نتیجه به اینجا برمی‌گردد. تماشا از فریم: جلو زدن سریع تا آن فریم و سپس پخش عادی.</string>
-    <string name="replaycheck_frame_label">فریم</string>
-    <string name="replaycheck_pick">بازپخش‌ها (برای شروع لمس کنید)</string>
-    <string name="replaycheck_none">هیچ فایل ‎.rep در %1$s نیست</string>
-    <string name="replaycheck_no_game_folder">ابتدا پوشهٔ بازی را در لانچر انتخاب کنید.</string>
-    <string name="replaycheck_need_frame">فریمی را که باید تا آن جلو رفت وارد کنید.</string>
-    <string name="replaycheck_trace_enabled">ردیابی شبکه برای بررسی روشن شد.</string>
-    <string name="replaycheck_trace_failed">روشن کردن ردیابی شبکه ممکن نشد؛ گزارش جزئیات مجموع‌های بررسی را نخواهد داشت.</string>
-    <string name="replaycheck_crc_every_frame">مجموع بررسی هر فریم</string>
-    <string name="replaycheck_crc_every_frame_help">مجموع بررسی منطق هر فریم را هم در گزارش می‌نویسد. برای ساختن نسخه‌ای از بازپخش که کلاینت رایانه فریم‌به‌فریم بررسی می‌کند. کندتر.</string>
     <string name="setup_online_anticheat_note">کلاینت موبایل ضدتقلب ندارد. برای بازی با هم، بازیکن رایانه باید ضدتقلب (GeneralsOnline AntiCheat یا Easy Anti-Cheat) را در لانچر GeneralsOnline خاموش کند: از گوشی نمی‌توان به لابی با ضدتقلب دیگر پیوست و برعکس.</string>
-    <string name="setup_switch_logging">جمع‌آوری گزارش‌ها</string>
-    <string name="setup_switch_logging_desc">گزارش‌های بازی، خرابی و شبکه روی دستگاه ذخیره شود. خاموش کنید تا تا روشن‌کردن دوباره هیچ چیز در پس‌زمینه ذخیره نشود. برای گزارش اشکال لازم است.</string>
-    <string name="setup_card_updates">به‌روزرسانی‌ها</string>
-    <string name="setup_updates_help">نسخه‌های تازهٔ موتور مستقیم از GitHub پروژه می‌آیند، بدون نصب دوبارهٔ APK. هر به‌روزرسانی امضا شده است؛ هر چیزی بدون امضای معتبر نادیده گرفته می‌شود. تنظیمات شبکه و داده‌های بازی آنلاین در حساب GeneralsOnline هستند.</string>
-    <string name="setup_updates_status">موتور: %1$s · آخرین بررسی: %2$s</string>
-    <string name="setup_updates_engine_bundled">داخلی، نسخه %1$d</string>
-    <string name="setup_updates_engine_updated">به‌روزشده، نسخه %1$d</string>
-    <string name="setup_updates_never">هنوز نه</string>
-    <string name="setup_button_check_updates">بررسی به‌روزرسانی</string>
-    <string name="setup_switch_auto_updates">بررسی خودکار</string>
-    <string name="setup_switch_auto_updates_desc">هنگام باز شدن لانچر.</string>
-    <string name="setup_updates_checking">در حال بررسی به‌روزرسانی…</string>
-    <string name="setup_updates_none">همه‌چیز به‌روز است.</string>
-    <string name="setup_updates_engine_ready">موتور جدیدتر (نسخه %1$d) دانلود شد. بار بعد که بازی را اجرا کنید استفاده می‌شود.</string>
-    <string name="setup_updates_engine_needs_apk">موتور جدیدتر (نسخه %1$d) به APK جدید نیاز دارد. آن را از صفحه پروژه دانلود کنید.</string>
-    <string name="setup_updates_failed">بررسی به‌روزرسانی ناموفق بود: %1$s</string>
-    <string name="setup_updates_not_published">هنوز به‌روزرسانی‌ای منتشر نشده است.</string>
-    <string name="setup_updates_offline">اتصال اینترنت وجود ندارد. لانچر و بازی بدون اینترنت هم کار می‌کنند؛ به‌روزرسانی‌ها دفعه بعد بررسی می‌شوند.</string>
-    <string name="setup_updates_datapack_installed">وصله داده‌های جامعه به نسخه %1$s به‌روز شد.</string>
-    <string name="setup_updates_datapack_available">نسخهٔ جدید داده‌های بازی شبکه‌ای منتشر شده (%1$s). آن را در حساب GeneralsOnline ← داده‌های بازی آنلاین به‌روز کنید.</string>
-    <string name="setup_updates_datapack_line_new">نسخهٔ جدید داده‌های بازی شبکه‌ای منتشر شده: %1$s.</string>
-    <string name="setup_button_open_online_data">به‌روزرسانی داده‌های شبکه</string>
-    <string name="online_datapacks_update_available">نصب‌شده: نسخهٔ %1$s. نسخهٔ جدید منتشر شده: %2$s.</string>
-    <string name="online_datapacks_update_for_crc">نصب‌شده: نسخهٔ %1$s. یک بار به‌روز کنید تا این دستگاه از روی آن جمع کنترلی کلاینت رایانه را حساب کند.</string>
-    <string name="online_datapacks_up_to_date">نصب‌شده: نسخهٔ %1$s، آخرین نسخه.</string>
-    <string name="online_network_settings">تنظیمات شبکه (سرورها، سازگاری با رایانه): مورخ %1$s، به‌طور خودکار از GitHub پروژه به‌روز و امضا می‌شوند.</string>
-    <string name="online_network_settings_builtin">تنظیمات شبکه (سرورها، سازگاری با رایانه): درون این نسخه؛ نسخه‌های تازه به‌طور خودکار از GitHub پروژه می‌آیند.</string>
-    <string name="online_datapacks_chip_update">به‌روزرسانی موجود است</string>
     <string name="setup_card_upscale">افزایش وضوح (Snapdragon GSR)</string>
     <string name="setup_upscale_off_short">خاموش</string>
     <string name="setup_upscale_ultra_short">فوق‌العاده</string>
@@ -345,4 +241,15 @@
     <string name="setup_interface_scale_label">%1$d%%</string>
     <string name="setup_button_apply_interface_scale">اعمال اندازه رابط کاربری</string>
     <string name="setup_interface_scale_help">رابط کاربری بازی را بدون تغییر فایل‌های آن بزرگ می‌کند: نوار کنترل همراه رادار از لبه پایین به بالا بزرگ می‌شود و نوار قدرت‌های ژنرال، چت، پیام‌های رویداد، فهرست بازیکنان، منوی بازی با ذخیره/بارگذاری و تنظیمات و دکمه‌های منوی اصلی از جای خود بزرگ می‌شوند. هیچ چیز از صفحه بیرون نمی‌رود: هر بخش فقط تا جایی که جا شود بزرگ می‌شود، پس در گوشی عریض نوار کنترل به‌جای پهن‌تر شدن بلندتر می‌شود و میدان نبرد بالای آن کوتاه‌تر. همراه با اندازه متن منو کار می‌کند. در اجرای بعدی بازی اعمال می‌شود.</string>
+    <!-- GeneralsX @feature Android port tactical-command-ui 20/10/2026 Setup hero status-strip readouts. -->
+    <string name="setup_hero_folder_ready">Game folder ready</string>
+    <string name="setup_hero_folder_missing">Game folder not set</string>
+    <string name="setup_hero_folder_check">Game folder needs attention</string>
+    <string name="setup_card_theme">پوسته</string>
+    <string name="setup_button_change_theme">تغییر پوسته</string>
+    <string name="setup_theme_dialog_title">انتخاب پوسته</string>
+    <string name="theme_name_generals">جنرالز</string>
+    <string name="theme_name_tactical">فرماندهی تاکتیکی</string>
+    <string name="theme_name_midnight">فولاد نیمه‌شب</string>
+    <string name="theme_name_crimson">فرماندهی سرخ</string>
 </resources>

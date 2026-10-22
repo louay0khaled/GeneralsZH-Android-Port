@@ -72,30 +72,13 @@ final class DataPackInstaller {
     private static final String MANIFEST_URL = "https://cdn.playgenerals.online/manifest.json";
 
     /**
-     * GeneralsX @feature Android port 27/09/2026 The package's own manifest address can be
-     * changed from the signed update settings (datapack_manifest_url), so a move of the
-     * GeneralsOnline CDN does not need a new APK. Only an https address is taken.
+     * GeneralsX @tweak Android port release 20/10/2026 The manifest address used
+     * to be overridable from the signed update settings; the release launcher
+     * carries no update system, so the GeneralsOnline CDN address is the
+     * built-in one.
      */
     static String manifestUrl(Context ctx) {
-        String url = UpdateManager.remoteConfig(ctx, "datapack_manifest_url", MANIFEST_URL);
-        // GeneralsX @bugfix Android port 03/10/2026 A copy on the updates branch is published for
-        // launchers up to 1.3.0, which compare the CDN's sha256 untrimmed (it starts with a space)
-        // and so fail every install with "checksum mismatch". This launcher trims it, and the copy
-        // is only as current as the last settings publish, so it reads the CDN itself.
-        if (url.startsWith(UpdateManager.BASE_URL)) {
-            return MANIFEST_URL;
-        }
-        return url.startsWith("https://") ? url : MANIFEST_URL;
-    }
-
-    /** The version the GeneralsOnline CDN offers now, or null if it cannot be reached. */
-    static String latestVersion(Context ctx) {
-        try {
-            String version = new JSONObject(fetchText(manifestUrl(ctx))).optString("version", "");
-            return version.isEmpty() ? null : version;
-        } catch (Exception e) {
-            return null;
-        }
+        return MANIFEST_URL;
     }
 
     /** The only two directories in the package that mean anything here. */
@@ -443,7 +426,6 @@ final class DataPackInstaller {
 
             ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit().putString(PREF_INSTALLED_VERSION, version).apply();
-            UpdateManager.noteDatapackLatest(ctx, version);
 
             return Result.success(version, written.size());
         } catch (Exception e) {

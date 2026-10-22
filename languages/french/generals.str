@@ -25728,6 +25728,26 @@ GX:ToolTipBuilderPageBack
 "Retour à la liste des bâtiments"
 END
 
+GX:SelectInfantry
+"Infanterie"
+END
+
+GX:SelectVehicles
+"Véhicules"
+END
+
+GX:SelectJets
+"Jets"
+END
+
+GX:SelectHelicopters
+"Hélicoptères"
+END
+
+GX:SelectAllArmy
+"Toute l'armée"
+END
+
 GUI:LoadReplayLong
 "CHARGER LE REPLAY"
 END

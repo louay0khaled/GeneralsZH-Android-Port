@@ -1,74 +1,301 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- GeneralsX @feature Android port launcher-ui-2026 08/09/2026 Design
+    <!-- GeneralsX @feature Android port tactical-command-ui 20/10/2026 Design
          tokens for the launcher (Setup / GeneralsOnline / Log Viewer /
-         Folder Picker). A Material 3 dark colour-role set: one near-black
-         ground, a small ladder of "surface container" greys for cards and
-         rows on top of it, a soft lavender primary for headings/active
-         state and a muted pastel for destructive actions.
+         Folder Picker / ReplayCheck / NetworkDiagnostics).
 
-         GeneralsZHActivity (the game surface itself) never references any of
-         these — it stays on its own plain fullscreen theme.
+         TACTICAL COMMAND identity — a military command-console HUD in the
+         spirit of the game itself, replacing the previous navy/cyan glass
+         look wholesale: near-black charcoal/olive grounds, dark olive-grey
+         panels with hard khaki hairline borders, SHARP corners (see
+         dimens.xml: 3-4dp radii), a signal-amber primary, a tactical
+         olive/khaki secondary, and alert red kept for destructive/status
+         use only. Every pre-existing gzh_* name is kept (Java and
+         themes.xml reference them) with retuned values; the old glass
+         token names now resolve to flat tactical fills/strokes, so no
+         call site had to change.
 
-         The gzh_primary/gzh_accent/gzh_surface/... names below predate this
-         palette and are kept (they are referenced from themes.xml and from
-         Java) — only their values were retuned to the new palette. -->
+         GeneralsZHActivity (the game surface itself) never references any
+         of these — it stays on its own plain fullscreen theme. -->
 
-    <!-- Ground + surface ladder (M3 surface container roles) -->
-    <color name="gzh_background">#0E0E11</color>
-    <color name="gzh_surface">#131318</color>
-    <color name="gzh_surface_container_low">#16161C</color>
-    <color name="gzh_surface_container">#1A1A21</color>
-    <color name="gzh_surface_container_high">#22222B</color>
-    <color name="gzh_surface_container_highest">#2B2B36</color>
+    <!-- Ground + surface ladder (dark olive-charcoal) -->
+    <color name="gzh_background">#0C0E0A</color>
+    <color name="gzh_surface">#12140F</color>
+    <color name="gzh_surface_container_low">#161810</color>
+    <color name="gzh_surface_container">#1A1D16</color>
+    <color name="gzh_surface_container_high">#22261C</color>
+    <color name="gzh_surface_container_highest">#2E3324</color>
 
-    <!-- Content on those surfaces -->
-    <color name="gzh_on_surface">#ECEBF2</color>
-    <color name="gzh_on_surface_variant">#A5A2B4</color>
-    <!-- The faintest tier still has to clear WCAG AA (4.5:1) at 12sp against
-         gzh_surface_container, which #7C798C did not (3.9:1). -->
-    <color name="gzh_on_surface_faint">#8F8CA0</color>
-    <color name="gzh_outline">#3A3846</color>
-    <color name="gzh_outline_variant">#26252F</color>
+    <!-- Content on those surfaces. gzh_on_surface / _variant / _faint all
+         clear WCAG AA (4.5:1) against gzh_surface_container (#1A1D16):
+         approx. 14.1:1, 9.9:1 and 6.9:1 respectively. -->
+    <color name="gzh_on_surface">#EDEAE0</color>
+    <color name="gzh_on_surface_variant">#CBC5B2</color>
+    <color name="gzh_on_surface_faint">#ABA48F</color>
+    <color name="gzh_outline">#6E7357</color>
+    <color name="gzh_outline_variant">#3B3F2F</color>
 
-    <!-- Primary: the soft lavender accent (headings, active nav item,
-         selected segment, hero action). -->
-    <color name="gzh_primary">#B9AEEA</color>
-    <color name="gzh_on_primary">#231B3F</color>
-    <color name="gzh_primary_container">#38305C</color>
-    <color name="gzh_on_primary_container">#E4DDFF</color>
-    <!-- Kept for the themes.xml colorPrimaryDark slot (pre-API-23 status bar). -->
-    <color name="gzh_primary_dark">#0E0E11</color>
-    <color name="gzh_accent">#B9AEEA</color>
+    <!-- Primary: signal amber — headings' ticks, active nav block, selected
+         segment, the hero launch block. Text on it is near-black. -->
+    <color name="gzh_primary">#FFB300</color>
+    <color name="gzh_on_primary">#1D1400</color>
+    <color name="gzh_primary_container">#4A3808</color>
+    <color name="gzh_on_primary_container">#FFD97A</color>
+    <!-- Kept for the themes.xml colorPrimaryDark slot. -->
+    <color name="gzh_primary_dark">#0C0E0A</color>
+    <color name="gzh_accent">#FFB300</color>
 
-    <!-- Secondary: a desaturated companion for tonal chips/containers. -->
-    <color name="gzh_secondary">#C9C4DC</color>
-    <color name="gzh_on_secondary">#302C42</color>
-    <color name="gzh_secondary_container">#393450</color>
-    <color name="gzh_on_secondary_container">#E6E1F6</color>
+    <!-- Secondary: tactical olive/khaki — tonal chips/containers, icons. -->
+    <color name="gzh_secondary">#A3B18A</color>
+    <color name="gzh_on_secondary">#1E2413</color>
+    <color name="gzh_secondary_container">#2F3821</color>
+    <color name="gzh_on_secondary_container">#DAE4C6</color>
 
-    <!-- Tertiary: the muted pastel used for destructive / "clear" actions. -->
-    <color name="gzh_tertiary">#F3C9C6</color>
-    <color name="gzh_on_tertiary">#4A2523</color>
-    <color name="gzh_tertiary_container">#5C3835</color>
-    <color name="gzh_on_tertiary_container">#FFDAD7</color>
+    <!-- Tertiary: alert red, sparingly — destructive / "clear" actions. -->
+    <color name="gzh_tertiary">#E4572E</color>
+    <color name="gzh_on_tertiary">#2E0D02</color>
+    <color name="gzh_tertiary_container">#5C2812</color>
+    <color name="gzh_on_tertiary_container">#FFD9C7</color>
 
-    <color name="gzh_error">#FFB4AB</color>
-    <color name="gzh_on_error">#690005</color>
-    <color name="gzh_error_container">#93000A</color>
-    <color name="gzh_on_error_container">#FFDAD6</color>
+    <color name="gzh_error">#FFB59D</color>
+    <color name="gzh_on_error">#621B00</color>
+    <color name="gzh_error_container">#7A2712</color>
+    <color name="gzh_on_error_container">#FFDAD0</color>
 
     <!-- Disabled state (M3: 38% of on-surface for content, 12% for containers) -->
-    <color name="gzh_on_surface_disabled">#61ECEBF2</color>
-    <color name="gzh_container_disabled">#1FECEBF2</color>
-    <color name="gzh_ripple_light">#1FECEBF2</color>
-    <color name="gzh_ripple_primary">#33B9AEEA</color>
+    <color name="gzh_on_surface_disabled">#61EDEAE0</color>
+    <color name="gzh_container_disabled">#1FEDEAE0</color>
+    <color name="gzh_ripple_light">#1FEDEAE0</color>
+    <color name="gzh_ripple_primary">#33FFB300</color>
 
-    <!-- GeneralsX @feature Android port game-folder-integrity-check 07/09/2026
-         Semantic status colours for the game-folder validity line (see
-         refreshStatus() in SetupActivity.java) — retuned for the near-black
-         ground above so they stay legible without shouting. -->
-    <color name="gzh_status_ok">#7FDCA4</color>
-    <color name="gzh_status_warn">#F2C97D</color>
-    <color name="gzh_status_error">#FFB4AB</color>
+    <!-- Semantic status colours, legible on the dark olive ground. -->
+    <color name="gzh_status_ok">#8FC97A</color>
+    <color name="gzh_status_warn">#FFB300</color>
+    <color name="gzh_status_error">#FF7A52</color>
+
+    <!-- Legacy glass token names (kept: UiKit, LogViewerActivity and
+         NetworkDiagnosticsActivity reference them). Under Tactical Command
+         they are FLAT tactical values — solid panel fills and khaki
+         hairline strokes. No translucency-blur look anywhere. -->
+    <color name="gzh_glass_fill">#23271B</color>
+    <color name="gzh_glass_fill_high">#2C3122</color>
+    <color name="gzh_glass_fill_low">#14160F</color>
+    <color name="gzh_glass_surface">#F21A1D16</color>
+    <color name="gzh_glass_surface_high">#F222261C</color>
+    <color name="gzh_glass_stroke">#4B5040</color>
+    <color name="gzh_glass_stroke_strong">#7D6C33</color>
+    <color name="gzh_glass_highlight">#12FFFFFF</color>
+    <color name="gzh_glass_nav">#FA0C0E0A</color>
+    <color name="gzh_glass_scrim">#99050703</color>
+
+    <!-- Page-background gradient stops (dark olive, top-lit). The old
+         teal/cyan/violet glow names are kept for compatibility and now
+         resolve into the amber/olive family. -->
+    <color name="gzh_gradient_start">#15170F</color>
+    <color name="gzh_gradient_mid">#0F110C</color>
+    <color name="gzh_gradient_end">#0A0C08</color>
+    <color name="gzh_glow_teal">#FFB300</color>
+    <color name="gzh_glow_cyan">#A3B18A</color>
+    <color name="gzh_glow_violet">#3B3F2F</color>
+    <color name="gzh_glow_gold">#FFB300</color>
+    <color name="gzh_accent_gold">#FFB300</color>
+
+    <!-- Tactical Command additions. -->
+    <color name="gzh_amber">#FFB300</color>
+    <color name="gzh_amber_dim">#59FFB300</color>
+    <color name="gzh_khaki">#9BA657</color>
+    <color name="gzh_grid_line">#14EDEAE0</color>
+    <color name="gzh_hero_start">#1D2016</color>
+    <color name="gzh_hero_end">#11130C</color>
+
+    <!-- GeneralsX @feature Android port launcher-themes 20/10/2026
+         Per-theme variants of every gzh_* token above, selected at
+         runtime by UiKit (theme index in SharedPreferences). The
+         unprefixed gzh_* values ARE the Tactical Command theme. -->
+
+    <!-- Generals (the logo palette: royal blue + eagle gold) -->
+    <color name="gzhg_background">#050A16</color>
+    <color name="gzhg_surface">#081120</color>
+    <color name="gzhg_surface_container_low">#0A1730</color>
+    <color name="gzhg_surface_container">#0C1D3A</color>
+    <color name="gzhg_surface_container_high">#12294D</color>
+    <color name="gzhg_surface_container_highest">#1A3560</color>
+    <color name="gzhg_on_surface">#F2F6FC</color>
+    <color name="gzhg_on_surface_variant">#C3D2E6</color>
+    <color name="gzhg_on_surface_faint">#93A8C4</color>
+    <color name="gzhg_outline">#4A6FA5</color>
+    <color name="gzhg_outline_variant">#22385E</color>
+    <color name="gzhg_primary">#1E88E5</color>
+    <color name="gzhg_on_primary">#FFFFFF</color>
+    <color name="gzhg_primary_container">#103A6B</color>
+    <color name="gzhg_on_primary_container">#BBDEFB</color>
+    <color name="gzhg_primary_dark">#050A16</color>
+    <color name="gzhg_accent">#FFC400</color>
+    <color name="gzhg_secondary">#FFC400</color>
+    <color name="gzhg_on_secondary">#241A00</color>
+    <color name="gzhg_secondary_container">#4A3808</color>
+    <color name="gzhg_on_secondary_container">#FFE082</color>
+    <color name="gzhg_tertiary">#E4572E</color>
+    <color name="gzhg_on_tertiary">#2E0D02</color>
+    <color name="gzhg_tertiary_container">#5C2812</color>
+    <color name="gzhg_on_tertiary_container">#FFD9C7</color>
+    <color name="gzhg_error">#FFB59D</color>
+    <color name="gzhg_on_error">#621B00</color>
+    <color name="gzhg_error_container">#7A2712</color>
+    <color name="gzhg_on_error_container">#FFDAD0</color>
+    <color name="gzhg_on_surface_disabled">#61F2F6FC</color>
+    <color name="gzhg_container_disabled">#1FF2F6FC</color>
+    <color name="gzhg_ripple_light">#1FF2F6FC</color>
+    <color name="gzhg_ripple_primary">#331E88E5</color>
+    <color name="gzhg_status_ok">#7BD88F</color>
+    <color name="gzhg_status_warn">#FFC400</color>
+    <color name="gzhg_status_error">#FF7A52</color>
+    <color name="gzhg_glass_fill">#14263F</color>
+    <color name="gzhg_glass_fill_high">#1B3050</color>
+    <color name="gzhg_glass_fill_low">#0B1626</color>
+    <color name="gzhg_glass_surface">#F20C1D3A</color>
+    <color name="gzhg_glass_surface_high">#F212294D</color>
+    <color name="gzhg_glass_stroke">#3D5A80</color>
+    <color name="gzhg_glass_stroke_strong">#77622A</color>
+    <color name="gzhg_glass_highlight">#12FFFFFF</color>
+    <color name="gzhg_glass_nav">#FA050A16</color>
+    <color name="gzhg_glass_scrim">#99030A14</color>
+    <color name="gzhg_gradient_start">#0A1730</color>
+    <color name="gzhg_gradient_mid">#060F22</color>
+    <color name="gzhg_gradient_end">#03060F</color>
+    <color name="gzhg_glow_teal">#1E88E5</color>
+    <color name="gzhg_glow_cyan">#64B5F6</color>
+    <color name="gzhg_glow_violet">#0D47A1</color>
+    <color name="gzhg_glow_gold">#FFC400</color>
+    <color name="gzhg_accent_gold">#FFC400</color>
+    <color name="gzhg_amber">#FFC400</color>
+    <color name="gzhg_amber_dim">#59FFC400</color>
+    <color name="gzhg_khaki">#B9C9DE</color>
+    <color name="gzhg_grid_line">#14F2F6FC</color>
+    <color name="gzhg_hero_start">#12294D</color>
+    <color name="gzhg_hero_end">#081426</color>
+
+    <!-- Midnight Steel (steel monochrome) -->
+    <color name="gzhm_background">#07090C</color>
+    <color name="gzhm_surface">#0C0F14</color>
+    <color name="gzhm_surface_container_low">#10141A</color>
+    <color name="gzhm_surface_container">#141A21</color>
+    <color name="gzhm_surface_container_high">#1C242E</color>
+    <color name="gzhm_surface_container_highest">#28313D</color>
+    <color name="gzhm_on_surface">#ECEFF1</color>
+    <color name="gzhm_on_surface_variant">#B9C2CC</color>
+    <color name="gzhm_on_surface_faint">#8A97A5</color>
+    <color name="gzhm_outline">#54687C</color>
+    <color name="gzhm_outline_variant">#2A333F</color>
+    <color name="gzhm_primary">#8FA8C8</color>
+    <color name="gzhm_on_primary">#0B1220</color>
+    <color name="gzhm_primary_container">#2C3E55</color>
+    <color name="gzhm_on_primary_container">#D3E2F2</color>
+    <color name="gzhm_primary_dark">#07090C</color>
+    <color name="gzhm_accent">#8FA8C8</color>
+    <color name="gzhm_secondary">#B0BEC5</color>
+    <color name="gzhm_on_secondary">#131A20</color>
+    <color name="gzhm_secondary_container">#2E3A44</color>
+    <color name="gzhm_on_secondary_container">#DDE6EC</color>
+    <color name="gzhm_tertiary">#D97B5F</color>
+    <color name="gzhm_on_tertiary">#2A120A</color>
+    <color name="gzhm_tertiary_container">#4A2C20</color>
+    <color name="gzhm_on_tertiary_container">#F2D5C8</color>
+    <color name="gzhm_error">#E8A08E</color>
+    <color name="gzhm_on_error">#4A1D10</color>
+    <color name="gzhm_error_container">#5C2B1C</color>
+    <color name="gzhm_on_error_container">#F5D9CF</color>
+    <color name="gzhm_on_surface_disabled">#61ECEFF1</color>
+    <color name="gzhm_container_disabled">#1FECEFF1</color>
+    <color name="gzhm_ripple_light">#1FECEFF1</color>
+    <color name="gzhm_ripple_primary">#338FA8C8</color>
+    <color name="gzhm_status_ok">#8FC97A</color>
+    <color name="gzhm_status_warn">#D9B45B</color>
+    <color name="gzhm_status_error">#E07A5F</color>
+    <color name="gzhm_glass_fill">#1A222C</color>
+    <color name="gzhm_glass_fill_high">#232E3A</color>
+    <color name="gzhm_glass_fill_low">#0D1117</color>
+    <color name="gzhm_glass_surface">#F2141A21</color>
+    <color name="gzhm_glass_surface_high">#F21C242E</color>
+    <color name="gzhm_glass_stroke">#3E4C5E</color>
+    <color name="gzhm_glass_stroke_strong">#5E748E</color>
+    <color name="gzhm_glass_highlight">#12FFFFFF</color>
+    <color name="gzhm_glass_nav">#FA07090C</color>
+    <color name="gzhm_glass_scrim">#99030507</color>
+    <color name="gzhm_gradient_start">#10151C</color>
+    <color name="gzhm_gradient_mid">#0A0E13</color>
+    <color name="gzhm_gradient_end">#05070A</color>
+    <color name="gzhm_glow_teal">#8FA8C8</color>
+    <color name="gzhm_glow_cyan">#B0BEC5</color>
+    <color name="gzhm_glow_violet">#2A333F</color>
+    <color name="gzhm_glow_gold">#CFD8DC</color>
+    <color name="gzhm_accent_gold">#CFD8DC</color>
+    <color name="gzhm_amber">#A8BEDD</color>
+    <color name="gzhm_amber_dim">#59A8BEDD</color>
+    <color name="gzhm_khaki">#93A5B5</color>
+    <color name="gzhm_grid_line">#14ECEFF1</color>
+    <color name="gzhm_hero_start">#1A232E</color>
+    <color name="gzhm_hero_end">#0C1015</color>
+
+    <!-- Crimson Command (crimson + muted gold) -->
+    <color name="gzhc_background">#0D0507</color>
+    <color name="gzhc_surface">#130709</color>
+    <color name="gzhc_surface_container_low">#180A0E</color>
+    <color name="gzhc_surface_container">#1E0D12</color>
+    <color name="gzhc_surface_container_high">#2A1219</color>
+    <color name="gzhc_surface_container_highest">#3A1A22</color>
+    <color name="gzhc_on_surface">#F7E8E6</color>
+    <color name="gzhc_on_surface_variant">#D8BDB8</color>
+    <color name="gzhc_on_surface_faint">#AC8B85</color>
+    <color name="gzhc_outline">#7A4A44</color>
+    <color name="gzhc_outline_variant">#3D2027</color>
+    <color name="gzhc_primary">#E0483E</color>
+    <color name="gzhc_on_primary">#FFFFFF</color>
+    <color name="gzhc_primary_container">#6E1F1A</color>
+    <color name="gzhc_on_primary_container">#FFC9C2</color>
+    <color name="gzhc_primary_dark">#0D0507</color>
+    <color name="gzhc_accent">#E0483E</color>
+    <color name="gzhc_secondary">#E0A458</color>
+    <color name="gzhc_on_secondary">#2A1A05</color>
+    <color name="gzhc_secondary_container">#4A3410</color>
+    <color name="gzhc_on_secondary_container">#F5D9AE</color>
+    <color name="gzhc_tertiary">#E07B39</color>
+    <color name="gzhc_on_tertiary">#2E1502</color>
+    <color name="gzhc_tertiary_container">#5C3412</color>
+    <color name="gzhc_on_tertiary_container">#FFDCC7</color>
+    <color name="gzhc_error">#FFB59D</color>
+    <color name="gzhc_on_error">#621B00</color>
+    <color name="gzhc_error_container">#7A2712</color>
+    <color name="gzhc_on_error_container">#FFDAD0</color>
+    <color name="gzhc_on_surface_disabled">#61F7E8E6</color>
+    <color name="gzhc_container_disabled">#1FF7E8E6</color>
+    <color name="gzhc_ripple_light">#1FF7E8E6</color>
+    <color name="gzhc_ripple_primary">#33E0483E</color>
+    <color name="gzhc_status_ok">#8FC97A</color>
+    <color name="gzhc_status_warn">#E0A458</color>
+    <color name="gzhc_status_error">#FF7A52</color>
+    <color name="gzhc_glass_fill">#2A1219</color>
+    <color name="gzhc_glass_fill_high">#361820</color>
+    <color name="gzhc_glass_fill_low">#170A0E</color>
+    <color name="gzhc_glass_surface">#F21E0D12</color>
+    <color name="gzhc_glass_surface_high">#F22A1219</color>
+    <color name="gzhc_glass_stroke">#5E3538</color>
+    <color name="gzhc_glass_stroke_strong">#8E5A3A</color>
+    <color name="gzhc_glass_highlight">#12FFFFFF</color>
+    <color name="gzhc_glass_nav">#FA0D0507</color>
+    <color name="gzhc_glass_scrim">#990A0205</color>
+    <color name="gzhc_gradient_start">#1C0B10</color>
+    <color name="gzhc_gradient_mid">#120609</color>
+    <color name="gzhc_gradient_end">#080304</color>
+    <color name="gzhc_glow_teal">#E0483E</color>
+    <color name="gzhc_glow_cyan">#E0A458</color>
+    <color name="gzhc_glow_violet">#3D2027</color>
+    <color name="gzhc_glow_gold">#E0A458</color>
+    <color name="gzhc_accent_gold">#E0A458</color>
+    <color name="gzhc_amber">#E0483E</color>
+    <color name="gzhc_amber_dim">#59E0483E</color>
+    <color name="gzhc_khaki">#C99B76</color>
+    <color name="gzhc_grid_line">#14F7E8E6</color>
+    <color name="gzhc_hero_start">#2A1219</color>
+    <color name="gzhc_hero_end">#12060A</color>
 </resources>

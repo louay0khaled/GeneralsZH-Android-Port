@@ -246,13 +246,26 @@ bool DX8Wrapper::Pillarbox_Setup(int gameW, int gameH)
 	if (!d3d8gles_ShouldUseVulkanBackend()) {
 		const char *upscaler = getenv("GX_UPSCALER");
 		const bool gsr = !(upscaler && strcmp(upscaler, "bilinear") == 0);
-		const int percent = UpscaleModePercent(getenv("GX_UPSCALE"));
+		const char *upscaleMode = getenv("GX_UPSCALE");
+		const int percent = UpscaleModePercent(upscaleMode);
 		const int scaledW = ((renderW * percent / 100) & ~1);
 		const int scaledH = ((renderH * percent / 100) & ~1);
-		const bool smaller = renderW < bbW || renderH < bbH || percent < 100;
+		// GeneralsX @feature Android port 21/10/2026 Round 8: the dynamic ("auto") upscaler mode.
+		// Fixed modes are startup-only; "auto" arms the adaptive controller in the translator,
+		// which steps the same {100,77,67,59,50}% ladder from the measured frame cadence. Start at
+		// 100% with the virtual backbuffer ACTIVE (unlike the off path, which leaves it inactive):
+		// the controller's step formula needs the game size from the translator's live state, and
+		// active-at-100% is the off look plus one fullscreen stretch pass. UpscaleModePercent
+		// already maps "auto" to 100 via its fall-through.
+		const bool dynamic = upscaleMode && strcmp(upscaleMode, "auto") == 0;
+		const bool smaller = renderW < bbW || renderH < bbH || percent < 100 || dynamic;
 		if (d3d8gles_SetVirtualBackbuffer(smaller ? renderW : 0, smaller ? renderH : 0, scaledW, scaledH, gsr ? 1 : 0)) {
 			fprintf(stderr, "INFO: game %dx%d on a %dx%d window: virtual backbuffer rendered at %dx%d (%s, upscale %d%%), no pillarbox\n",
 				renderW, renderH, bbW, bbH, scaledW, scaledH, gsr ? "SGSR" : "bilinear", percent);
+			if (dynamic) {
+				d3d8gles_SetDynamicUpscale(1);
+				fprintf(stderr, "INFO: dynamic render scale armed (auto mode): adjusting 100%%..50%% to hold the frame rate\n");
+			}
 			return false;
 		}
 	}

@@ -25729,6 +25729,26 @@ GX:ToolTipBuilderPageBack
 "Voltar à lista de estruturas"
 END
 
+GX:SelectInfantry
+"Infantaria"
+END
+
+GX:SelectVehicles
+"Veículos"
+END
+
+GX:SelectJets
+"Jatos"
+END
+
+GX:SelectHelicopters
+"Helicópteros"
+END
+
+GX:SelectAllArmy
+"Todo o exército"
+END
+
 GUI:LoadReplayLong
 "CARREGAR REPLAY"
 END

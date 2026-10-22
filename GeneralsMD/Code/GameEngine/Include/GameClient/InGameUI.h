@@ -532,6 +532,21 @@ public:  // ********************************************************************
 	virtual Int selectAllUnitsByTypeAcrossMap(KindOfMaskType mustBeSet, KindOfMaskType mustBeClear);
 	virtual Int selectAllUnitsByTypeAcrossRegion( IRegion2D *region, KindOfMaskType mustBeSet, KindOfMaskType mustBeClear );
 
+	// GeneralsX @feature Android port 20/10/2026 Select-panel (SelectPanel.wnd)
+	// category selection: REPLACE the current selection with every locally
+	// controlled unit of one category visible on the current screen. The
+	// selectAllUnitsByType family above cannot express the jet/helicopter
+	// split (there is no KINDOF_HELICOPTER), which is why this exists.
+	enum PanelSelectCategory
+	{
+		PANEL_SELECT_INFANTRY = 0,	///< KINDOF_INFANTRY
+		PANEL_SELECT_GROUND_VEHICLES,	///< KINDOF_VEHICLE without KINDOF_AIRCRAFT
+		PANEL_SELECT_JETS,			///< KINDOF_AIRCRAFT with a JetAIUpdate
+		PANEL_SELECT_HELICOPTERS,	///< KINDOF_AIRCRAFT without a JetAIUpdate
+		PANEL_SELECT_ALL_ARMY,		///< all of the above, accumulated
+	};
+	virtual Int selectPanelCategoryAcrossScreen( Int category );	///< returns # of units selected
+
 	virtual void buildRegion( const ICoord2D *anchor, const ICoord2D *dest, IRegion2D *region );  ///< builds a region around the specified coordinates
 
 	virtual Bool getDisplayedMaxWarning() { return m_displayedMaxWarning; }

@@ -25728,6 +25728,26 @@ GX:ToolTipBuilderPageBack
 "Повернутися до списку споруд"
 END
 
+GX:SelectInfantry
+"Піхота"
+END
+
+GX:SelectVehicles
+"Техніка"
+END
+
+GX:SelectJets
+"Винищувачі"
+END
+
+GX:SelectHelicopters
+"Гелікоптери"
+END
+
+GX:SelectAllArmy
+"Вся армія"
+END
+
 GUI:LoadReplayLong
 "ЗАВАНТАЖИТИ ПОВТОР"
 END

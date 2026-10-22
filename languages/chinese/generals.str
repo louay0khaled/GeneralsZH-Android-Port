@@ -25729,6 +25729,26 @@ GX:ToolTipBuilderPageBack
 "返回建筑列表"
 END
 
+GX:SelectInfantry
+"步兵"
+END
+
+GX:SelectVehicles
+"车辆"
+END
+
+GX:SelectJets
+"战机"
+END
+
+GX:SelectHelicopters
+"直升机"
+END
+
+GX:SelectAllArmy
+"全军"
+END
+
 GUI:LoadReplayLong
 "载入录像"
 END

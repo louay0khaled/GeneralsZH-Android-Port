@@ -384,6 +384,21 @@ extern void GroupPanelCalibrateFollowOffset( Int barScreenX, Int barScreenY );
 // animation, instead of only snapping into place once the bar settles.
 extern void GroupPanelFollowControlBar( Int barScreenX, Int barScreenY, Bool visible );
 
+// GeneralsX @feature Android port 20/10/2026 Unit-category selection touch
+// panel (SelectPanel.wnd, loaded from a loose file the same way as
+// GroupPanel.wnd): five always-visible buttons next to the group panel
+// that REPLACE the current selection with every on-screen infantry /
+// ground vehicle / jet / helicopter / all-army unit of the local player
+// (see InGameUI::selectPanelCategoryAcrossScreen).
+extern void SelectPanelInit( WindowLayout *layout, void *userData );
+extern void SelectPanelUpdate( WindowLayout *layout, void *userData );
+extern void SelectPanelShutdown( WindowLayout *layout, void *userData );
+extern WindowMsgHandledType SelectPanelSystem( GameWindow *window, UnsignedInt msg, WindowMsgData mData1, WindowMsgData mData2 );
+// Same calibrate-once-at-ControlBar::init() / track-every-frame pairing as
+// the group panel above, against this panel's single button row.
+extern void SelectPanelCalibrateFollowOffset( Int barScreenX, Int barScreenY );
+extern void SelectPanelFollowControlBar( Int barScreenX, Int barScreenY, Bool visible );
+
 
 // IdleWorker Controls --------------------------------------------------------------------------------
 WindowMsgHandledType IdleWorkerSystem( GameWindow *window, UnsignedInt msg, WindowMsgData mData1, WindowMsgData mData2 );

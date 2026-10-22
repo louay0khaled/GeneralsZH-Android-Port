@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GeneralsZH</string>
+    <string name="app_name">Zero Hour</string>
+    <string name="setup_developer_credit">Louay Khaled</string>
+
     <string name="common_cancel">Cancel</string>
 
     <!-- SetupActivity: title / fallback -->
@@ -13,7 +15,6 @@
     <string name="setup_card_game_folder">Game Folder</string>
     <string name="setup_button_select_game_folder">Select Game Folder</string>
     <string name="setup_button_launch_game">Launch Game</string>
-    <string name="setup_button_view_logs">View Logs</string>
     <string name="setup_button_clear_game_folder">Clear Game Folder Setting</string>
 
     <!-- SetupActivity: status text -->
@@ -27,7 +28,6 @@
     <string name="setup_folder_issue_bad_header">%1$s doesn\'t look like a valid game archive</string>
     <string name="setup_folder_issue_missing_data">%1$s is missing expected game data — likely an incomplete copy</string>
     <string name="setup_folder_issue_no_base_game">Base Generals game data missing:%1$s\n\nOr point Setup at the folder that already has them — the “Base Generals folder” button below (usually ZH_Generals or Command and Conquer Generals).</string>
-    <string name="setup_status_logs_note">Crash/engine logs live in this app\'s private storage and are only reachable through \"View Logs\" above — Android hides them from normal file managers by design (this is standard Android sandboxing, not specific to this app).</string>
 
     <!-- SetupActivity: Language card -->
     <string name="setup_card_language">Language</string>
@@ -102,19 +102,7 @@
     <string name="setup_toast_dxvk_config_no_default">No bundled default dxvk.conf found in this build.</string>
 
     <!-- SetupActivity: Diagnostics card -->
-    <string name="setup_card_diagnostics">Diagnostics</string>
-    <string name="setup_diagnostics_help">These turn on extra logging for bug reports — leave them all off for normal play, they can slow the game down or produce large logs. If someone reporting an issue asks you to turn one on, enable it, reproduce the problem, then use \"View Logs\" above to send the result.</string>
     <string name="setup_diagnostics_no_folder">Select a game folder first (above) to use these</string>
-    <string name="setup_switch_gx_trace">Verbose trace log</string>
-    <string name="setup_switch_gx_trace_desc">Very detailed internal logging (UI, fonts, INI files) for chasing a specific hang or bug. Can grow to a huge log (50–100+ MB) over a long session — use \"Performance summary\" instead if you only need FPS numbers. (gx_trace.txt)</string>
-    <string name="setup_switch_touch_debug">Touch input overlay</string>
-    <string name="setup_switch_touch_debug_desc">Draws the touch layer\'s own state over the game: current gesture, where your finger is, where the engine thinks the pointer is, and the camera scroll anchor. Turn this on to report control problems — a runaway map, a ghost building in the wrong place, an ability aiming somewhere you did not touch. (gx_touch_debug.txt)</string>
-    <string name="setup_switch_gx_perf">Performance summary</string>
-    <string name="setup_switch_gx_perf_desc">Adds one short line per second showing where frame time goes (radar, audio, network, game logic, rendering). Safe to leave on for a whole play session — turn this on for FPS/slowdown reports. (gx_perf.txt)</string>
-    <string name="setup_switch_gx_audio_trace">Audio log</string>
-    <string name="setup_switch_gx_audio_trace_desc">Records what the sound system is doing: music and speech buffer levels, movie audio, and every source that starts or stops. Turn this on if you are asked for an audio log after reporting missing, stuttering or silent sound. (gx_audio_trace.txt)</string>
-    <string name="setup_switch_gx_net_trace">Online network log</string>
-    <string name="setup_switch_gx_net_trace_desc">Records every request the game makes to the GeneralsOnline servers, with the reply it got. Turn this on if sign-in, the lobby or matchmaking fails from inside the game. The launcher\'s own requests are always recorded; this adds the game\'s. It also turns on the cross-play desync diagnostics: the simulation checksums that are compared each interval, and, in a replay, the checksum of every single object. (gx_net_trace.txt)</string>
     <string name="setup_button_download_langpack">Download language pack</string>
     <string name="setup_langpack_downloading">Downloading the language pack…</string>
     <string name="setup_langpack_done">Language pack installed. The game will use it on the next launch.</string>
@@ -133,12 +121,6 @@
     <string name="setup_game_text_status_default">Game text: English — unless a .big in your game folder replaces it</string>
     <string name="setup_game_text_none_found">No language packs found in your game folder yet. Download one first.</string>
     <string name="setup_langpack_dialog_title">Which language?</string>
-    <string name="setup_switch_dxvk_hud">On-screen performance overlay</string>
-    <string name="setup_switch_dxvk_hud_desc">Shows FPS, draw calls, submissions, and pipeline count directly on screen and in the log. Turn this on for GPU performance reports. (dxvk_hud.txt)</string>
-    <string name="setup_switch_dxvk_validation">Vulkan validation layer</string>
-    <string name="setup_switch_dxvk_validation_desc">Checks every graphics call for correctness — catches real rendering bugs but slows the game down noticeably. Only turn this on when asked to reproduce a specific crash or glitch, not for everyday play. (dxvk_validation.txt)</string>
-    <string name="setup_switch_dxvk_verbose_log">Verbose renderer log</string>
-    <string name="setup_switch_dxvk_verbose_log_desc">Adds extra startup details about how the game talks to your GPU driver (exact display format and settings negotiated). Turn this on when asked to track down a rendering glitch specific to your device. (dxvk_verbose_log.txt)</string>
 
     <!-- SetupActivity: Online Multiplayer card -->
     <string name="setup_card_online">Online Multiplayer</string>
@@ -147,8 +129,6 @@
     <string name="setup_online_signed_out">Not signed in — required for online matches.</string>
 
     <!-- SetupActivity: How this works card -->
-    <string name="setup_card_how_it_works">How this works</string>
-    <string name="setup_how_it_works_body">1. \"Select Game Folder\" opens a folder browser on your phone\'s storage. Navigate to wherever you copied your own Command &amp; Conquer Generals Zero Hour install (the folder containing INIZH.big, Data\\, ZH_Generals\\, etc.) and tap \"Use This Folder\".\n\n2. If browsing looks empty, Android is asking for the \"All files access\" permission first — grant it in the screen that opens (this is a normal Android permission, no root involved).\n\n3. \"View Logs\" shows the engine log and, if the game crashed, a native crash log — no computer or adb needed. Use the Share button there to send the log to yourself.\n\n4. \"Launch Game\" starts the game with the folder you picked.</string>
 
     <!-- SetupActivity: folder selection / misc toasts -->
     <string name="setup_toast_grant_all_files">Grant \"Allow access to manage all files\" on the next screen, then come back and tap Select Game Folder again.</string>
@@ -171,43 +151,8 @@
     <string name="folderpicker_toast_cant_read_legacy">Can\'t read this folder. On Android 9–10, allow the Storage permission for this app (Settings → Apps → GeneralsZH → Permissions → Storage), then try again.</string>
 
     <!-- NetworkDiagnosticsActivity -->
-    <string name="netdiag_title">Network diagnostics</string>
-    <string name="netdiag_row_note">Check whether this device can reach the GeneralsOnline servers, and collect a report to send with a bug report.</string>
-    <string name="netdiag_intro">This checks, in order, whether the device has a working network, whether the GeneralsOnline server names resolve, whether the servers answer, and what they say about signing in.\n\nNothing is sent anywhere. Tap Run to start.</string>
-    <string name="netdiag_running">Running…</string>
-    <string name="netdiag_running_step">Running… (%1$s)</string>
-    <string name="netdiag_button_run">Run diagnostics</string>
-    <string name="netdiag_button_share">Share report</string>
-    <string name="netdiag_button_copy">Copy</string>
-    <string name="netdiag_toast_copied">Report copied to clipboard.</string>
-    <string name="netdiag_toast_share_failed">Could not share the report: %1$s</string>
-    <string name="netdiag_share_subject">GeneralsZH network log</string>
 
     <!-- LogViewerActivity -->
-    <string name="logviewer_title">Logs</string>
-    <string name="logviewer_button_clear">Clear Logs</string>
-    <string name="logviewer_button_copy">Copy</string>
-    <string name="logviewer_button_share">Share</string>
-    <string name="logviewer_toast_copied">Copied to clipboard.</string>
-    <string name="logviewer_section_crash_log">=== crash.log (native crash handler, internal storage) ===\n</string>
-    <string name="logviewer_crash_log_absent">(not present — no native crash recorded since install, or the app has never launched past library load)</string>
-    <string name="logviewer_section_crash_prev_log">=== crash-prev.log (native crash handler, previous session) ===\n</string>
-    <string name="logviewer_crash_prev_log_absent">(not present)</string>
-    <string name="logviewer_section_stderr_log">=== generals-stderr.log (engine log, external storage) ===\n</string>
-    <string name="logviewer_stderr_log_absent">(not present — the engine\'s main() has not started yet, or external storage is unavailable)</string>
-    <string name="logviewer_section_prev_log">=== generals-stderr-prev.log (previous session) ===\n</string>
-    <string name="logviewer_prev_log_absent">(not present)</string>
-    <string name="logviewer_dialog_clear_title">Clear Logs</string>
-    <string name="logviewer_dialog_clear_message">Delete the crash log and engine log files? This can\'t be undone.</string>
-    <string name="logviewer_dialog_clear_confirm">Clear</string>
-    <string name="logviewer_dialog_clear_cancel">Cancel</string>
-    <string name="logviewer_toast_cleared">Logs cleared.</string>
-    <string name="logviewer_share_subject">GeneralsZH Android log</string>
-    <string name="logviewer_share_chooser_title">Share log</string>
-    <string name="logviewer_toast_share_failed">Could not prepare log file to share: %1$s</string>
-    <string name="logviewer_toast_share_none">No log files found to share yet.</string>
-    <string name="logviewer_read_failed">(could not read %1$s: %2$s)</string>
-    <string name="logviewer_elided_notice">\n...(%1$d characters omitted here; the session start above and the most recent output below are kept)...\n\n</string>
 
     <!-- GeneralsOnlineActivity -->
     <string name="online_window_title">GeneralsOnline Account</string>
@@ -278,62 +223,13 @@
     <string name="nav_tab_home">Home</string>
     <string name="nav_tab_graphics">Graphics</string>
     <string name="nav_tab_interface">Interface</string>
-    <string name="nav_tab_tools">Tools</string>
     <string name="nav_tab_help">Help</string>
     <string name="setup_render_backend_gles_short">GLES</string>
     <string name="setup_render_backend_gles_angle_short">ANGLE</string>
     <string name="setup_render_backend_vulkan_short">Vulkan</string>
     <string name="online_status_requesting_code">Requesting a login code from the server…</string>
     <string name="online_status_no_login_code">The server would not issue a login code. Check your connection and try again, or run Network diagnostics in Tools.</string>
-    <string name="replaycheck_title">Replay check</string>
-    <string name="replaycheck_row_note">Run a PC replay through this build without watching it, or jump to a frame, and see where the checksums part.</string>
-    <string name="replaycheck_refresh">Refresh</string>
-    <string name="replaycheck_last_result">Last result</string>
-    <string name="replaycheck_no_result">No check has been run yet.</string>
-    <string name="replaycheck_result_match">%1$s: matched the recording at all %2$s of %3$s checkpoints (%4$s frames, %5$s s).</string>
-    <string name="replaycheck_result_mismatch">%1$s: first mismatch at frame %2$s, last match at %3$s. %4$s of %5$s checkpoints matched (%6$s frames, %7$s s). Send the logs.</string>
-    <string name="replaycheck_mode">Mode</string>
-    <string name="replaycheck_mode_run">Run through</string>
-    <string name="replaycheck_mode_watch">Watch from frame</string>
-    <string name="replaycheck_mode_help">Run through: the replay is simulated as fast as the phone allows, stops a little after the first mismatch or at the end, and returns here with the result. Watch from frame: fast-forwards to the frame, then plays normally.</string>
-    <string name="replaycheck_frame_label">Frame</string>
-    <string name="replaycheck_pick">Replays (tap to start)</string>
-    <string name="replaycheck_none">No .rep files in %1$s</string>
-    <string name="replaycheck_no_game_folder">Choose the game folder in the launcher first.</string>
-    <string name="replaycheck_need_frame">Enter the frame to fast-forward to.</string>
-    <string name="replaycheck_trace_enabled">Network trace switched on for the check.</string>
-    <string name="replaycheck_trace_failed">Could not switch the network trace on; the log will lack the checksum details.</string>
-    <string name="replaycheck_crc_every_frame">Checksum of every frame</string>
-    <string name="replaycheck_crc_every_frame_help">Also writes the logic checksum of every frame to the log. Used to build a copy of a replay that the PC client checks frame by frame. Slower.</string>
     <string name="setup_online_anticheat_note">Mobile clients have no anti-cheat. To play together, the PC player has to turn anti-cheat off (GeneralsOnline AntiCheat or Easy Anti-Cheat) in the GeneralsOnline launcher: lobbies with a different anti-cheat cannot be joined from a phone, and a phone lobby cannot be joined from them.</string>
-    <string name="setup_switch_logging">Collect logs</string>
-    <string name="setup_switch_logging_desc">Write game, crash and network logs to the device. Turn off to keep nothing in the background; the logs stay off until you turn this back on. Needed for bug reports.</string>
-    <string name="setup_card_updates">Updates</string>
-    <string name="setup_updates_help">Newer engine builds come straight from the project\'s GitHub, without reinstalling the APK. Every update is signed; anything without a valid signature is ignored. Network settings and network game data are on the GeneralsOnline account screen.</string>
-    <string name="setup_updates_status">Engine: %1$s · Last check: %2$s</string>
-    <string name="setup_updates_engine_bundled">built-in, build %1$d</string>
-    <string name="setup_updates_engine_updated">updated, build %1$d</string>
-    <string name="setup_updates_never">never</string>
-    <string name="setup_button_check_updates">Check for updates</string>
-    <string name="setup_switch_auto_updates">Check automatically</string>
-    <string name="setup_switch_auto_updates_desc">When the launcher opens.</string>
-    <string name="setup_updates_checking">Checking for updates…</string>
-    <string name="setup_updates_none">Everything is up to date.</string>
-    <string name="setup_updates_engine_ready">A newer engine (build %1$d) has been downloaded. It will be used the next time you start the game.</string>
-    <string name="setup_updates_engine_needs_apk">A newer engine (build %1$d) needs a new APK. Download it from the project page.</string>
-    <string name="setup_updates_failed">Update check failed: %1$s</string>
-    <string name="setup_updates_not_published">No updates have been published yet.</string>
-    <string name="setup_updates_offline">No internet connection. The launcher and the game work offline; updates will be checked next time.</string>
-    <string name="setup_updates_datapack_installed">Community data patch updated to version %1$s.</string>
-    <string name="setup_updates_datapack_available">A new version of the network game data is out (%1$s). Update it in GeneralsOnline Account → Online game data.</string>
-    <string name="setup_updates_datapack_line_new">A new version of the network game data is out: %1$s.</string>
-    <string name="setup_button_open_online_data">Update network game data</string>
-    <string name="online_datapacks_update_available">Installed: version %1$s. A new version is out: %2$s.</string>
-    <string name="online_datapacks_update_for_crc">Installed: version %1$s. Update once so this device computes the PC client checksum from it.</string>
-    <string name="online_datapacks_up_to_date">Installed: version %1$s, the latest.</string>
-    <string name="online_network_settings">Network settings (servers, PC compatibility): from %1$s, updated automatically from the project\'s GitHub and signed.</string>
-    <string name="online_network_settings_builtin">Network settings (servers, PC compatibility): built into this version; newer ones come automatically from the project\'s GitHub.</string>
-    <string name="online_datapacks_chip_update">Update available</string>
     <string name="setup_card_upscale">Upscaling (Snapdragon GSR)</string>
     <string name="setup_upscale_off_short">Off</string>
     <string name="setup_upscale_ultra_short">Ultra</string>
@@ -346,10 +242,28 @@
     <string name="setup_upscale_performance">Performance</string>
     <string name="setup_upscale_status_off">Off: rendered at the full %1$d×%2$d</string>
     <string name="setup_upscale_status">%1$s: 3D rendered at %2$d×%3$d, upscaled to %4$d×%5$d</string>
-    <string name="setup_upscale_help">Renders the battlefield at a lower resolution and sharpens it back to full screen with Snapdragon GSR: more frames, the interface stays sharp. GLES and ANGLE only. Applies on the next launch.</string>
+    <string name="setup_upscale_help">Renders the battlefield at a lower resolution and sharpens it back to full screen with Snapdragon GSR: more frames, the interface stays sharp. GLES and ANGLE only. Applies on the next launch. Dynamic mode picks the render scale automatically between 100%% and 50%% to hold the frame rate; it targets GPU-bound slowdowns (zoomed-out views), not CPU-bound ones (huge late-game armies).</string>
+    <string name="setup_upscale_dynamic_short">Dynamic</string>
+    <string name="setup_upscale_dynamic">Dynamic</string>
+    <string name="setup_upscale_status_dynamic">Dynamic: 3D render scale adjusts automatically between 100%% and 50%% to hold the frame rate, upscaled to %1$d×%2$d</string>
     <string name="setup_toast_render_scale_saved">Saved. Takes effect next time you launch the game.</string>
     <string name="setup_card_interface_scale">Interface Size</string>
     <string name="setup_interface_scale_label">%1$d%%</string>
     <string name="setup_button_apply_interface_scale">Apply Interface Size</string>
     <string name="setup_interface_scale_help">Makes the in-game interface bigger, without touching the game\'s files: the control bar with the radar grows up from the bottom, and the generals\' powers bar, chat, event messages, player list, in-game menu with Save/Load and Options, and the main menu\'s buttons grow from where they sit. Nothing is pushed off the screen: each part grows only as far as it fits, so the control bar gets taller rather than wider on a wide phone, and the battlefield above it gets shorter. Works together with Menu Text Size. Takes effect the next time you launch the game.</string>
+    <string name="setup_card_select_panel">Unit Select Panel</string>
+    <string name="setup_switch_select_panel">Show unit select panel</string>
+    <string name="setup_switch_select_panel_desc">Infantry / Vehicles / Jets / Helicopters / All Army buttons on the left edge of the screen.</string>
+    <string name="setup_select_panel_help">The buttons sit above the control-group buttons and select every on-screen unit of one kind, replacing the current selection. Their labels follow the game\'s language. Takes effect the next time you launch the game.</string>
+    <!-- GeneralsX @feature Android port tactical-command-ui 20/10/2026 Setup hero status-strip readouts. -->
+    <string name="setup_hero_folder_ready">Game folder ready</string>
+    <string name="setup_hero_folder_missing">Game folder not set</string>
+    <string name="setup_hero_folder_check">Game folder needs attention</string>
+    <string name="setup_card_theme">Theme</string>
+    <string name="setup_button_change_theme">Change theme</string>
+    <string name="setup_theme_dialog_title">Choose theme</string>
+    <string name="theme_name_generals">Generals</string>
+    <string name="theme_name_tactical">Tactical Command</string>
+    <string name="theme_name_midnight">Midnight Steel</string>
+    <string name="theme_name_crimson">Crimson Command</string>
 </resources>

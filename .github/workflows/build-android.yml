@@ -1,5 +1,9 @@
 name: Build Android
 
+concurrency:
+  group: build-android-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   # GeneralsX @feature Android port 09/07/2026 contents:write is needed for the
   # optional "create a GitHub Release" step below (softprops/action-gh-release
@@ -48,6 +52,9 @@ on:
         description: "CMake preset for Android"
         options:
           - android-vulkan
+          - android-vulkan-release
+          - android-vulkan-o3
+          - android-vulkan-o3-lto
         default: android-vulkan
       version_name:
         type: string
@@ -278,6 +285,32 @@ jobs:
       # and run #2 sailed straight past a fatal configure error into "success"
       # — exactly the pipeline-masking failure the porting playbook warns
       # about. The Verify step caught it; now the failing step reports itself.
+      # GeneralsX @feature Android CI 20/10/2026 The APK must carry BOTH
+      # engines -- libmain.so (30 Hz) and libmain60.so (60 Hz): the sim tick
+      # rate is a compile-time constant (WWSyncPerSecond), so no single build
+      # can offer both, and GeneralsZHActivity.getLibraries() silently falls
+      # back to the 30 Hz library when libmain60.so is absent. CI shipped
+      # only 30 Hz, which capped every CI APK at 30 FPS even for players who
+      # picked 60 in Setup. scripts/build/android/build-dual-hz.sh does this
+      # same two-pass dance locally; pass 1 here builds the 60 Hz engine and
+      # sets it aside, the configure/build below is pass 2 (30 Hz), and the
+      # Package step picks the stashed library up via GX_SECOND_GAME_LIB.
+      - name: Build 60 Hz engine (libmain60.so, pass 1 of 2)
+        run: |
+          set -o pipefail
+          mkdir -p logs
+          cmake --preset ${{ env.PRESET }} \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DANDROID_CI_BUILD_NUMBER=${{ github.run_number }} \
+            -DSAGE_HIGH_FPS_SIM=ON \
+            2>&1 | tee logs/configure_android_60hz.log
+          cmake --build build/${{ env.PRESET }} --target z_generals -- -k 0 2>&1 | tee logs/build_android_60hz.log
+          GAME_LIB60="build/${{ env.PRESET }}/GeneralsMD/Code/Main/libmain.so"
+          if [ ! -f "$GAME_LIB60" ]; then echo "::error::60 Hz libmain.so not found at $GAME_LIB60"; exit 1; fi
+          cp "$GAME_LIB60" build/libmain60.so
+          ls -la build/libmain60.so
+
       - name: Configure CMake (Android)
         run: |
           set -o pipefail
@@ -286,6 +319,7 @@ jobs:
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DANDROID_CI_BUILD_NUMBER=${{ github.run_number }} \
+            -DSAGE_HIGH_FPS_SIM=OFF \
             2>&1 | tee logs/configure_android.log
 
       - name: Build z_generals (libmain.so) + DXVK d3d8/d3d9
@@ -390,6 +424,22 @@ jobs:
             echo "::warning::libmain.so yielded only ${SYMS} symbols -- crash logs from this build will not symbolize."
           fi
           gzip -9 "$OUT"
+          # GeneralsX @feature Android CI 20/10/2026 Same table for the
+          # 60 Hz engine stashed by pass 1, so a tombstone from a 60 Hz
+          # session symbolizes against the library that actually ran.
+          LIB60="build/libmain60.so"
+          if [ -f "$LIB60" ]; then
+            OUT60="symbols/libmain60-run${{ github.run_number }}.symbols.txt"
+            BUILD_ID60="$(readelf -n "$LIB60" 2>/dev/null | sed -n 's/.*Build ID: \([0-9a-f]*\).*/\1/p' | head -1)"
+            {
+              echo "# libmain60.so symbols -- run ${{ github.run_number }}, commit ${{ github.sha }}"
+              echo "# BuildID: ${BUILD_ID60:-UNKNOWN}"
+              "$TOOLS/llvm-readelf" --notes --program-headers "$LIB60"
+              echo "# --- defined symbols: address size type name ---"
+              "$TOOLS/llvm-nm" --defined-only --numeric-sort --print-size --demangle "$LIB60"
+            } > "$OUT60"
+            gzip -9 "$OUT60"
+          fi
           ls -la symbols/
 
       # GeneralsX @bugfix Android CI 06/08/2026 CI never stripped debug
@@ -408,7 +458,8 @@ jobs:
       - name: Strip debug symbols
         run: |
           STRIP="$(ls "${ANDROID_NDK_HOME}"/toolchains/llvm/prebuilt/*/bin/llvm-strip | head -1)"
-          for lib in "build/${{ env.PRESET }}/GeneralsMD/Code/Main/libmain.so" \
+          for lib in "build/libmain60.so" \
+                     "build/${{ env.PRESET }}/GeneralsMD/Code/Main/libmain.so" \
                      "build/${{ env.PRESET }}/_deps/sdl3-build/libSDL3.so" \
                      "build/${{ env.PRESET }}/_deps/sdl3_image-build/libSDL3_image.so" \
                      "build/${{ env.PRESET }}/_deps/openal_soft-build/libopenal.so" \
@@ -446,14 +497,30 @@ jobs:
           GX_ANDROID_STAGING: ${{ github.workspace }}/android-staging
           GX_ANDROID_VERSION_CODE: ${{ steps.artifact.outputs.version_code }}
           GX_ANDROID_VERSION_NAME: ${{ steps.artifact.outputs.version_name }}
+          # GeneralsX @feature Android CI 20/10/2026 Package the 60 Hz
+          # engine stashed by pass 1 as libmain60.so, next to libmain.so.
+          GX_SECOND_GAME_LIB: ${{ github.workspace }}/build/libmain60.so
+          GX_BUILD_DIR: ${{ github.workspace }}/build/${{ env.PRESET }}
         run: |
-          ./scripts/build/android/package-android-zh.sh
+          # GeneralsX @bugfix Android CI 20/10/2026 Invoke via bash explicitly:
+          # this script's git mode is 100644 (a connector push stripped its
+          # execute bit), and run #43 died at this step with exit code 126
+          # ("command cannot execute") for exactly that reason. Calling bash
+          # makes the step independent of the stored file mode.
+          bash scripts/build/android/package-android-zh.sh
 
       - name: Locate APK
         id: locate
         run: |
-          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          APK="android/app/build/outputs/apk/release/app-release.apk"
           if [ ! -f "$APK" ]; then echo "::error::APK not found at $APK"; exit 1; fi
+          # GeneralsX @feature Android CI 20/10/2026 The 60 Hz engine must
+          # actually be inside the APK -- without it the launcher silently
+          # falls back to 30 Hz, which is the bug the two-pass build fixes.
+          if ! unzip -l "$APK" | grep -q "lib/arm64-v8a/libmain60.so"; then
+            echo "::error::libmain60.so is not packaged in the APK"; exit 1
+          fi
+          echo "OK: libmain60.so (60 Hz engine) is packaged in the APK."
           cp "$APK" "${{ steps.artifact.outputs.apk_name }}"
           echo "path=${{ steps.artifact.outputs.apk_name }}" >> "$GITHUB_OUTPUT"
 
@@ -551,6 +618,7 @@ jobs:
           files: |
             ${{ steps.locate.outputs.path }}
             symbols/libmain-run${{ github.run_number }}.symbols.txt.gz
+            symbols/libmain60-run${{ github.run_number }}.symbols.txt.gz
           generate_release_notes: true
           make_latest: true
 
@@ -600,8 +668,20 @@ jobs:
           set -euo pipefail
           declare -A latest_run
 
+          # GeneralsX @bugfix Android CI 20/10/2026 Scope this sweep to THIS
+          # workflow's own runs, and never touch the current run's artifacts.
+          # The repo-wide version compared artifact run ids across every
+          # workflow: Build Android run #45 deleted its own just-uploaded APK
+          # because a GeneralsX CI run triggered by the same push had a
+          # higher run id on the same branch and already had log artifacts,
+          # so it counted as the branch's "latest" run.
+          OWN_RUNS="$(mktemp)"
+          gh api "repos/${{ github.repository }}/actions/workflows/build-android.yml/runs" --paginate \
+            --jq '.workflow_runs[].id' > "$OWN_RUNS" || true
+
           while IFS=$'\t' read -r branch run_id; do
             [ -z "${branch}" ] && continue
+            grep -qx "${run_id}" "$OWN_RUNS" || continue
             if [ -z "${latest_run[$branch]:-}" ] || [ "${run_id}" -gt "${latest_run[$branch]}" ]; then
               latest_run[$branch]="${run_id}"
             fi
@@ -612,6 +692,8 @@ jobs:
             --jq '.artifacts[] | [(.workflow_run.head_branch // ""), .workflow_run.id, .id] | @tsv' \
           | while IFS=$'\t' read -r branch run_id artifact_id; do
               [ -z "${branch}" ] && continue
+              [ "${run_id}" = "${{ github.run_id }}" ] && continue
+              grep -qx "${run_id}" "$OWN_RUNS" || continue
               if [ "${run_id}" != "${latest_run[$branch]:-}" ]; then
                 echo "Deleting old artifact ${artifact_id} (branch ${branch}, run ${run_id}, latest for that branch is ${latest_run[$branch]})"
                 gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/${artifact_id}" || true

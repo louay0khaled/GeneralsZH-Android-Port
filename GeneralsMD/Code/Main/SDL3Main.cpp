@@ -1368,6 +1368,15 @@ int main(int argc, char* argv[])
 									snprintf(uiScaleVal, sizeof(uiScaleVal), "%d", uiScale);
 									setenv("GX_UI_SCALE", uiScaleVal, 1);
 								}
+								// GeneralsX @feature Android port 21/10/2026
+								// GXSelectPanel: the unit-category select
+								// panel's show/hide toggle, consumed by
+								// ControlBar::init() (1 = show, 0 = hide;
+								// absent keeps the panel on).
+								int selectPanel = 0;
+								if (sscanf(line, " GXSelectPanel = %d", &selectPanel) == 1) {
+									setenv("GX_SELECT_PANEL", selectPanel ? "1" : "0", 1);
+								}
 							}
 							fclose(fp);
 						}

@@ -30,6 +30,8 @@
 // USER INCLUDES //////////////////////////////////////////////////////////////////////////////////
 
 #include "PreRTS.h"	// This must go first in EVERY cpp file in the GameEngine
+
+#include <cstdlib>	// getenv() for the GX_SELECT_PANEL toggle below
 #define DEFINE_GUI_COMMAND_NAMES
 #define DEFINE_COMMAND_OPTION_NAMES
 #define DEFINE_WEAPONSLOTTYPE_NAMES
@@ -959,7 +961,8 @@ ControlBar::ControlBar()
 
 	m_specialPowerShortcutParent = nullptr;
 	m_specialPowerLayout = nullptr;
-	m_groupPanelLayout = nullptr;
+	m_selectPanelLayout = nullptr;
+	m_selectPanelEnabled = TRUE;
 	m_scienceLayout = nullptr;
 	m_rightHUDWindow = nullptr;
 	m_rightHUDCameoWindow = nullptr;
@@ -1017,11 +1020,11 @@ ControlBar::~ControlBar()
 		deleteInstance(m_scienceLayout);
 		m_scienceLayout = nullptr;
 	}
-	if(m_groupPanelLayout)
+	if(m_selectPanelLayout)
 	{
-		m_groupPanelLayout->destroyWindows();
-		deleteInstance(m_groupPanelLayout);
-		m_groupPanelLayout = nullptr;
+		m_selectPanelLayout->destroyWindows();
+		deleteInstance(m_selectPanelLayout);
+		m_selectPanelLayout = nullptr;
 	}
 	m_genArrow = nullptr;
 
@@ -1127,47 +1130,59 @@ void ControlBar::init()
 		m_scienceLayout->hide(TRUE);
 		id = TheNameKeyGenerator->nameToKey( "GeneralsExpPoints.wnd:GenExpParent" );
 
-		// GeneralsX @feature Android port 02/08/2026 Native unit-group touch
-		// panel -- GroupPanel.wnd is a loose file (Window\GroupPanel.wnd, not
-		// in the game's .big archives), so this can return nullptr on an
+		// GeneralsX @feature Android port 20/10/2026 Unit-category selection
+		// touch panel -- SelectPanel.wnd is a loose file (Window\SelectPanel.wnd,
+		// not in the game's .big archives), so this can return nullptr on an
 		// install that hasn't had it extracted yet; guard against that rather
 		// than assume it's always present the way the archived .wnd files are.
-		m_groupPanelLayout = TheWindowManager->winCreateLayout("GroupPanel.wnd");
-		if (m_groupPanelLayout) {
-			m_groupPanelLayout->hide(TRUE);
+		// GeneralsX @feature Android port 21/10/2026 Round 6: SelectPanel.wnd
+		// now ALSO contains the unit-group windows (GroupPanel.wnd's
+		// ButtonHandle/GroupRow/ButtonGroup0..9, names and GroupPanelSystem
+		// callback unchanged) -- one merged panel, one layout, one follow.
+		// The separate GroupPanel.wnd layout that used to be created here is
+		// gone; GroupPanel.wnd itself stays on disk as unreferenced data.
+		// GeneralsX @feature Android port 21/10/2026 GXSelectPanel launcher
+		// toggle: SetupActivity writes GXSelectPanel to Options.ini and
+		// SDL3Main republishes it as the GX_SELECT_PANEL env var (the
+		// GXUiScale pipeline). Read once here; when off, the layout is
+		// never created and the whole merged panel (select + groups) never
+		// shows. A missing key -- and any value but 0 -- keeps the panel
+		// on, so existing installs see no change unless the user turns it
+		// off in the launcher.
+		const char *selectPanelEnv = getenv("GX_SELECT_PANEL");
+		m_selectPanelEnabled = !(selectPanelEnv && selectPanelEnv[0] == '0');
+		if (m_selectPanelEnabled) {
+			m_selectPanelLayout = TheWindowManager->winCreateLayout("SelectPanel.wnd");
+		}
+		if (m_selectPanelLayout) {
+			m_selectPanelLayout->hide(TRUE);
 
-			// GeneralsX @bugfix Android port 03/08/2026 WindowLayout::hide()
-			// only touches the layout's OWN root window list (just
-			// GroupPanelParent here -- see WindowLayoutInfo::windows, which
-			// only ever collects top-level "WINDOW" blocks, never nested
-			// CHILD entries), so it does not reach GroupRow independently.
-			// GroupPanel.cpp used to try to hide GroupRow from its own
-			// GWM_CREATE handler, but for a WINDOWTYPE=USER window
-			// winSetWindowId() runs AFTER winCreate() already dispatched
-			// GWM_CREATE (see createGadget()'s "USER" branch) -- so
-			// winGetWindowId() read from inside that handler was always
-			// still the pre-assignment default, never matching, and the
-			// row silently stayed at GameWindow's own default visibility
-			// (shown) instead of starting collapsed. Right here, after
-			// winCreateLayout() has fully returned, every window in the
-			// tree is guaranteed to have its real id already set, so this
-			// lookup is race-free.
+			// GeneralsX @bugfix Android port 03/08/2026, kept for the merged
+			// layout: WindowLayout::hide() only touches the layout's OWN root
+			// window list, so it does not reach GroupRow independently, and
+			// GroupPanel.cpp cannot hide it from its GWM_CREATE handler (a
+			// USER window's id is assigned only after GWM_CREATE has been
+			// dispatched). Right here, after winCreateLayout() has fully
+			// returned, every window in the tree has its real id, so hiding
+			// the row (it starts collapsed) is race-free.
 			GameWindow *groupRow = TheWindowManager->winGetWindowFromId(nullptr,
 				TheNameKeyGenerator->nameToKey("GroupPanel.wnd:GroupRow"));
 			if (groupRow) {
 				groupRow->winHide(TRUE);
 			}
 
-			// GeneralsX @bugfix Android port 03/08/2026 Calibrate the
-			// panel-to-bar follow offset right here, before the real bar has
-			// ever run a show/hide slide animation -- see
-			// GroupPanelCalibrateFollowOffset's comment in GUICallbacks.h for
-			// why this specific moment (both windows are still at their
-			// authored resting positions) makes the offset correct forever,
-			// with no runtime recalibration ever needed again.
+			// Calibrate the panel-to-bar follow offset right here, before
+			// the real bar has ever run a show/hide slide animation -- see
+			// SelectPanelCalibrateFollowOffset / GroupPanel's identical
+			// rationale: at this moment both the panel and the real
+			// ControlBarParent are still at their authored resting
+			// positions, so the offset is correct forever. The merged group
+			// windows ride this same follow (SelectPanel.cpp translates
+			// them by the column's delta), so no separate group calibration
+			// exists anymore.
 			Int barX, barY;
 			m_contextParent[ CP_MASTER ]->winGetScreenPosition(&barX, &barY);
-			GroupPanelCalibrateFollowOffset(barX, barY);
+			SelectPanelCalibrateFollowOffset(barX, barY);
 		}
 
 		m_contextParent[ CP_PURCHASE_SCIENCE ] = TheWindowManager->winGetWindowFromId( nullptr, id );//m_scienceLayout->getFirstWindow();
@@ -1476,7 +1491,10 @@ void ControlBar::update()
 	if (TheGlobalData->m_headless)
 		return;
 
-	// GeneralsX @feature Android port 02/08/2026 Unit-group touch panel:
+	// GeneralsX @feature Android port 20/10/2026 Unit-category selection
+	// panel -- GeneralsX @feature Android port 21/10/2026 Round 6: this one
+	// layout now carries the whole merged panel (select column + the
+	// unit-group windows that used to be the separate GroupPanel layout):
 	// hide outside of real, already-started gameplay. TheGameLogic->getFrame()
 	// stays 0 through both the initial loading screen and the pre-match
 	// general-briefing/army-summary screen (map preview + player list before
@@ -1485,48 +1503,31 @@ void ControlBar::update()
 	// game mode there even though nothing is simulating yet. Same two-part
 	// check the Android-overlay version of this panel used (nativeIsGameplayActive()
 	// in SDL3GameEngine.cpp), just directly in C++ now -- no JNI round-trip needed.
-	if (m_groupPanelLayout) {
+	// The panel is meant to be an inseparable part of the real command
+	// bar/minimap strip, so rather than re-deriving visibility from bar
+	// stages it reads the real bar root's own WIN_STATUS_HIDDEN bit
+	// directly: hidden exactly when the bar is hidden, visible (and
+	// followed to wherever the bar currently is, any stage) whenever the
+	// bar is visible. runUpdate() below is also what drives the group
+	// panel's hold-gesture visuals now: the merged layout's LAYOUTUPDATE
+	// (SelectPanelUpdate) forwards to GroupPanelUpdate().
+	if (m_selectPanelLayout) {
 		Bool gameplayActive = !(TheShell && TheShell->isShellActive())
 			&& TheGameLogic && TheGameLogic->isInInteractiveGame() && TheGameLogic->getFrame() > 0;
 
-		// GeneralsX @bugfix Android port 03/08/2026 The group panel is meant
-		// to be an inseparable part of the real command bar/minimap strip --
-		// it should inherit *every* state that bar goes through, not just a
-		// gameplay-active gate. Rather than re-deriving that from
-		// m_currentControlBarStage (default/squished/low/hidden) or guessing
-		// at m_animateWindowManager's semantics (an earlier attempt at that
-		// left the panel permanently hidden -- it's evidently not reliably
-		// "empty" once the one-time slide-in finishes), just read the real
-		// bar root's own actual WIN_STATUS_HIDDEN bit directly: hidden
-		// exactly when it's hidden, visible (and followed to wherever it
-		// currently is on screen, any stage) whenever it's visible.
 		GameWindow *controlBarRoot = TheWindowManager->winGetWindowFromId(nullptr,
 			TheNameKeyGenerator->nameToKey("ControlBar.wnd:ControlBarParent"));
 		Bool barHidden = !controlBarRoot || controlBarRoot->winIsHidden();
-		Bool groupPanelVisible = gameplayActive && !barHidden;
-		m_groupPanelLayout->hide(!groupPanelVisible);
+		Bool selectPanelVisible = gameplayActive && !barHidden && m_selectPanelEnabled;
+		m_selectPanelLayout->hide(!selectPanelVisible);
 
 		if (controlBarRoot) {
-			// GeneralsX @bugfix Android port 03/08/2026 The offset is
-			// calibrated once, permanently, in init() (see
-			// GroupPanelCalibrateFollowOffset) -- so this just tracks the
-			// bar's live screen position every single frame, including
-			// every frame of its own slide-in/out animation, instead of
-			// waiting for that animation to settle first. That's what
-			// makes the panel actually slide in/out together with the bar
-			// rather than sitting static and "already in place" for the
-			// whole animation.
 			Int barX, barY;
 			controlBarRoot->winGetScreenPosition(&barX, &barY);
-			GroupPanelFollowControlBar(barX, barY, groupPanelVisible);
+			SelectPanelFollowControlBar(barX, barY, selectPanelVisible);
 		}
 
-		// GeneralsX @feature Android port 03/08/2026 hold-gesture (add/clear
-		// with radial clock-overlay feedback) needs GroupPanelUpdate() to
-		// actually run every frame -- runUpdate() was never being called
-		// for this layout at all, matching the m_buildToolTipLayout
-		// precedent just above, so the hold logic silently never fired.
-		m_groupPanelLayout->runUpdate();
+		m_selectPanelLayout->runUpdate();
 	}
 
 	getStarImage();

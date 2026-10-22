@@ -68,6 +68,7 @@ public class FolderPickerActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        UiKit.applyThemeOverlay(this);
         setTitle(R.string.folderpicker_title);
 
         File start = Environment.getExternalStorageDirectory();
@@ -79,7 +80,7 @@ public class FolderPickerActivity extends Activity {
         // M3 actions at the bottom where a thumb reaches them.
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(UiKit.color(this, R.color.gzh_background));
+        UiKit.applyPageBackground(root);
 
         UiKit.appBar(root, getString(R.string.setup_window_title),
             getString(R.string.folderpicker_title), 0, null, null);

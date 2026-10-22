@@ -1667,7 +1667,7 @@ heightmap.  As the view slides around, this determines what is the actually
 rendered portion of the terrain. Only a small section is rendered at any time.
 */
 //=============================================================================
-void HeightMapRenderObjClass::updateCenter(CameraClass *camera, const Vector3 *cameraPivot, RefRenderObjListIterator *pLightsIterator)
+void HeightMapRenderObjClass::updateCenter(CameraClass *camera, const Vector3 *cameraPivot, RefRenderObjListIterator *pLightsIterator, const Vector2 *drawCenter)
 {
 	if (m_map==nullptr) {
 		return;
@@ -1678,18 +1678,24 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, const Vector3 *c
 	if (m_vertexBufferTiles ==nullptr)
 		return;		//did not initialize resources yet.
 
-	BaseHeightMapRenderObjClass::updateCenter(camera, cameraPivot, pLightsIterator);
+	BaseHeightMapRenderObjClass::updateCenter(camera, cameraPivot, pLightsIterator, drawCenter);
 
 	if (m_x >= m_map->getXExtent() && m_y >= m_map->getYExtent())
   {
 		return; // no need to center.
 	}
 
-	const Real cameraPitch = asin(fabs(camera->Get_Forward_Dir().Z));
 	Int newOrgX;
 	Int newOrgY;
 
-	if (cameraPitch > ViewDefaultLowPitchRadians)
+	if (drawCenter)
+	{
+		// TheSuperHackers @performance sailro 06/09/2026 Reuse the footprint used for sizing instead of
+		// scanning the heightmap again or applying the low-pitch center approximation.
+		newOrgX = WWMath::Round(drawCenter->X/MAP_XY_FACTOR) - m_x/2 + m_map->getBorderSizeInline();
+		newOrgY = WWMath::Round(drawCenter->Y/MAP_XY_FACTOR) - m_y/2 + m_map->getBorderSizeInline();
+	}
+	else if (asin(fabs(camera->Get_Forward_Dir().Z)) > ViewDefaultLowPitchRadians)
 	{
 		// TheSuperHackers @info This is the original code to determine the center position for the visible terrain area.
 		// It is relatively expensive and breaks when the frustum planes can no longer intersect with the terrain at low camera
@@ -1854,6 +1860,11 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, const Vector3 *c
 			// It is much more efficient to update a couple of columns one frame, and then
 			// a couple of rows.  So if we aren't "jumping" to a new view, and have done X
 			// recently, return.
+			// GeneralsX @tweak Android port 21/10/2026 Round 6: upstream PR #2785 gated
+			// this stagger on !drawCenter, but this port supplies a drawCenter on every
+			// recenter, which disabled the stagger entirely and doubled the peak
+			// per-frame band-update work while panning. The stock stagger applies
+			// with a drawCenter too.
 			if (abs(deltaX) < BIG_JUMP && !m_doXNextTime) {
 				m_updating = false;
 				m_doXNextTime = true;
