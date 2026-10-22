@@ -53,6 +53,7 @@ on:
         options:
           - android-vulkan
           - android-vulkan-release
+          - android-vulkan-o3
         default: android-vulkan
       version_name:
         type: string
@@ -498,6 +499,7 @@ jobs:
           # GeneralsX @feature Android CI 20/10/2026 Package the 60 Hz
           # engine stashed by pass 1 as libmain60.so, next to libmain.so.
           GX_SECOND_GAME_LIB: ${{ github.workspace }}/build/libmain60.so
+          GX_BUILD_DIR: ${{ github.workspace }}/build/${{ env.PRESET }}
         run: |
           # GeneralsX @bugfix Android CI 20/10/2026 Invoke via bash explicitly:
           # this script's git mode is 100644 (a connector push stripped its
