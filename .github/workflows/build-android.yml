@@ -54,6 +54,7 @@ on:
           - android-vulkan
           - android-vulkan-release
           - android-vulkan-o3
+          - android-vulkan-o3-lto
         default: android-vulkan
       version_name:
         type: string
